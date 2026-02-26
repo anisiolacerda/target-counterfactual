@@ -146,3 +146,7 @@ logs/
 wandb/
 .env
 .autoenv
+
+# macOS
+.DS_Store
+**/.DS_Store
