@@ -1,0 +1,351 @@
+\documentclass[11pt,dvipsnames]{article}
+
+\usepackage[dvipsnames]{xcolor}
+
+\usepackage{bibentry}
+\nobibliography*
+
+%\usepackage[brazil]{babel}
+%\usepackage[latin1]{inputenc}
+\usepackage{inputenc}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{subfigure}
+\usepackage{a4wide}
+\usepackage{fancyhdr}
+\usepackage[Algoritmo]{algorithm}
+\usepackage{algorithmic}
+\usepackage{tikz}
+\usepackage{empheq}
+\usetikzlibrary{trees}
+\usepackage{multirow}
+\usepackage{subfigure}
+\usepackage{amssymb,amsmath}
+\usepackage{amsthm,amsfonts}
+\usepackage{float}
+
+
+\newcommand{\cmt}[1]{{\color{blue}{#1}}}
+
+\newcommand{\myref}[1]{\bold{#1}{#1}}
+
+\pagestyle{fancy}
+\lhead{Literature Review}
+\rhead{\thepage}
+%\addtolength{\headheight}{\baselineskip}
+\renewcommand{\headrulewidth}{0.1pt}
+\renewcommand{\footrulewidth}{0.1pt}
+\lfoot{NOME}
+\rfoot{DATE}
+\cfoot{}
+
+\sloppy
+
+\begin{document}
+% \floatname{algorithm}{Algoritmo}
+% \renewcommand{\algorithmicend}{\textbf{fim}}
+% \renewcommand{\algorithmicif}{\textbf{se}}
+% \renewcommand{\algorithmicthen}{\textbf{então}}
+% \renewcommand{\algorithmicelse}{\textbf{senão}}
+% \renewcommand{\algorithmicfor}{\textbf{para}}
+% \renewcommand{\algorithmicdo}{\textbf{faça}}
+% \renewcommand{\algorithmicwhile}{\textbf{enquanto}}
+\thispagestyle{empty}
+
+\begin{center}
+\begin{minipage}[l]{10cm}{
+\center
+Trabalho de Conclus\~{a}o de Curso \\
+}\end{minipage}
+ \vfill
+ \begin{minipage}[l]{11cm}{
+  \begin{center}
+  \Large{Literature Review}
+  \end{center}
+}\end{minipage}
+\end{center}
+ \vspace*{8cm}
+ \begin{center}
+ \begin{minipage}[l]{10cm}{
+ \center NOME\\
+ DATE\\
+ }
+ \end{minipage}
+ \end{center}
+%\newpage
+%\thispagestyle{empty}
+%\tableofcontents
+\newpage
+
+% -----
+
+\thispagestyle{empty}
+\tableofcontents
+\newpage
+
+\section{Instructions}
+
+
+
+\subsection{The Goals of Literature Review:}\cmt{
+
+\begin{itemize}
+    \item In the literature review phase, we search the academic literature to give our project context and develop its research gap.
+    \item It pursues interdependence by putting our project in the context of other researcher's work.
+\end{itemize}
+
+}
+
+\subsection{Reasons to cite literature:}\cmt{
+
+\begin{enumerate}
+    \item to motivate our work and explain its value,
+    \item to provide technical background information,
+    \item to compare our findings against other articles',
+    \item to communicate our project's scientific novelty by framing the research gap, and
+    \item to justify our experimental methods.
+\end{enumerate}
+
+\begin{itemize}
+    \item  The idea is that, whereas we read, we find gaps in scientific understanding.
+
+    \item These gaps represent missing knowledge, and we identify them by posing questions that the literature cannot answer.
+
+    \item These inquiries evolve into our project’s research question. 
+    
+    \item And by building our research question around these gaps and answering it via existing experimental methods, we feel confident that our project can likely solve that research question, produce scientific novelty, and intrigue the researchers in our field.
+\end{itemize}
+}
+
+\subsection{Don't Read; Skim} \cmt{
+\begin{itemize}
+    \item We won't fully read most articles, at least not from start to finish~\footnote{The exception to this skimming is when we read our \textit{anchor papers}, i.e. those directly related to ours. For instance, our baseline methods.}.
+    \item 
+\end{itemize}
+}
+
+\subsection{Take home}\cmt{
+
+\begin{itemize}
+    \item From a practical standpoint, literature review reduces our overall effort. 
+    
+    \begin{itemize}
+        \item It makes the writing process easier, 
+        \item Reduces research mistakes, and 
+        \item Helps us pursue a meaningful research question.
+    \end{itemize}
+    
+    \item \textbf{Your goal is to answer a specific question in a narrow niche of your broader research field.}
+\end{itemize}
+}
+
+
+
+
+\newpage
+
+
+% --
+\input{literature_review/texrefs/emptyanalysis}
+
+% --
+\input{literature_review/texrefs/khanacmsurveys21}
+
+% --
+\input{literature_review/texrefs/hantpami22}
+
+% --
+\input{literature_review/texrefs/matsoukasarxiv21}
+
+% --
+\input{literature_review/texrefs/atwany@ieeeaccess22}
+
+
+% --
+\input{literature_review/texrefs/band@neurips21}
+
+
+% --
+\input{literature_review/texrefs/park@iclr22}
+
+
+% --
+\input{literature_review/texrefs/naseer@neurips21}
+
+
+% --
+\input{literature_review/texrefs/wu@medical_physics21}
+
+
+% --
+\input{literature_review/texrefs/bai@neurips21}
+
+
+% --
+\input{literature_review/texrefs/yaojie@pmlr22}
+
+
+% --
+\input{literature_review/texrefs/lu@iclr21}
+
+
+% --
+\input{literature_review/texrefs/sun@neurips21}
+
+
+% --
+\input{literature_review/texrefs/lv@cvpr22}
+
+
+% --
+\input{literature_review/texrefs/park@neurips21}
+
+
+% --
+\input{literature_review/texrefs/hu@icml22}
+
+
+% --
+\input{literature_review/texrefs/liu@neurips21}
+
+
+% --
+\input{literature_review/texrefs/ghosal@arxiv22}
+
+
+% --
+\input{literature_review/texrefs/correa@icml22}
+
+
+% --
+\input{literature_review/texrefs/zhang@icml21}
+
+
+% --
+\input{literature_review/texrefs/ming@aaai22}
+
+
+% --
+\input{literature_review/texrefs/wiles@iclr22}
+
+
+% --
+\input{literature_review/texrefs/paul@aaai22}
+
+
+% --
+\input{literature_review/texrefs/morteza@aaai22}
+
+
+% --
+\input{literature_review/texrefs/pang@csur21}
+
+
+% --
+\input{literature_review/texrefs/ruff@ieee21}
+
+
+% --
+\input{literature_review/texrefs/pearl2022external}
+
+% --
+\input{literature_review/texrefs/atwany@ieeeaccess22}
+
+
+% --
+\input{literature_review/texrefs/band@neurips21}
+
+
+% --
+\input{literature_review/texrefs/park@iclr22}
+
+
+% --
+\input{literature_review/texrefs/naseer@neurips21}
+
+
+% --
+\input{literature_review/texrefs/wu@medical_physics21}
+
+
+% --
+\input{literature_review/texrefs/bai@neurips21}
+
+
+% --
+\input{literature_review/texrefs/yaojie@pmlr22}
+
+
+% --
+\input{literature_review/texrefs/lu@iclr21}
+
+
+% --
+\input{literature_review/texrefs/sun@neurips21}
+
+
+% --
+\input{literature_review/texrefs/lv@cvpr22}
+
+
+% --
+\input{literature_review/texrefs/park@neurips21}
+
+
+% --
+\input{literature_review/texrefs/hu@icml22}
+
+
+% --
+\input{literature_review/texrefs/liu@neurips21}
+
+
+% --
+\input{literature_review/texrefs/ghosal@arxiv22}
+
+
+% --
+\input{literature_review/texrefs/correa@icml22}
+
+
+% --
+\input{literature_review/texrefs/zhang@icml21}
+
+
+% --
+\input{literature_review/texrefs/ming@aaai22}
+
+
+% --
+\input{literature_review/texrefs/wiles@iclr22}
+
+
+% --
+\input{literature_review/texrefs/paul@aaai22}
+
+
+% --
+\input{literature_review/texrefs/morteza@aaai22}
+
+
+% --
+\input{literature_review/texrefs/pang@csur21}
+
+
+% --
+\input{literature_review/texrefs/ruff@ieee21}
+
+
+% --
+\input{literature_review/texrefs/pearl2022external}
+
+% END
+
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}
+
+
+
+

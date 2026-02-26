@@ -1,0 +1,267 @@
+\documentclass[11pt,dvipsnames]{article}
+
+\usepackage[dvipsnames]{xcolor}
+
+\usepackage{bibentry}
+\nobibliography*
+
+%\usepackage[brazil]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{subfigure}
+\usepackage{a4wide}
+\usepackage{fancyhdr}
+\usepackage[Algoritmo]{algorithm}
+\usepackage{algorithmic}
+\usepackage{tikz}
+\usepackage{empheq}
+\usetikzlibrary{trees}
+\usepackage{multirow}
+\usepackage{subfigure}
+\usepackage{amssymb,amsmath}
+\usepackage{amsthm,amsfonts}
+\usepackage{float}
+
+
+\newcommand{\cmt}[1]{{\color{blue}{#1}}}
+
+\pagestyle{fancy}
+\lhead{Literature Synopsis}
+\rhead{\thepage}
+%\addtolength{\headheight}{\baselineskip}
+\renewcommand{\headrulewidth}{0.1pt}
+\renewcommand{\footrulewidth}{0.1pt}
+\lfoot{NOME}
+\rfoot{DATE}
+\cfoot{}
+
+\sloppy
+
+\begin{document}
+% \floatname{algorithm}{Algoritmo}
+% \renewcommand{\algorithmicend}{\textbf{fim}}
+% \renewcommand{\algorithmicif}{\textbf{se}}
+% \renewcommand{\algorithmicthen}{\textbf{então}}
+% \renewcommand{\algorithmicelse}{\textbf{senão}}
+% \renewcommand{\algorithmicfor}{\textbf{para}}
+% \renewcommand{\algorithmicdo}{\textbf{faça}}
+% \renewcommand{\algorithmicwhile}{\textbf{enquanto}}
+\thispagestyle{empty}
+
+\begin{center}
+\begin{minipage}[l]{10cm}{
+\center
+Mestrado \\
+}\end{minipage}
+ \vfill
+ \begin{minipage}[l]{11cm}{
+  \begin{center}
+  \Large{Literature Synopsis}
+  \end{center}
+}\end{minipage}
+\end{center}
+ \vspace*{8cm}
+ \begin{center}
+ \begin{minipage}[l]{10cm}{
+ \center NOME\\
+ May, 2022\\
+ }
+ \end{minipage}
+ \end{center}
+%\newpage
+%\thispagestyle{empty}
+%\tableofcontents
+\newpage
+
+% -----
+
+\thispagestyle{empty}
+
+\tableofcontents
+
+
+\newpage
+
+% \begin{center}
+% \begin{minipage}[l]{8cm}{
+% {\huge Synopsis of the literature}
+% }\end{minipage}
+% \vspace{1cm}
+% \end{center}
+
+\section{Instructions}
+
+\subsection{The Goal of Literature Synopsis}\cmt{
+\begin{itemize}
+    \item The literature synopsis compiles the high points of your individual article notes,
+    \item You will synthesizes the summaries you create in \textit{Literature Review} to help identify research gaps and develop your research question,
+    \item We cannot identify a gap by reading a single publication: we must look across multiple articles,
+    \item The literature synopsis has two sections, as following. Hence, each time you take notes on an article, paste those two items into the literature synopsis.
+\end{itemize}
+}
+
+\subsubsection{Ledger}\cmt{
+
+For each article in your literature review, paste from your individual notes:
+
+\begin{itemize}
+    \item \textbf{Your} one-sentence version of article's research question
+    \item \textbf{Your} one-sentence summary of article's methods
+\end{itemize}
+
+}
+
+\subsubsection{Impressions}\cmt{
+
+\begin{itemize}
+    \item For each article in your literature review, paste the Impressions from your individual notes. Cite each Impression. As this synopsis grows, reorganize the notes by common themes.
+    \item This will help you notice questions, criticisms, or weaknesses that span multiple articles.
+\end{itemize}
+}
+
+\subsection{When to Move On}\cmt{
+\begin{itemize}
+    \item You can endlessly find more articles, note them, curate your literature synopsis, and never finish,
+    \item You are done with the literature review phase when:
+    \begin{itemize}
+        \item All of the questions in your literature synopsis have been answered, deleted, or confirmed as identifying a research gap. Hopefully you have a handful of these unanswered questions so you can start forming a research gap around the most promising ones,
+        \item You have identified some experimental methods for exploring your research gap. Your literature review yields some example experiments. You can use those experimental methods verbatim or add minor adjustments, and
+        \item You have found a handful of anchor articles. These publications give your work a foundation to build on. They support your project's reasonableness and feasibility. You'll want to find a few of them, at least.
+    \end{itemize}
+\end{itemize}
+}
+
+\subsection{Choose three significant weaknesses from your literature synopsis:}\cmt{
+\textit{These weaknesses might be experimental limitations, weak assumptions, narrow applications, caveats, omissions, etc.}
+\begin{itemize}
+    \item \textbf{Weakness1:}
+    \begin{itemize}
+        \item \textbf{Summarize the weakness:}
+        \item \textbf{Describe the research area, citing a few publications, where the weakness is most prevalent:}
+        \item \textbf{Point out how each of those publications exhibits that weakness:}
+    \end{itemize}
+    \item \textbf{Weakness2:}
+    \begin{itemize}
+        \item \textbf{Summarize the weakness:}
+        \item \textbf{Describe the research area, citing a few publications, where the weakness is most prevalent:}
+        \item \textbf{Point out how each of those publications exhibits that weakness:}
+    \end{itemize}
+    \item \textbf{Weakness3:}
+    \begin{itemize}
+        \item \textbf{Summarize the weakness:}
+        \item \textbf{Describe the research area, citing a few publications, where the weakness is most prevalent:}
+        \item \textbf{Point out how each of those publications exhibits that weakness:}
+    \end{itemize}
+\end{itemize}
+}
+
+\newpage
+
+% --
+\input{literature_synopsis/texrefs/khanacmsurverys22}
+
+% --
+\input{literature_synopsis/texrefs/hantpami22}
+
+% --
+\input{literature_synopsis/texrefs/matsoukasarxiv21}
+
+
+% --
+\input{literature_review/texrefs/atwany@ieeeaccess22}
+
+
+% --
+\input{literature_review/texrefs/band@neurips21}
+
+
+% --
+\input{literature_review/texrefs/park@iclr22}
+
+
+% --
+\input{literature_review/texrefs/naseer@neurips21}
+
+
+% --
+\input{literature_review/texrefs/wu@medical_physics21}
+
+
+% --
+\input{literature_review/texrefs/bai@neurips21}
+
+
+% --
+\input{literature_review/texrefs/yaojie@pmlr22}
+
+
+% --
+\input{literature_review/texrefs/lu@iclr21}
+
+
+% --
+\input{literature_review/texrefs/sun@neurips21}
+
+
+% --
+\input{literature_review/texrefs/lv@cvpr22}
+
+
+% --
+\input{literature_review/texrefs/park@neurips21}
+
+
+% --
+\input{literature_review/texrefs/hu@icml22}
+
+
+% --
+\input{literature_review/texrefs/liu@neurips21}
+
+
+% --
+\input{literature_review/texrefs/ghosal@arxiv22}
+
+
+% --
+\input{literature_review/texrefs/correa@icml22}
+
+
+% --
+\input{literature_review/texrefs/zhang@icml21}
+
+
+% --
+\input{literature_review/texrefs/ming@aaai22}
+
+
+% --
+\input{literature_review/texrefs/wiles@iclr22}
+
+
+% --
+\input{literature_review/texrefs/paul@aaai22}
+
+
+% --
+\input{literature_review/texrefs/morteza@aaai22}
+
+
+% --
+\input{literature_review/texrefs/pang@csur21}
+
+
+% --
+\input{literature_review/texrefs/ruff@ieee21}
+
+
+% --
+\input{literature_review/texrefs/pearl2022external}
+
+% END
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}
+
