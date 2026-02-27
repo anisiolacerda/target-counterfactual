@@ -143,8 +143,7 @@ class VAEModel(pl.LightningModule):
         dataloader = get_dataloader(CIPDataset(self.dataset_collection.val_f.data, self.config), batch_size=self.config['exp']['batch_size'], shuffle=False)
         # dataloader = get_dataloader(CIPDataset(self.dataset_collection.val_f.data, self.config), batch_size=1, shuffle=False)
         
-        device = "cuda"
-        # device = self.device
+        device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
 
         self.inference_model.to(device)
         self.generative_model.to(device)
@@ -251,7 +250,7 @@ class VAEModel(pl.LightningModule):
         dataloader = get_dataloader(CIPDataset(data, self.config), batch_size=batch_size, shuffle=False)
         # dataloader = get_dataloader(CIPDataset(self.dataset_collection.test_f.data, self.config), batch_size=batch_size, shuffle=False)
         
-        device = "cuda"
+        device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
 
         self.inference_model.to(device)
         self.generative_model.to(device)
@@ -390,7 +389,7 @@ class VAEModel(pl.LightningModule):
         output_after_actions = self.dataset_collection.val_f.simulate_output_after_actions(H_t, a_seq, self.dataset_collection.train_scaling_params)
         ture_output = Y_targets[:, -1, :].detach().cpu().numpy()
         loss = np.sqrt(((output_after_actions-ture_output) ** 2).mean())
-        loss = F.mse_loss(torch.tensor(output_after_actions, device=Y_targets.device), Y_targets[:, -1, :])
+        loss = F.mse_loss(torch.tensor(output_after_actions, device=Y_targets.device, dtype=Y_targets.dtype), Y_targets[:, -1, :])
         return loss, output_after_actions
 
     def calculate_elbo(self, H_t, Y_targets, a_seq, X_targets=None, num_samples=10, optimize_a=False):
@@ -475,7 +474,7 @@ class VAEModel(pl.LightningModule):
                 if s == self.tau - 1:
                     Y_after_actions = self.dataset_collection.val_f.simulate_output_after_actions(H_t, a_seq.detach(), self.dataset_collection.train_scaling_params)
                     Y_preds = self.generative_model.decode(Z_samples)
-                    Y_after_actions = torch.tensor(Y_after_actions, device=Y_preds.device)
+                    Y_after_actions = torch.tensor(Y_after_actions, device=Y_preds.device, dtype=Y_preds.dtype)
                     # mean over each num_samples
                     Y_preds = Y_preds.mean(dim=0)
                     # print(f"Y_after_actions shape: {Y_after_actions.shape}")
@@ -577,8 +576,8 @@ class VAEModel(pl.LightningModule):
             data = self.dataset_collection.test_f.data
         dataloader = get_dataloader(CIPDataset(data, self.config), 
                                 batch_size=1, shuffle=False)
-        device = "cuda"
-        
+        device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
+
         self.inference_model.to(device)
         self.generative_model.to(device)
         self.auxiliary_model.to(device)

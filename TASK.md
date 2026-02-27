@@ -10,9 +10,9 @@
 
 ## Step 2 — Replicate results
 
-- [ ] Set up `vcip` conda environment from `requirements_vcip.txt`
-- [ ] Set up `baseline` conda environment from `requirements_ct.txt`
-- [ ] Run smoke test: single gamma, single seed, VCIP only
+- [x] Set up `vcip` conda environment from `requirements_vcip.txt` (using `target-counterfactual-env`)
+- [x] Set up `baseline` conda environment from `requirements_ct.txt` (using `baseline-env`)
+- [x] Run smoke test: single gamma, single seed, VCIP only (2 epochs, gamma=4, seed=10, MPS device)
 - [ ] Replicate Table 1: long-range prediction, gamma=4, tau=1..12 (identical strategies)
 - [ ] Replicate Table 2: long-range prediction, gamma=4, tau=1..12 (distinct strategies)
 - [ ] Replicate Table 3: ablation study (with/without adjustment)
