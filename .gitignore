@@ -147,6 +147,10 @@ wandb/
 .env
 .autoenv
 
+# Experiment outputs
+my_outputs/
+**/my_outputs/
+
 # macOS
 .DS_Store
 **/.DS_Store
