@@ -2,7 +2,7 @@
 
 ## Step 1 — Understand the VCIP codebase
 
-- [ ] Map each paper result (Tables 1-3, Figures 3-6) to specific config + script combinations
+- [x] Map each paper result (Tables 1-3, Figures 3-6) to specific config + script combinations (see `context/EXPERIMENT_MAP.md`)
 - [ ] Document the causal model (Theorem 4.1, ELBO derivation, g-formula connection)
 - [ ] Document model architecture: generative model, inference model, auxiliary model, dynamic model
 - [ ] Document baseline implementations: RMSN, CRN, CT, G-Net, ACTIN
