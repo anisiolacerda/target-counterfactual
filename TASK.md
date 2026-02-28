@@ -20,6 +20,19 @@
 - [ ] Replicate Figure 6: target distances across gamma=1,2,3, tau=1..6
 - [ ] Compare replicated numbers against paper (document discrepancies)
 
+## Step 2b — MIMIC-III experiments (feature/mimic-iii-experiments branch)
+
+- [x] Create feature branch and documentation (data setup, experiment map)
+- [x] Fix ACTIN hparam filename mismatch (renamed to `diastolic_blood_pressure.yaml`)
+- [x] Update training scripts to use 5 seeds
+- [x] Create results analysis notebook (`results/mimic/analysis.ipynb`)
+- [ ] Obtain and preprocess MIMIC-III data (PhysioNet → `all_hourly_data.h5`)
+- [ ] Smoke test: VCIP on MIMIC, 5 epochs, single seed
+- [ ] Full VCIP run: 100 epochs, 5 seeds
+- [ ] Baseline runs: CRN, CT, RMSN, ACTIN (5 seeds each)
+- [ ] Run analysis notebook with real experiment outputs
+- [ ] Slice discovery: identify patient subgroups where VCIP underperforms
+
 ## Step 3 — Analyze weaknesses
 
 - [ ] Create analysis notebook: load and parse experiment results
