@@ -13,12 +13,12 @@
 - [x] Set up `vcip` conda environment from `requirements_vcip.txt` (using `target-counterfactual-env`)
 - [x] Set up `baseline` conda environment from `requirements_ct.txt` (using `baseline-env`)
 - [x] Run smoke test: single gamma, single seed, VCIP only (2 epochs, gamma=4, seed=10, MPS device)
-- [ ] Replicate Table 1: long-range prediction, gamma=4, tau=1..12 (identical strategies)
-- [ ] Replicate Table 2: long-range prediction, gamma=4, tau=1..12 (distinct strategies)
-- [ ] Replicate Table 3: ablation study (with/without adjustment)
-- [ ] Replicate Figure 4: GRP and RCS across models, gamma=4, tau=2,4,6,8
-- [ ] Replicate Figure 6: target distances across gamma=1,2,3, tau=1..6
-- [ ] Compare replicated numbers against paper (document discrepancies)
+- [x] Replicate Table 1: long-range prediction, gamma=4, tau=1..12 (identical strategies)
+- [ ] Replicate Table 2: long-range prediction, gamma=4, tau=1..12 (distinct strategies) — requires `exp.test=True`
+- [x] Replicate Table 3: ablation study (with/without adjustment) — partial: ablation only at gamma=4
+- [x] Replicate Figure 4: GRP and RCS across models, gamma=4, tau=2,4,6,8
+- [x] Replicate Figure 6: target distances across gamma=1,2,3, tau=1..6
+- [x] Compare replicated numbers against paper (see `results_remote/REPLICATION_REPORT.md`)
 
 ## Step 3 — Analyze weaknesses
 
