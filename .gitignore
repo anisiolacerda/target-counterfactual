@@ -154,3 +154,8 @@ my_outputs/
 # macOS
 .DS_Store
 **/.DS_Store
+results_remote/my_outputs/
+results_remote/results.tar.gz
+results_remote/all_results.tgz
+results_remote/r/
+commands.txt
