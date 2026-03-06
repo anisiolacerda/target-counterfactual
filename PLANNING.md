@@ -4,4 +4,5 @@ With this goal in mind, the overall steps, currently, are:
 
 - Step 1: Understand the VCIP's codebase located at lightning-hydra-template-main/src/vendor/VCIP.
 - Step 2: Using the above understanding of the VCIP's codebase, we will try to replicate the results from the paper. Here, we need to adapt the code to run each result presented at the VCIP paper (available at: literature_review/pdfs/VCIP.pdf).
+- Step 2b: ✓ **COMPLETE.** Replicated VCIP results on MIMIC-III real ICU data (feature/mimic-iii-experiments branch). All 5 models × 5 seeds trained on Vast.ai (~19.5 hours). All 3 paper claims verified (VCIP GRP: 0.876→0.992 across tau=2..8; baselines degrade). Analysis notebook: `VCIP/results/mimic/analysis.ipynb`. Remaining: slice discovery for patient subgroup analysis. See `context/MIMIC_DATA_SETUP.md` and `context/MIMIC_EXPERIMENT_MAP.md`.
 - Step 3: From the execution of the tests, we need to understand the weakeness of VCIP. Here, we need to develop a notebook python that will receive the execution results and analyse them with techniques such as, slice discovery or with simpler techniques.

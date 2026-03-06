@@ -1,9 +1,7 @@
 eval "$(conda shell.bash hook)"
 conda activate vcip
 gpu=${1:-0}
-seeds=(10 101 1010 10101 101010 20 202 2020 20202 202020)
 seeds=(10 101 1010 10101 101010)
-seeds=(10)
 
 for seed in "${seeds[@]}"
 do

@@ -81,4 +81,5 @@ exp:
   repeats: 5
   test: False
   rank: True
+  remove_aux: False
 
