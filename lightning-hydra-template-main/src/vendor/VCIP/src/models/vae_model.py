@@ -14,7 +14,7 @@ from src.utils.utils import set_seed
 from scipy.stats import spearmanr
 # from scipy.stats import spearmanr
 from scipy import stats
-from src.utils.helper_functions import generate_perturbed_sequences, compute_reach_avoid_score
+from src.utils.helper_functions import generate_perturbed_sequences
 import os
 import pickle
 
@@ -414,9 +414,6 @@ class VAEModel(pl.LightningModule):
         kl_losses = []
         reg_losses = []
         action_losses = []
-        disent_losses = []
-
-        lambda_disent = getattr(self.config.exp, 'lambda_disent', 0.0)
 
         Y_last = Y_targets[:, -1, :]
         reg_loss_2 = None
@@ -439,33 +436,8 @@ class VAEModel(pl.LightningModule):
                 # action_loss = self.generative_model.mmd_loss(Z_s_i, a_s_next)
                 action_losses.append(action_loss)
             
-            # Inference network — with optional VCI-inspired disentanglement
-            if lambda_disent > 0 and not optimize_a:
-                # Save LSTM state before inference call
-                saved_hidden = self.inference_model.hidden_state.clone() if self.inference_model.hidden_state is not None else None
-                saved_cell = self.inference_model.cell_state.clone() if self.inference_model.cell_state is not None else None
-
-                # Compute q under observed action
-                q_mu, q_logvar = self.inference_model(Z_s_inf, a_s_hidden, H_rep, Y_last)
-
-                # Restore LSTM state and compute q under alternative action
-                self.inference_model.hidden_state = saved_hidden
-                self.inference_model.cell_state = saved_cell
-                batch_size = a_s_hidden.size(0)
-                perm = torch.randperm(batch_size, device=a_s_hidden.device)
-                a_s_hidden_alt = a_seq_hiddens[perm, s, :]
-                q_mu_alt, q_logvar_alt = self.inference_model(Z_s_inf, a_s_hidden_alt, H_rep, Y_last)
-
-                # Compute disentanglement loss: DKL[q(Z|a_obs) || q(Z|a_alt)]
-                disent_loss = compute_kl_divergence(q_mu, q_logvar, q_mu_alt, q_logvar_alt)
-                disent_losses.append(disent_loss)
-
-                # Restore LSTM state and re-run with original action to get correct state
-                self.inference_model.hidden_state = saved_hidden
-                self.inference_model.cell_state = saved_cell
-                q_mu, q_logvar = self.inference_model(Z_s_inf, a_s_hidden, H_rep, Y_last)
-            else:
-                q_mu, q_logvar = self.inference_model(Z_s_inf, a_s_hidden, H_rep, Y_last)
+            # Inference network
+            q_mu, q_logvar = self.inference_model(Z_s_inf, a_s_hidden, H_rep, Y_last)
 
             # Generative network
             p_mu, p_logvar = self.generative_model(Z_s_i, a_s_hidden)
@@ -532,14 +504,10 @@ class VAEModel(pl.LightningModule):
         if optimize_a:
             reg_loss = reg_losses[-1]
         else:
-            terminal_loss = reg_losses[-1]
-            lambda_terminal = getattr(self.config.exp, 'lambda_terminal', 1.0)
-            lambda_intermediate = getattr(self.config.exp, 'lambda_intermediate', 0.0)
-            if len(reg_losses) > 1 and lambda_intermediate > 0:
-                intermediate_loss = torch.stack(reg_losses[:-1]).mean()
-                reg_loss = lambda_terminal * terminal_loss + lambda_intermediate * intermediate_loss
-            else:
-                reg_loss = terminal_loss
+            reg_loss = torch.stack(reg_losses).mean()
+            if self.config.exp.remove_aux:
+                reg_loss = reg_losses[-1]
+            reg_loss = reg_losses[-1]
 
         action_loss = torch.stack(action_losses).mean() if action_losses else 0
         
@@ -557,10 +525,6 @@ class VAEModel(pl.LightningModule):
                    action_loss * self.config.exp.lambda_step + \
                    predict_action_loss * self.config.exp.lambda_action + \
                    loss_hy * self.config.exp.lambda_hy
-            # VCI-inspired latent disentanglement regularizer (Wu et al., ICLR 2025)
-            if disent_losses and lambda_disent > 0:
-                disent_loss = torch.stack(disent_losses).mean()
-                elbo += disent_loss * lambda_disent
 
         return elbo, reg_loss, reg_loss_2
 
@@ -704,15 +668,6 @@ class VAEModel(pl.LightningModule):
         self.generative_model.eval()
         self.auxiliary_model.eval()
 
-        # Reach-avoid configuration (optional, backward compatible)
-        ra_config = getattr(self.config.exp, 'reach_avoid', None)
-        compute_ra = ra_config is not None
-        if compute_ra:
-            ra_target_upper = ra_config.target_upper
-            ra_safety_volume_upper = ra_config.safety_volume_upper
-            ra_safety_chemo_upper = getattr(ra_config, 'safety_chemo_upper', None)
-            ra_kappa = getattr(ra_config, 'kappa', 10.0)
-
         all_ranks = []
         all_correlation = []
         case_infos = []
@@ -734,8 +689,6 @@ class VAEModel(pl.LightningModule):
 
             elbos = []
             true_losses = []
-            ra_scores_list = []
-            true_ra_scores_list = []
             with torch.no_grad():
                 for seq in all_sequences:
                     # Compute ELBO
@@ -744,24 +697,8 @@ class VAEModel(pl.LightningModule):
                                                 optimize_a=True)
                     elbos.append(elbo.item())
 
-                    if compute_ra:
-                        # Get full trajectory for RA scoring
-                        sim_result = self.dataset_collection.val_f.simulate_output_after_actions(
-                            H_t, seq, self.dataset_collection.train_scaling_params,
-                            return_trajectory=True)
-                        output_after_actions = sim_result['scaled_output']
-                        # Compute ground-truth RA score on unscaled trajectory
-                        ra_score, ra_details = compute_reach_avoid_score(
-                            sim_result['cancer_volume_trajectory'],
-                            sim_result['chemo_dosage_trajectory'],
-                            target_upper=ra_target_upper,
-                            safety_volume_upper=ra_safety_volume_upper,
-                            safety_chemo_upper=ra_safety_chemo_upper,
-                            kappa=ra_kappa)
-                        true_ra_scores_list.append(ra_score[0])  # single patient
-                    else:
-                        output_after_actions = self.dataset_collection.val_f.simulate_output_after_actions(
-                            H_t, seq, self.dataset_collection.train_scaling_params)
+                    output_after_actions = self.dataset_collection.val_f.simulate_output_after_actions(
+                        H_t, seq, self.dataset_collection.train_scaling_params)
 
                     true_output = targets['outputs'][:, -1, :].detach().cpu().numpy()
                     true_loss = np.sqrt(((output_after_actions - true_output) ** 2).mean())
@@ -784,28 +721,6 @@ class VAEModel(pl.LightningModule):
                 'all_sequences': all_sequences.cpu().numpy(),  # (k, 1, tau, a_dim)
             }
 
-            # Add RA scoring results if computed
-            if compute_ra:
-                true_ra_scores = np.array(true_ra_scores_list)
-                case_info['true_ra_scores'] = true_ra_scores
-                # RA ranking: higher RA score = better (closer to 0 from below)
-                # ELBO ranking: lower ELBO = better
-                # For true_ra_scores, rank by descending (higher is better)
-                ra_rank_true = np.sum(true_ra_scores > true_ra_scores[-1]) + 1
-                case_info['true_sequence_ra_rank'] = ra_rank_true
-                # Correlation between ELBO and ground-truth RA score
-                corr_elbo_ra, _ = spearmanr(model_losses, true_ra_scores)
-                case_info['correlations']['elbo_ra'] = corr_elbo_ra
-                # Correlation between true distance loss and ground-truth RA score
-                corr_dist_ra, _ = spearmanr(true_losses, true_ra_scores)
-                case_info['correlations']['dist_ra'] = corr_dist_ra
-                # RA diagnostic: fraction of sequences with non-trivial scores
-                case_info['ra_diagnostics'] = {
-                    'nonzero_frac': float((true_ra_scores > -60).mean()),  # log(1e-26) ≈ -60
-                    'score_range': (float(true_ra_scores.min()), float(true_ra_scores.max())),
-                    'unique_scores': int(len(np.unique(np.round(true_ra_scores, 2)))),
-                }
-
             case_infos.append(case_info)
 
             elbos = np.array(elbos)
@@ -818,8 +733,6 @@ class VAEModel(pl.LightningModule):
             all_ranks.append(true_seq_rank)
 
             print(f"Individual {i} - True sequence rank: {true_seq_rank} out of {k}")
-            if compute_ra:
-                print(f"  RA rank (ground truth): {case_info['true_sequence_ra_rank']} out of {k}")
             print(f"ELBO for true sequence: {elbos[-1]}")
             print(f"True Loss for true sequence: {true_losses[-1]}")
             print(f"Rank correlation for this individual: {correlation:.3f} (p-value: {p_value:.3f})")
