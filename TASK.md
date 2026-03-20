@@ -70,7 +70,7 @@
 - [x] Confounding sensitivity: VCIP advantage grows with gamma (GRP drop: -0.248 at tau=2, -0.163 at tau=8); CRN most affected (-0.362 at tau=8); CT nearly unaffected
 - [x] Horizon sensitivity: VCIP rank stability improves with tau (std: 7.0→0.8); slice discovery confirms advantage grows
 - [x] Calibration analysis: Cancer ELBO-True Spearman rho=0.75-0.90 (5 seeds); Top-1 agreement 19% at tau=2, rising to 76% at tau=8
-- [ ] Extended ablation: latent dimension, LSTM capacity, training schedule sensitivity (requires compute)
+- [ ] Extended ablation: latent dimension, LSTM capacity, training schedule sensitivity — **running in parallel with Step 4 Phase 0-1** (6 runs on Vast.ai, ~$3-5). Results reviewed at Phase 1 decision gate. See PLANNING.md for configurations.
 - [x] Summarize identified weaknesses as candidate research directions (6 weaknesses, 4 research directions)
 
 ### Key Weakness Findings
@@ -90,15 +90,81 @@
 3. Off-policy evaluation for real-world validation (W6)
 4. Treatment-interaction-aware generative models (W5)
 
-## Step 4 — Targeted improvement (contingent on Step 3 findings)
+## Step 4 — Reach-Avoid Counterfactual Intervention Planning
 
-- [ ] Formalize the identified weakness theoretically
-- [ ] Propose and implement improvement method
-- [ ] Run comparative experiments
-- [ ] Write NeurIPS paper
+**Direction chosen (2026-03-15):** Focused reach-avoid formulation (set targets + safety constraints), with T2 theory proving RA ranking is more robust to variational bound-gap variation than point-target ELBO ranking. See `PLANNING.md` for full rationale and `ideas/IDEA1.md` for the broader R²-VCIP sketch (confounding robustness deferred to future work).
+
+### Phase 0 — Infrastructure (no retraining)
+- [x] 0.1 Modify `simulate_output_after_actions()` to return full trajectory + dosages
+- [x] 0.2 Implement `compute_reach_avoid_score()` with sigmoid soft indicators
+- [x] 0.3 Extend `optimize_interventions_discrete_onetime()` with RA scoring path
+- [x] 0.4 Calibrate T and S thresholds from data distributions
+
+### Phase 1 — Zero-retraining experiments (~$5)
+- [ ] E1 Ranking comparison: RA vs ELBO Top-1 agreement on Cancer ground truth
+- [ ] E2 Margin analysis: pairwise margin distributions (validates T2 theorem)
+- [ ] E3 Ranking stability: cross-seed RA vs ELBO stability on MIMIC
+- [ ] E4 VCI-style counterfactual consistency diagnostic on existing models (Cancer + MIMIC) — compute DKL[q(Z|a_obs) || q(Z|a_alt)] as model-intrinsic CF reliability score (addresses RC3/W6)
+- [ ] **Decision gate:** If RA scoring does not improve Top-1, reassess before Phase 2
+
+### Phase 2 — RA-aware retraining (Cancer, ~$15-20)
+- [ ] 2.1 Fix `vae_model.py:511` — weighted intermediate + terminal loss (λ_terminal=1.0, λ_intermediate=0.5)
+- [ ] 2.2 Add calibration regularizer for P̂(Y_s ∈ S)
+- [ ] 2.3 Retrain: 5 seeds × gamma={1,4} = 10 runs
+- [ ] 2.4 Compare RA-retrained vs vanilla VCIP
+- [ ] 2.5 VCI-inspired latent disentanglement regularizer: DKL[q(Z_s|a_obs) || q(Z_s|a_alt)] penalty (Wu et al., ICLR 2025)
+
+### Phase 3 — Gradient-based RA planning (~$10-15)
+- [ ] 3.1 Implement `optimize_reach_avoid()` (gradient optimization of J_RA)
+- [ ] 3.2 Compare gradient RA planning vs perturbation-based ranking
+
+### Phase 4 — Full experimental matrix (~$50-60)
+- [ ] Cancer: vanilla baseline (existing) + RA scoring + RA-retrained + gradient planning
+- [ ] MIMIC: vanilla baseline (existing) + RA scoring + RA-retrained
+
+### Phase 5 — Ablations
+- [ ] 5.1 Target set size sensitivity
+- [ ] 5.2 Sigmoid hardness κ: {1, 5, 10, 50, 100}
+- [ ] 5.3 Reach-only vs reach-avoid
+- [ ] 5.4 Intermediate loss weight ratio
+- [ ] 5.5 Model-agnostic: RA scoring on ACTIN, CRN, CT, RMSN
+- [ ] 5.6 **Midpoint-baseline** (RC1): VCIP with Y_target = midpoint(T) vs RA scoring — must demonstrate RA is strictly better
+- [ ] 5.7 **ε_VI estimation** (RC2): compute TV distance proxy on Cancer data, verify T2 bound is non-vacuous
+- [ ] 5.8 **Latent disentanglement** (VCI-inspired): with/without DKL regularizer, varying λ_disent ∈ {0.01, 0.1, 0.5}
+- [ ] 5.9 **CF consistency diagnostic validation**: correlate latent divergence with ground-truth CF prediction error on Cancer
+
+### Reviewer-Driven Experiments (from VCIP OpenReview analysis)
+- [ ] RC3: Document real-data evaluation limitations explicitly in paper (MIMIC has no ground-truth counterfactuals)
+- [ ] RC4: Present gamma={1,2,3,4} sweep as sensitivity analysis; show RA scoring robustness across gamma levels
+- [ ] RC6: Report intermediate prediction quality Y_s at each step s on Cancer (model vs simulator ground truth)
+- [ ] RC7: Create Figure 1 (visual reach-avoid concept: trajectory entering T while staying in S)
+
+### Paper Writing
+- [ ] Formalize T2 theorem (ranking robustness proof)
+- [ ] Write Introduction — cite VCIP Reviewer ixW5's range-target concern + author acknowledgment as direct motivation
+- [ ] Write Section 3 (ELBO ranking failure motivation)
+- [ ] Write Method section (J_RA, soft indicators, RA-aware training) with intuitive interpretation before formal definition
+- [ ] Write Theory section (T2 theorem + corollary + "what it means" paragraph + empirical ε_VI verification)
+- [ ] Write Experiments section (include midpoint-baseline, intermediate quality, sensitivity analysis)
+- [ ] Write Discussion + Conclusion (explicit limitations: T/S specification, real-data evaluation, assumptions)
 
 ---
 
 ## Discovered During Work
 
-_(Add new sub-tasks or TODOs discovered during development here.)_
+### From VCIP OpenReview Analysis (2026-03-15)
+
+- VCIP was accepted as ICML 2025 poster (not NeurIPS as originally assumed). Venue: `ICML.cc/2025/Conference`.
+- The range-target limitation was explicitly identified by Reviewer ixW5 and acknowledged by VCIP authors in their rebuttal as future work. This is our strongest motivation — cite directly.
+- Reviewer g91d (initially weak reject) was most critical of theoretical rigor. Our T2 theorem must survive similar scrutiny — the bound must be empirically non-vacuous.
+- The midpoint-baseline is the most dangerous simple objection. Must be addressed as a core ablation, not an afterthought.
+- VCIP's ELBO ranking inconsistency (W1) was NOT raised by any ICML reviewer — the community may not find this as compelling on its own. It works best as supporting motivation for RA scoring, not as a standalone contribution.
+
+### From VCI Paper Analysis (Wu et al., ICLR 2025) (2026-03-15)
+
+- VCI derives ELBO for individual-level counterfactual likelihood p(Y'|Y,X,T,T') — fundamentally different from CVAE's p(Y|X,T). Static setting, high-dim outcomes (genes, images).
+- **Key transferable principle**: DKL[q(z|y,t,x) || q(z|y',t',x)] → 0 provably disentangles Z from T (Lemma 1, Propositions 1-2). Adapted as latent disentanglement regularizer for VCIP (Idea A, ablation 5.8).
+- **Counterfactual consistency diagnostic**: The latent divergence can serve as a model-intrinsic metric for CF prediction reliability — crucial for MIMIC evaluation where ground-truth CFs are unavailable (Idea C, experiment E4).
+- **Intermediate supervision**: VCI's log[p̂(y'|x,t')] term motivates principled intermediate prediction supervision beyond simple loss weight increase (Idea B, task 2.1).
+- VCI is ICLR 2025, not a direct competitor — different setting (static vs. longitudinal). Cite in Related Work as sharing the principle of counterfactual-aware variational inference.
+- Full analysis: `.claude/plans/binary-wishing-whisper.md`

@@ -818,17 +818,27 @@ def get_scaling_params(sim):
     return pd.Series(means), pd.Series(stds)
 
 
-def simulate_output_after_actions(Ht, actions, scaling_params):
+def simulate_output_after_actions(Ht, actions, scaling_params, return_trajectory=False):
     """
     Simulate counterfactual trajectories given historical data and one intervention sequence
-    
+
     Args:
         Ht: Dictionary containing historical data
         actions: Single intervention sequence of shape (projection_horizon, 2)
-        projection_horizon: Number of steps to project into future
-    
+        scaling_params: Tuple of (mean, std) for output normalization
+        return_trajectory: If True, return full projected trajectory and dosages
+            alongside the scaled final output
+
     Returns:
-        Dictionary containing simulated trajectories
+        If return_trajectory=False: scaled final cancer volume, shape (num_patients, 1)
+        If return_trajectory=True: dict with keys:
+            'scaled_output': scaled final cancer volume, shape (num_patients, 1)
+            'cancer_volume_trajectory': unscaled cancer volume at each projected step,
+                shape (num_patients, projection_horizon + 1)  — from current_t to current_t + projection_horizon
+            'chemo_dosage_trajectory': cumulative chemo dosage at each projected step,
+                shape (num_patients, projection_horizon)
+            'radio_dosage_trajectory': radio dosage at each projected step,
+                shape (num_patients, projection_horizon)
     """
     # Extract historical information
     projection_horizon = actions.shape[1]
@@ -848,12 +858,17 @@ def simulate_output_after_actions(Ht, actions, scaling_params):
     
     num_patients = len(factual_cancer_volume)
     current_t = factual_cancer_volume.shape[1]
-    
+
     # Initialize output arrays
     cancer_volume = np.zeros((num_patients, current_t + projection_horizon + 1))
     chemo_application = np.zeros((num_patients, current_t + projection_horizon))
     radio_application = np.zeros((num_patients, current_t + projection_horizon))
     sequence_lengths = np.zeros(num_patients)
+
+    # Trajectory arrays for reach-avoid scoring
+    if return_trajectory:
+        all_chemo_dosage = np.zeros((num_patients, current_t + projection_horizon))
+        all_radio_dosage = np.zeros((num_patients, current_t + projection_horizon))
     
     drug_half_life = 1  # one day half life for drugs
     noise = 0.01 * np.random.randn(num_patients, current_t + projection_horizon + 1)
@@ -924,13 +939,23 @@ def simulate_output_after_actions(Ht, actions, scaling_params):
             chemo_application[i] = cf_chemo_application
             radio_application[i] = cf_radio_application
             sequence_lengths[i] = current_t + projection_horizon + 1
+            if return_trajectory:
+                all_chemo_dosage[i] = cf_chemo_dosage
+                all_radio_dosage[i] = cf_radio_dosage
     
-    # print(f'cancer_volume: {cancer_volume}')
-    outputs = cancer_volume[:, -1].reshape(-1, 1) # only return the final time step
+    outputs = cancer_volume[:, -1].reshape(-1, 1)  # final time step
     mean, std = scaling_params
     outputs = (outputs - mean['cancer_volume']) / std['cancer_volume']
-    # print(f'outputs: {outputs}')
-    
+
+    if return_trajectory:
+        # Extract only the projected portion (from current_t onward)
+        return {
+            'scaled_output': outputs,
+            'cancer_volume_trajectory': cancer_volume[:, current_t:],  # shape (N, tau+1)
+            'chemo_dosage_trajectory': all_chemo_dosage[:, current_t:],  # shape (N, tau)
+            'radio_dosage_trajectory': all_radio_dosage[:, current_t:],  # shape (N, tau)
+        }
+
     return outputs
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

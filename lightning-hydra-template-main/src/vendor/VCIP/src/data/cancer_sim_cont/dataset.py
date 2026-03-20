@@ -90,8 +90,9 @@ class SyntheticCancerDataset(Dataset):
     def get_scaling_params(self):
         return get_scaling_params(self.data)
 
-    def simulate_output_after_actions(self, Ht, actions, scaling_params):
-        return simulate_output_after_actions(Ht, actions, scaling_params)
+    def simulate_output_after_actions(self, Ht, actions, scaling_params, return_trajectory=False):
+        return simulate_output_after_actions(Ht, actions, scaling_params,
+                                             return_trajectory=return_trajectory)
 
     def process_data(self, scaling_params):
         """

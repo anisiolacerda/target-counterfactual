@@ -13,10 +13,23 @@ With this goal in mind, the overall steps, currently, are:
 
 ```
 ├── lightning-hydra-template-main                   <- Project source code
+│   └── src/vendor/VCIP                             <- VCIP codebase (models, configs, scripts)
 ├── literature_review                   <- Detailed analysis of related work
 ├── literature_synopsis                 <- Summary of the detailed analysis of related work
 ├── project_outline                     <- Latex source for the article
+├── context/                            <- Execution plans and documentation
+├── ideas/                              <- Research direction sketches
+├── results_remote/                     <- Downloaded experiment results from Vast.ai
 ```
+
+## Remote Execution (Vast.ai)
+
+- **Current instance:** `ssh -p 20525 root@70.69.192.6` (2x RTX 3090, venv at `/root/vcip_env`)
+- **Previous instance (MIMIC):** `ssh -p 63498 root@142.112.39.215` (expired)
+- **Remote code path:** `/root/VCIP/` (code + checkpoints, no `my_outputs` or `results` from local)
+- **Hydra config note:** `reach_avoid.*` params require `+` prefix (e.g., `+exp.reach_avoid.target_upper=65.45`) since they are not in the base YAML config.
+- **Python env:** Python 3.12, PyTorch 2.6.0+cu124 (NOT the pinned 2.0.1 — works fine for eval), venv instead of conda.
+- **Execution plans:** See `context/PHASE1_VASTAI_EXECUTION_PLAN.md` and `context/MIMIC_VASTAI_EXECUTION_PLAN.md`.
 
 ## System Identity
 

@@ -14,7 +14,7 @@ from src.utils.utils import set_seed
 from scipy.stats import spearmanr
 # from scipy.stats import spearmanr
 from scipy import stats
-from src.utils.helper_functions import generate_perturbed_sequences
+from src.utils.helper_functions import generate_perturbed_sequences, compute_reach_avoid_score
 import os
 import pickle
 
@@ -414,7 +414,10 @@ class VAEModel(pl.LightningModule):
         kl_losses = []
         reg_losses = []
         action_losses = []
-        
+        disent_losses = []
+
+        lambda_disent = getattr(self.config.exp, 'lambda_disent', 0.0)
+
         Y_last = Y_targets[:, -1, :]
         reg_loss_2 = None
         
@@ -436,9 +439,34 @@ class VAEModel(pl.LightningModule):
                 # action_loss = self.generative_model.mmd_loss(Z_s_i, a_s_next)
                 action_losses.append(action_loss)
             
-            # Inference network
-            q_mu, q_logvar = self.inference_model(Z_s_inf, a_s_hidden, H_rep, Y_last)
-            
+            # Inference network — with optional VCI-inspired disentanglement
+            if lambda_disent > 0 and not optimize_a:
+                # Save LSTM state before inference call
+                saved_hidden = self.inference_model.hidden_state.clone() if self.inference_model.hidden_state is not None else None
+                saved_cell = self.inference_model.cell_state.clone() if self.inference_model.cell_state is not None else None
+
+                # Compute q under observed action
+                q_mu, q_logvar = self.inference_model(Z_s_inf, a_s_hidden, H_rep, Y_last)
+
+                # Restore LSTM state and compute q under alternative action
+                self.inference_model.hidden_state = saved_hidden
+                self.inference_model.cell_state = saved_cell
+                batch_size = a_s_hidden.size(0)
+                perm = torch.randperm(batch_size, device=a_s_hidden.device)
+                a_s_hidden_alt = a_seq_hiddens[perm, s, :]
+                q_mu_alt, q_logvar_alt = self.inference_model(Z_s_inf, a_s_hidden_alt, H_rep, Y_last)
+
+                # Compute disentanglement loss: DKL[q(Z|a_obs) || q(Z|a_alt)]
+                disent_loss = compute_kl_divergence(q_mu, q_logvar, q_mu_alt, q_logvar_alt)
+                disent_losses.append(disent_loss)
+
+                # Restore LSTM state and re-run with original action to get correct state
+                self.inference_model.hidden_state = saved_hidden
+                self.inference_model.cell_state = saved_cell
+                q_mu, q_logvar = self.inference_model(Z_s_inf, a_s_hidden, H_rep, Y_last)
+            else:
+                q_mu, q_logvar = self.inference_model(Z_s_inf, a_s_hidden, H_rep, Y_last)
+
             # Generative network
             p_mu, p_logvar = self.generative_model(Z_s_i, a_s_hidden)
             
@@ -503,12 +531,15 @@ class VAEModel(pl.LightningModule):
         kl_loss = torch.stack(kl_losses).mean()
         if optimize_a:
             reg_loss = reg_losses[-1]
-            # reg_loss = torch.stack(reg_losses).mean()
         else:
-            reg_loss = torch.stack(reg_losses).mean()
-            if self.config.exp.remove_aux:
-                reg_loss = reg_losses[-1]
-            reg_loss = reg_losses[-1]
+            terminal_loss = reg_losses[-1]
+            lambda_terminal = getattr(self.config.exp, 'lambda_terminal', 1.0)
+            lambda_intermediate = getattr(self.config.exp, 'lambda_intermediate', 0.0)
+            if len(reg_losses) > 1 and lambda_intermediate > 0:
+                intermediate_loss = torch.stack(reg_losses[:-1]).mean()
+                reg_loss = lambda_terminal * terminal_loss + lambda_intermediate * intermediate_loss
+            else:
+                reg_loss = terminal_loss
 
         action_loss = torch.stack(action_losses).mean() if action_losses else 0
         
@@ -525,9 +556,12 @@ class VAEModel(pl.LightningModule):
                    kl_loss * self.config.exp.lambda_kl + \
                    action_loss * self.config.exp.lambda_step + \
                    predict_action_loss * self.config.exp.lambda_action + \
-                   loss_hy * self.config.exp.lambda_hy 
-            # elbo = reg_loss + kl_loss
-        
+                   loss_hy * self.config.exp.lambda_hy
+            # VCI-inspired latent disentanglement regularizer (Wu et al., ICLR 2025)
+            if disent_losses and lambda_disent > 0:
+                disent_loss = torch.stack(disent_losses).mean()
+                elbo += disent_loss * lambda_disent
+
         return elbo, reg_loss, reg_loss_2
 
     def print_topk_diff(self, a, b, k=5):
@@ -537,6 +571,90 @@ class VAEModel(pl.LightningModule):
         # print(f"Top 5 differences: {topk.values}")
         # print(f"Indices: {topk.indices}")
         return topk
+
+    def compute_counterfactual_consistency(self, H_t, Y_targets, a_seq_observed,
+                                             a_seq_alternatives, num_samples=10):
+        """Compute VCI-style latent divergence diagnostic (Wu et al., ICLR 2025).
+
+        For each timestep s, measures DKL[q(Z_s | a_obs) || q(Z_s | a_alt)] to assess
+        how much the latent representation depends on the treatment sequence. Low divergence
+        indicates Z_s captures patient-specific features rather than treatment information,
+        suggesting more reliable counterfactual predictions.
+
+        Args:
+            H_t: Patient history dict (same format as calculate_elbo input).
+            Y_targets: Target outcomes (batch_size, tau, output_dim).
+            a_seq_observed: Observed action sequence (batch_size, tau, treatment_dim).
+            a_seq_alternatives: List of alternative action sequences, each (batch_size, tau, treatment_dim).
+            num_samples: Number of MC samples for reparameterization.
+
+        Returns:
+            dict with keys:
+                'mean_kl': Scalar mean KL divergence across timesteps and alternatives.
+                'per_step_kl': List of KL values per timestep (averaged over alternatives).
+                'per_alt_kl': List of KL values per alternative (averaged over timesteps).
+        """
+        self.eval()
+        with torch.no_grad():
+            # Forward pass under observed actions
+            H_rep = self.auxiliary_model.build_representations(H_t, only_last=True)
+            Z_s_i_obs, _ = self.inference_model.init_hidden_history(H_t)
+            self.inference_model.reset_states()
+            self.generative_model.reset_states()
+
+            a_seq_hiddens_obs = self.generative_model.build_reverse_action_encoding(a_seq_observed)
+            Y_last = Y_targets[:, -1, :]
+
+            # Collect q distributions under observed actions
+            obs_q_mus = []
+            obs_q_logvars = []
+            Z_s_i = Z_s_i_obs.clone()
+
+            for s in range(self.tau):
+                a_s_hidden = a_seq_hiddens_obs[:, s, :]
+                Z_s_inf = torch.cat([Z_s_i, Z_s_i], dim=-1)
+                q_mu, q_logvar = self.inference_model(Z_s_inf, a_s_hidden, H_rep, Y_last)
+                obs_q_mus.append(q_mu.clone())
+                obs_q_logvars.append(q_logvar.clone())
+                Z_samples = self.inference_model.reparameterize_multiple(q_mu, q_logvar, num_samples)
+                Z_s_i = Z_samples.mean(dim=0)
+
+            # For each alternative action sequence, compute q distributions and KL
+            all_kls = []  # shape will be (num_alternatives, tau)
+            for a_seq_alt in a_seq_alternatives:
+                self.inference_model.reset_states()
+                self.generative_model.reset_states()
+
+                a_seq_hiddens_alt = self.generative_model.build_reverse_action_encoding(a_seq_alt)
+                Z_s_i = Z_s_i_obs.clone()
+                alt_kls = []
+
+                for s in range(self.tau):
+                    a_s_hidden_alt = a_seq_hiddens_alt[:, s, :]
+                    Z_s_inf = torch.cat([Z_s_i, Z_s_i], dim=-1)
+                    q_mu_alt, q_logvar_alt = self.inference_model(
+                        Z_s_inf, a_s_hidden_alt, H_rep, Y_last
+                    )
+                    # KL between observed and alternative posteriors
+                    kl = compute_kl_divergence(
+                        obs_q_mus[s], obs_q_logvars[s],
+                        q_mu_alt, q_logvar_alt
+                    )
+                    alt_kls.append(kl.item())
+                    # Advance state using alternative actions
+                    Z_samples = self.inference_model.reparameterize_multiple(
+                        q_mu_alt, q_logvar_alt, num_samples
+                    )
+                    Z_s_i = Z_samples.mean(dim=0)
+
+                all_kls.append(alt_kls)
+
+        all_kls = np.array(all_kls)  # (num_alternatives, tau)
+        return {
+            'mean_kl': float(all_kls.mean()),
+            'per_step_kl': all_kls.mean(axis=0).tolist(),  # (tau,)
+            'per_alt_kl': all_kls.mean(axis=1).tolist(),    # (num_alternatives,)
+        }
 
     def optimize_interventions_discrete(self):
         results = {}
@@ -574,7 +692,7 @@ class VAEModel(pl.LightningModule):
             data = self.dataset_collection.val_f.data
         else:
             data = self.dataset_collection.test_f.data
-        dataloader = get_dataloader(CIPDataset(data, self.config), 
+        dataloader = get_dataloader(CIPDataset(data, self.config),
                                 batch_size=1, shuffle=False)
         device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
 
@@ -585,11 +703,20 @@ class VAEModel(pl.LightningModule):
         self.inference_model.eval()
         self.generative_model.eval()
         self.auxiliary_model.eval()
-        
+
+        # Reach-avoid configuration (optional, backward compatible)
+        ra_config = getattr(self.config.exp, 'reach_avoid', None)
+        compute_ra = ra_config is not None
+        if compute_ra:
+            ra_target_upper = ra_config.target_upper
+            ra_safety_volume_upper = ra_config.safety_volume_upper
+            ra_safety_chemo_upper = getattr(ra_config, 'safety_chemo_upper', None)
+            ra_kappa = getattr(ra_config, 'kappa', 10.0)
+
         all_ranks = []
-        all_correlation = []  # 存储每个个体的排序相关性
+        all_correlation = []
         case_infos = []
-        
+
         for (i, batch) in enumerate(dataloader):
             if i > 99:
                 break
@@ -602,30 +729,40 @@ class VAEModel(pl.LightningModule):
             Y_targets = targets['outputs']
             X_targets = None if not self.predict_X else targets['vitals']
             true_actions = targets['current_treatments']
-            
-            
-            # random_sequences = torch.rand(k-1, 1, self.tau, self.a_dim, device=device)
-            # random_sequences = torch.sigmoid(random_sequences)
-            # if self.config.dataset.treatment_mode == 'multilabel':
-            #     random_sequences = (torch.rand(k-1, 1, self.tau, self.a_dim, device=device) > 0.5).float()
-            # all_sequences = torch.cat([random_sequences, true_actions.unsqueeze(0)], dim=0)
 
             all_sequences = generate_perturbed_sequences(true_actions, k, self.tau, self.a_dim, device, treatment_mode=self.config.dataset.treatment_mode)
-            
-            # 计算ELBO和真实模拟loss
+
             elbos = []
             true_losses = []
+            ra_scores_list = []
+            true_ra_scores_list = []
             with torch.no_grad():
                 for seq in all_sequences:
-                    # 计算ELBO
+                    # Compute ELBO
                     elbo, _, _ = self.calculate_elbo(H_t, Y_targets, seq, X_targets=X_targets,
                                                 num_samples=self.config.exp.num_samples,
                                                 optimize_a=True)
-                    elbos.append(elbo.item()) 
-                    
-                    # 计算真实模拟loss
-                    output_after_actions = self.dataset_collection.val_f.simulate_output_after_actions(
-                        H_t, seq, self.dataset_collection.train_scaling_params)
+                    elbos.append(elbo.item())
+
+                    if compute_ra:
+                        # Get full trajectory for RA scoring
+                        sim_result = self.dataset_collection.val_f.simulate_output_after_actions(
+                            H_t, seq, self.dataset_collection.train_scaling_params,
+                            return_trajectory=True)
+                        output_after_actions = sim_result['scaled_output']
+                        # Compute ground-truth RA score on unscaled trajectory
+                        ra_score, ra_details = compute_reach_avoid_score(
+                            sim_result['cancer_volume_trajectory'],
+                            sim_result['chemo_dosage_trajectory'],
+                            target_upper=ra_target_upper,
+                            safety_volume_upper=ra_safety_volume_upper,
+                            safety_chemo_upper=ra_safety_chemo_upper,
+                            kappa=ra_kappa)
+                        true_ra_scores_list.append(ra_score[0])  # single patient
+                    else:
+                        output_after_actions = self.dataset_collection.val_f.simulate_output_after_actions(
+                            H_t, seq, self.dataset_collection.train_scaling_params)
+
                     true_output = targets['outputs'][:, -1, :].detach().cpu().numpy()
                     true_loss = np.sqrt(((output_after_actions - true_output) ** 2).mean())
                     true_losses.append(true_loss)
@@ -634,7 +771,7 @@ class VAEModel(pl.LightningModule):
             true_losses = np.array(true_losses)
 
             corr_model_true, _ = spearmanr(model_losses, true_losses)
-            
+
             case_info = {
                 'individual_id': i,
                 'model_losses': model_losses,
@@ -643,28 +780,50 @@ class VAEModel(pl.LightningModule):
                     'model_true': corr_model_true,
                 },
                 'true_sequence': true_actions.cpu().numpy(),
-                'true_sequence_rank': np.sum(model_losses < model_losses[-1]) + 1
+                'true_sequence_rank': np.sum(model_losses < model_losses[-1]) + 1,
+                'all_sequences': all_sequences.cpu().numpy(),  # (k, 1, tau, a_dim)
             }
+
+            # Add RA scoring results if computed
+            if compute_ra:
+                true_ra_scores = np.array(true_ra_scores_list)
+                case_info['true_ra_scores'] = true_ra_scores
+                # RA ranking: higher RA score = better (closer to 0 from below)
+                # ELBO ranking: lower ELBO = better
+                # For true_ra_scores, rank by descending (higher is better)
+                ra_rank_true = np.sum(true_ra_scores > true_ra_scores[-1]) + 1
+                case_info['true_sequence_ra_rank'] = ra_rank_true
+                # Correlation between ELBO and ground-truth RA score
+                corr_elbo_ra, _ = spearmanr(model_losses, true_ra_scores)
+                case_info['correlations']['elbo_ra'] = corr_elbo_ra
+                # Correlation between true distance loss and ground-truth RA score
+                corr_dist_ra, _ = spearmanr(true_losses, true_ra_scores)
+                case_info['correlations']['dist_ra'] = corr_dist_ra
+                # RA diagnostic: fraction of sequences with non-trivial scores
+                case_info['ra_diagnostics'] = {
+                    'nonzero_frac': float((true_ra_scores > -60).mean()),  # log(1e-26) ≈ -60
+                    'score_range': (float(true_ra_scores.min()), float(true_ra_scores.max())),
+                    'unique_scores': int(len(np.unique(np.round(true_ra_scores, 2)))),
+                }
+
             case_infos.append(case_info)
-            
+
             elbos = np.array(elbos)
             true_losses = np.array(true_losses)
 
-            
             correlation, p_value = spearmanr(elbos, true_losses)
             all_correlation.append(correlation)
-            
+
             true_seq_rank = np.sum(elbos < elbos[-1]) + 1
             all_ranks.append(true_seq_rank)
-            
+
             print(f"Individual {i} - True sequence rank: {true_seq_rank} out of {k}")
+            if compute_ra:
+                print(f"  RA rank (ground truth): {case_info['true_sequence_ra_rank']} out of {k}")
             print(f"ELBO for true sequence: {elbos[-1]}")
             print(f"True Loss for true sequence: {true_losses[-1]}")
-            print(f"First 10 ELBOs: {elbos[:10]}")
-            print(f"First 10 True Losses: {true_losses[:10]}")
             print(f"Rank correlation for this individual: {correlation:.3f} (p-value: {p_value:.3f})")
-        
-        # 计算平均结果
+
         all_correlation = [c for c in all_correlation if not np.isnan(c)]
         avg_rank = sum(all_ranks) / len(all_ranks)
         if len(all_correlation) > 0:
@@ -673,6 +832,6 @@ class VAEModel(pl.LightningModule):
             avg_correlation = 0
         print(f"Average rank of true sequences across all individuals: {avg_rank:.2f} out of {k}")
         print(f"Average rank correlation across all individuals: {avg_correlation:.3f}")
-        
+
         return case_infos
         
