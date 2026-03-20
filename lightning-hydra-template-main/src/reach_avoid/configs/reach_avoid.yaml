@@ -1,0 +1,16 @@
+# Reach-Avoid extension configuration
+# These parameters extend the base VCIP config (configs/model/vcip.yaml).
+# Pass via Hydra CLI with + prefix: +exp.reach_avoid.target_upper=3.0
+
+# VCI-inspired enhancements (Wu et al., ICLR 2025)
+# lambda_intermediate: 0.5  # Weight for intermediate timestep reconstruction loss
+# lambda_terminal: 1.0      # Weight for terminal timestep reconstruction loss
+# lambda_disent: 0.1        # Weight for latent disentanglement regularizer
+
+# Reach-avoid scoring thresholds
+# Option A (calibrated from cancer sim volume distribution at t=20-25):
+reach_avoid:
+  target_upper: 3.0           # ~p75 cancer volume at eval time (diam ~1.8cm)
+  safety_volume_upper: 12.0   # ~p95 cancer volume (diam ~2.8cm)
+  safety_chemo_upper: 5.0     # ~p95 cumulative chemo dosage
+  kappa: 10.0                 # sigmoid hardness for soft indicators
