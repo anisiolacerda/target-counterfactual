@@ -158,4 +158,5 @@ results_remote/my_outputs/
 results_remote/results.tar.gz
 results_remote/all_results.tgz
 results_remote/r/
+results_remote/mimic_extract/
 commands.txt

@@ -37,10 +37,10 @@ This is a single, clean conceptual upgrade — from point optimization to set-me
 
 **Formal statement (sketch):**
 
-Assumptions: (i) TV(p_θ(·|ā), q_φ(·|ā)) ≤ ε_VI, (ii) soft indicator error ||g_T - 𝟙_T||_∞ ≤ ε_soft(κ).
+Assumptions: (i) $TV(p_θ(·|ā), q_φ(·|ā)) ≤ ε_VI$, (ii) soft indicator error $||g_T - 𝟙_T||_∞ ≤ ε_{soft}(κ)$.
 
-- **(a) Ranking preservation:** RA ranking preserved whenever margin m = |P(ā₁) - P(ā₂)| > 2ε_VI + 2τ·ε_soft(κ).
-- **(b) Comparison:** Point-target ranking requires |d(ā₁) - d(ā₂)| > 2ε_VI·C_d, where C_d depends on outcome variance (typically large).
+- **(a) Ranking preservation:** RA ranking preserved whenever margin $m = |P(ā₁) - P(ā₂)| > 2ε_VI + 2τ·ε_{soft}(κ)$.
+- **(b) Comparison:** Point-target ranking requires $|d(ā₁) - d(ā₂)| > 2ε_{VI}·C_d$, where C_d depends on outcome variance (typically large).
 - **(c) Strict improvement:** When boundary mass is small (most outcomes clearly in/out of T), RA margin is large even when point-target margin is small.
 
 **Proof strategy:** Part (a) via data processing inequality. Part (b) via Lipschitz analysis of continuous loss. Part (c) via interior/boundary mass decomposition.
@@ -50,9 +50,11 @@ Assumptions: (i) TV(p_θ(·|ā), q_φ(·|ā)) ≤ ε_VI, (ii) soft indicator err
 #### Paper Contributions (4 bullets)
 
 1. **Problem formulation:** Reach-avoid counterfactual intervention planning — plan interventions to reach a target set while maintaining safety constraints across the entire horizon.
-2. **Method:** A differentiable reach-avoid score compatible with variational latent-state models, requiring minimal architectural changes to existing counterfactual planners.
+2. **Method:** RA-constrained ELBO selection — use reach-avoid feasibility as a safety filter on ELBO-ranked candidates. Requires no retraining; threshold-tunable; compatible with any variational counterfactual planner.
 3. **Theory:** Reach-avoid ranking is provably more robust to variational bound-gap variation than point-target ELBO ranking, with explicit approximation bounds (ε_soft from sigmoid hardness, ε_VI from variational gap).
-4. **Experiments:** Improved target attainment, lower safety violation rates, and more stable rankings on Cancer (ground truth) and MIMIC-III (clinical plausibility).
+4. **Experiments:** RA-constrained selection yields +18–33pp safety improvement under moderate-to-strong confounding (γ=3,4) at modest Top-1 cost (-6 to -18pp), on Cancer ground truth. MIMIC-III clinical plausibility validation.
+
+**Note (2026-03-20):** Contribution 2 evolved from Phase 1A/1B experiments. Original plan was RA as a ranking replacement for ELBO. Phase 1A showed RA scoring alone cannot rank (near-binary scores, chance-level Top-1). Pivoted to RA as constraint/filter (Option 2), which leverages RA's strength in binary feasibility assessment while preserving ELBO's ranking quality. This is arguably a cleaner contribution: the method is simpler, requires no retraining, and the safety–quality trade-off is interpretable and tunable.
 
 #### Target Set and Safety Set Definitions
 
@@ -100,22 +102,89 @@ Assumptions: (i) TV(p_θ(·|ā), q_φ(·|ā)) ≤ ε_VI, (ii) soft indicator err
 
 ### Execution Plan
 
-#### Phase 0 — Infrastructure (no retraining, ~1 day)
+#### Phase 0 — Infrastructure (no retraining, ~1 day) ✓ COMPLETE
 
-- [ ] **0.1** Modify `simulate_output_after_actions()` in `cancer_simulation.py:929` to optionally return full projected trajectory (`cancer_volume[:, current_t:]`) and `chemo_dosage[:, current_t:]`
-- [ ] **0.2** Implement `compute_reach_avoid_score(trajectory, dosage_trajectory, T, S, kappa)` with sigmoid soft indicators
-- [ ] **0.3** Extend `optimize_interventions_discrete_onetime()` in `vae_model.py:571` to compute both ELBO and RA rankings, storing both in case_infos
-- [ ] **0.4** Calibrate T and S thresholds from data distributions (histogram analysis of cancer volumes and dosages across the existing results)
+- [x] **0.1** Modify `simulate_output_after_actions()` in `cancer_simulation.py:929` to return full trajectory + dosages
+- [x] **0.2** Implement `compute_reach_avoid_score()` with sigmoid soft indicators
+- [x] **0.3** Extend `optimize_interventions_discrete_onetime()` in `vae_model.py:571` to save trajectory features (cv_terminal, cv_max, cd_max) per sequence for offline RA scoring
+- [x] **0.4** Calibrate T and S thresholds from data distributions — discovered cancer volumes are in unscaled range 0–1150 (most <10); original thresholds were completely miscalibrated
 
-#### Phase 1 — Zero-retraining experiments on existing models (~$5)
+#### Phase 1A — RA-as-ranker experiments (Cancer, ~$5) ✓ COMPLETE (2026-03-19)
 
-Using already-trained Cancer models (5 seeds × 4 gammas) and MIMIC models (5 seeds):
+Ran on Vast.ai (2× RTX 3090, ssh -p 40575 root@174.88.181.175). Evaluated 5 seeds × 4 gammas × 4 taus on Cancer ground truth. Results: `results_remote/phase1_ra_v2/` (20 pkl files, 64MB).
 
-- [ ] **E1 — Ranking comparison (Cancer, ground truth).** For each individual × seed × gamma, score all k=100 sequences with ELBO (existing) and J_RA (new). Compare Top-1 agreement, Spearman correlation, and GRP against ground-truth reach-avoid outcomes. *Key metric: RA Top-1 agreement vs. ELBO's 19% at tau=2.*
-- [ ] **E2 — Margin analysis (Cancer).** Compute pairwise margin distributions under ELBO and RA scoring. Measure fraction of small-margin pairs (ranking inversion risk). Directly validates T2 theorem.
-- [ ] **E3 — Ranking stability (MIMIC).** Compare cross-seed rank stability of ELBO vs. J_RA rankings across 5 seeds × tau={2,4,6,8}.
+- [x] **E1 — Ranking comparison.** RA Top-1 at ~1% (chance level) across all configs. ELBO Top-1: 2.8–75.8% depending on gamma/tau. RA scoring alone cannot rank sequences.
+- [x] **E2 — Margin analysis.** RA scores are near-binary (pass/fail) with little gradient — soft indicator product collapses to 0 or 1 for most sequences, providing no discrimination.
+- [x] **E3 — Ranking stability (Cancer only).** RA rank std consistently higher than ELBO rank std across all gamma/tau.
 
-**Decision gate after Phase 1:** If RA scoring does not substantially improve Top-1 agreement over ELBO on Cancer ground truth, reassess the approach before investing in retraining.
+**Analysis notebook:** `lightning-hydra-template-main/src/reach_avoid/analysis.ipynb` (+ `analysis_executed.ipynb`)
+
+##### Phase 1A Decision Gate (2026-03-19)
+
+**Result: RA-as-ranker FAILS.** RA scoring does not improve Top-1 agreement over ELBO. Overall: ELBO Top-1=0.276, RA Top-1=0.020, Δ=-0.256. Failure is fundamental: RA produces near-binary scores (set membership is too coarse for ranking among 100 candidates).
+
+**Two options evaluated:**
+
+| Option | Description | Pros | Cons |
+|--------|-------------|------|------|
+| **1: RA in training objective** | Retrain VCIP with RA loss component | Could improve intermediate predictions | Requires GPU retraining; unclear if RA gradient signal helps when scores are near-binary |
+| **2: RA as constraint/filter** | `ā* = argmin_{ā ∈ F_RA} ELBO(ā)` — use RA as feasibility filter, ELBO as ranker | No retraining needed; simple, interpretable; threshold-tunable | May reduce candidate pool too aggressively; Top-1 accuracy cost |
+
+**Decision: Option 2 (RA as constraint/filter).** Rationale: RA's strength is in binary feasibility assessment (safe/unsafe), not continuous ranking. ELBO is already good at ranking. The natural combination leverages each method's strength.
+
+#### Phase 1B — RA-Constrained ELBO Selection (E4) ✓ COMPLETE (2026-03-20)
+
+Offline analysis using saved trajectory features. No GPU needed.
+
+- [x] **E4 — Constrained selection sweep.** Evaluated 9 threshold configs (Loose/Moderate/Strict) on gamma=4, plus detailed per-gamma×tau breakdown with moderate thresholds (target≤0.6, vol≤5.0, chemo≤8.5).
+
+##### Phase 1B Key Results
+
+| γ | Top-1 Cost | Safety Gain | Feasibility | Loss Penalty | Verdict |
+|---|-----------|------------|-------------|-------------|---------|
+| 1 | +0.0% | +3.1pp | 87.3% | -0.000070 | No-op (ELBO already safe) |
+| 2 | -1.2% | +7.8pp | 83.8% | +0.000235 | Marginal benefit |
+| 3 | -6.3% | +18.3pp | 79.3% | +0.002132 | Good trade-off |
+| 4 | -17.9% | +33.1pp | 69.1% | +0.006354 | Strong safety gain, notable quality cost |
+
+**Key insight:** RA-constrained selection is most valuable under strong confounding (γ≥3), precisely where ELBO alone selects unsafe plans (only 50–75% safe). The constraint boosts safety to 85–92%. The method requires no retraining and is threshold-tunable.
+
+**Figures:** `lightning-hydra-template-main/src/reach_avoid/figures/e4_constrained_selection_tradeoff.png`
+
+##### Phase 1B Decision: Recommended Next Steps (2026-03-20)
+
+Three candidate directions identified and evaluated:
+
+#### Phase 1C — Heterogeneity Analysis (E5) ✓ COMPLETE (2026-03-20)
+
+**Result:** Top-1 loss is broadly distributed (82/100 individuals are losers at γ=4), NOT concentrated. Top 20% of losers account for only 41% of total loss (near-uniform). Zero individuals benefit from constrained selection in Top-1.
+
+**Implication:** Adaptive per-patient thresholds would NOT help. The cost is fundamental to hard filtering.
+
+#### Phase 1D — Soft Constraint / Lagrangian Relaxation (E6) ✓ COMPLETE (2026-03-20)
+
+Tested `score = ELBO + λ · RA_penalty` with λ ∈ {0, 0.01, ..., 50}.
+
+**Result:** Hard filter Pareto-dominates soft constraint at high safety levels. At γ=4, ~86% safety: hard=32.0% Top-1 vs soft(λ=50)=25.9% Top-1. The soft penalty shifts rankings globally (hurting all sequences), while hard filtering is surgical (preserves ELBO ranking among feasible).
+
+**Decision (2026-03-20): Hard filter is the preferred method for the paper.** Simpler, more interpretable, empirically superior. Method: `ā* = argmin_{ā ∈ F_RA} ELBO(ā)`.
+
+#### Remaining
+
+- MIMIC-III validation with clinically-motivated safety constraints
+- VCI-style counterfactual consistency diagnostic (addresses RC3/W6)
+
+#### Phase 1 — Zero-retraining experiments on existing models (~$5) — SUPERSEDED
+
+*Original plan below retained for reference. Phase 1A/1B above replaced E1–E3. E4 from original plan (VCI counterfactual consistency diagnostic) not yet attempted.*
+
+~~Using already-trained Cancer models (5 seeds × 4 gammas) and MIMIC models (5 seeds):~~
+
+~~- [ ] **E1 — Ranking comparison (Cancer, ground truth).** ...~~
+~~- [ ] **E2 — Margin analysis (Cancer).** ...~~
+~~- [ ] **E3 — Ranking stability (MIMIC).** ...~~
+
+~~**Decision gate after Phase 1:** If RA scoring does not substantially improve Top-1 agreement over ELBO on Cancer ground truth, reassess the approach before investing in retraining.~~
 
 #### Phase 2 — RA-aware retraining (Cancer, ~$15-20)
 

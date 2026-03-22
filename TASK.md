@@ -100,12 +100,86 @@
 - [x] 0.3 Extend `optimize_interventions_discrete_onetime()` with RA scoring path
 - [x] 0.4 Calibrate T and S thresholds from data distributions
 
-### Phase 1 — Zero-retraining experiments (~$5)
-- [ ] E1 Ranking comparison: RA vs ELBO Top-1 agreement on Cancer ground truth
-- [ ] E2 Margin analysis: pairwise margin distributions (validates T2 theorem)
-- [ ] E3 Ranking stability: cross-seed RA vs ELBO stability on MIMIC
-- [ ] E4 VCI-style counterfactual consistency diagnostic on existing models (Cancer + MIMIC) — compute DKL[q(Z|a_obs) || q(Z|a_alt)] as model-intrinsic CF reliability score (addresses RC3/W6)
-- [ ] **Decision gate:** If RA scoring does not improve Top-1, reassess before Phase 2
+### Phase 1A — RA-as-ranker experiments (Cancer) ✓ COMPLETE (2026-03-19)
+
+Ran on Vast.ai (2× RTX 3090). 5 seeds × 4 gammas × 4 taus. Results: `results_remote/phase1_ra_v2/`
+
+- [x] E1 Ranking comparison: RA Top-1 ~1% (chance level) vs ELBO 2.8–75.8%. RA scoring alone cannot rank.
+- [x] E2 Margin analysis: RA scores near-binary (pass/fail), no discrimination among candidates.
+- [x] E3 Ranking stability (Cancer): RA rank std consistently higher than ELBO.
+
+**Decision gate (2026-03-19): RA-as-ranker FAILS.** Overall ELBO Top-1=0.276 vs RA Top-1=0.020. Pivoted to Option 2: RA as constraint/filter (not ranker). See PLANNING.md for full rationale.
+
+### Phase 1B — RA-Constrained ELBO Selection ✓ COMPLETE (2026-03-20)
+
+Offline analysis (no GPU). Analysis notebook: `lightning-hydra-template-main/src/reach_avoid/analysis.ipynb`
+
+- [x] E4 Constrained selection: `ā* = argmin_{ā ∈ F_RA} ELBO(ā)` — RA as feasibility filter, ELBO as ranker
+- [x] Threshold sweep (9 configs) + per-gamma×tau breakdown (moderate: target≤0.6, vol≤5.0, chemo≤8.5)
+- [x] Visualization: safety–quality Pareto frontier (`figures/e4_constrained_selection_tradeoff.png`)
+
+**Key results:** γ=1,2: negligible effect (ELBO already safe). γ=3: +18pp safety for -6pp Top-1. γ=4: +33pp safety for -18pp Top-1. Most valuable under strong confounding where ELBO alone selects unsafe plans.
+
+### Phase 1C — Heterogeneity Analysis (E5) ✓ COMPLETE (2026-03-20)
+
+- [x] E5 Per-individual breakdown: 82/100 individuals are losers at γ=4 (>5pp Top-1 worse). Zero winners.
+- [x] E5 Concentration analysis: Top 20% of losers account for 41% of total loss — near-uniform, NOT concentrated.
+- [x] E5 Loser characterization: losers have lower feasibility (68.2%) than neutral (higher feasibility).
+
+**Finding: Top-1 loss is broadly distributed (fundamental to hard constraint approach), not concentrated in a few hard individuals. Adaptive per-patient thresholds would NOT substantially help.**
+
+**Decision (2026-03-20):** This rules out adaptive thresholds and favors the **soft constraint variant** (Lagrangian relaxation: weighted ELBO + RA penalty) as next direction, since it avoids the hard in/out boundary.
+
+### Phase 1D — Soft Constraint / Lagrangian Relaxation (E6) ✓ COMPLETE (2026-03-20)
+
+- [x] E6 Lambda sweep (11 values from 0 to 50) across all gammas
+- [x] E6 Detailed per-gamma×tau breakdown at λ={0.1, 0.5, 2.0} vs hard filter
+- [x] E6 Pareto frontier visualization
+
+**Finding: Hard filter Pareto-dominates soft constraint at high safety levels.** At γ=4, ~86% safety: hard filter achieves 32.0% Top-1 vs soft (λ=50) 25.9% Top-1. The soft penalty shifts rankings globally (hurting all sequences), while hard filtering is surgical (preserves ELBO ranking among feasible set).
+
+**Decision (2026-03-20): Hard filter is the preferred method** — simpler, more interpretable, and empirically superior. This is the method for the paper: `ā* = argmin_{ā ∈ F_RA} ELBO(ā)`.
+
+### Phase 1E — MIMIC-III RA Evaluation (E7) — COMPLETE ✓
+
+**Status:** Eval complete. Results downloaded. Analysis executed.
+
+- [x] Write `eval_mimic_traj.py` — extracts predicted DBP trajectories from existing VCIP models
+- [x] Write `run_mimic_ra.sh` — 2-GPU parallel execution script (5 seeds, ~2-4 hours)
+- [x] Create Vast.ai execution plan (`context/MIMIC_RA_VASTAI_PLAN.md`)
+- [x] Add E7 analysis cells to `analysis.ipynb` (constrained selection, visualization, stability, summary)
+- [x] **Run on Vast.ai** — completed on `ssh -p 11299 root@70.69.192.6` (2x RTX 3090, ~15 min total for 5 seeds)
+  - Full MIMIC-Extract pipeline: PostgreSQL → concepts → MIMIC-Extract → `all_hourly_data.h5` (7.3GB, 34,472 patients)
+  - Eval: 5 seeds × 4 taus (2,3,4,5) × 100 individuals × 100 candidate sequences
+  - DBP scaling: mean=60.93 mmHg, std=13.96 mmHg
+  - Predicted DBP range: ~[52, 63] mmHg across individuals
+- [x] Download results to `results_remote/mimic_ra/` (5 pickle files, ~2.8MB each)
+- [x] Download MIMIC-Extract HDF5 data to `results_remote/mimic_extract/` (7.6GB total)
+- [x] Execute E7 analysis cells — see results below
+
+**Clinical thresholds:**
+- Target: diastolic BP ∈ [60, 90] mmHg
+- Safety: diastolic BP ∈ [40, 120] mmHg at all intermediate steps
+
+**E7 Results (5 seeds pooled):**
+
+| τ | Feasibility | ELBO in-target | Constrained in-target | ELBO DBP (mean) | Constrained DBP (mean) |
+|---|-------------|----------------|-----------------------|-----------------|------------------------|
+| 2 | 33.4% | 73.0% | 100.0% (+27.0pp) | 60.4 mmHg | 61.3 mmHg |
+| 3 | 28.6% | 79.2% | 100.0% (+20.8pp) | 60.6 mmHg | 61.6 mmHg |
+| 4 | 24.7% | 80.0% | 99.8% (+19.8pp) | 60.7 mmHg | 61.8 mmHg |
+| 5 | 22.5% | 81.2% | 99.2% (+18.0pp) | 60.8 mmHg | 61.8 mmHg |
+
+**Key findings:**
+1. RA constraint lifts in-target rate from ~73-81% to ~99-100% across all horizons
+2. Feasibility decreases with τ (33% → 22%) — longer horizons have fewer feasible plans
+3. Constrained selection strongly reduces vasopressor use (ELBO vaso=0.29-0.79, Cstr vaso=0.01-0.29)
+4. Cross-seed ELBO rank std decreases with τ (7.9 → 2.7), indicating more stable ranking at longer horizons
+5. Predicted DBP distribution is narrow (~52-63 mmHg), clustering near the lower target boundary (60 mmHg)
+6. Figure saved: `lightning-hydra-template-main/src/reach_avoid/figures/e7_mimic_constrained_selection.png`
+
+### Phase 1 — Remaining items
+- [ ] E4-original: VCI-style counterfactual consistency diagnostic (DKL[q(Z|a_obs) || q(Z|a_alt)]) — addresses RC3/W6
 
 ### Phase 2 — RA-aware retraining (Cancer, ~$15-20)
 - [ ] 2.1 Fix `vae_model.py:511` — weighted intermediate + terminal loss (λ_terminal=1.0, λ_intermediate=0.5)
