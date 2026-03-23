@@ -72,21 +72,18 @@ def draw_panel(ax, selected, rejected, annot_label, annot_color,
 
     if show_ystar:
         ax.axhline(Y_STAR, color='#1a5e28', ls=':', lw=1.0, alpha=0.45, zorder=1)
-        ax.text(tau + 0.15, Y_STAR + 0.25, '$Y^*$', fontsize=12,
+        ax.text(tau + 0.15, Y_STAR + 0.25, '$Y^*$', fontsize=18,
                 color='#1a5e28', va='bottom', ha='left')
 
-    # ── Region labels (left side, inside plot) ──
-    # Target label
+    # ── Region labels ──
     ax.text(0.15, (T_lo + T_hi) / 2, r'$\mathcal{T}$',
-            fontsize=20, fontweight='bold', color='#1a7832',
-            va='center', ha='left', alpha=0.65)
-    # Safety label (right side, between T_hi and S_hi)
-    ax.text(tau + 0.35, (T_hi + S_hi) / 2, r'$\mathcal{S}$',
-            fontsize=20, fontweight='bold', color='#555555',
-            va='center', ha='left', alpha=0.45)
-    # Unsafe label
+            fontsize=26, fontweight='bold', color='#1a7832',
+            va='center', ha='left', alpha=0.6)
+    ax.text(tau + 0.3, (T_hi + S_hi) / 2, r'$\mathcal{S}$',
+            fontsize=26, fontweight='bold', color='#555555',
+            va='center', ha='left', alpha=0.4)
     ax.text(0.15, 11.5, 'Unsafe',
-            fontsize=11, color='#cc0000', va='center', ha='left',
+            fontsize=16, color='#cc0000', va='center', ha='left',
             alpha=0.55, fontweight='bold')
 
     # ── Plot trajectories ──
@@ -114,7 +111,7 @@ def draw_panel(ax, selected, rejected, annot_label, annot_color,
         annot_label,
         xy=(tau - 0.15, y_sel),
         xytext=annot_xytext,
-        fontsize=11, fontweight='bold', color=annot_color,
+        fontsize=16, fontweight='bold', color=annot_color,
         arrowprops=dict(arrowstyle='->', color=annot_color,
                         lw=2.0, connectionstyle='arc3,rad=0.2'),
         bbox=dict(boxstyle='round,pad=0.4', fc='white', ec=annot_color,
@@ -130,14 +127,14 @@ def draw_panel(ax, selected, rejected, annot_label, annot_color,
                 markeredgewidth=3.0, zorder=6)
 
     # ── Axes ──
-    ax.set_xlim(-0.4, tau + 0.6)
+    ax.set_xlim(-0.4, tau + 0.7)
     ax.set_ylim(-0.5, 12.5)
     ax.set_xticks(ts)
     xlabels = ['$t$'] + ['$t{\\!+\\!}' + str(s) + '$' for s in range(1, tau + 1)]
-    ax.set_xticklabels(xlabels, fontsize=11)
+    ax.set_xticklabels(xlabels, fontsize=16)
     ax.set_yticks([0, 2, 4, 6, 8, 10, 12])
-    ax.tick_params(axis='y', labelsize=11)
-    ax.set_xlabel('Time step', fontsize=13)
+    ax.tick_params(axis='y', labelsize=16)
+    ax.set_xlabel('Time step', fontsize=19)
     ax.grid(axis='y', alpha=0.1, lw=0.5)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
@@ -145,17 +142,17 @@ def draw_panel(ax, selected, rejected, annot_label, annot_color,
 
 def main():
     fig, (ax_l, ax_r) = plt.subplots(
-        1, 2, figsize=(14, 5.5), sharey=True,
-        gridspec_kw={'wspace': 0.05})
+        1, 2, figsize=(16, 6.0), sharey=True,
+        gridspec_kw={'wspace': 0.12})
 
     # (a) ELBO picks D
     draw_panel(ax_l, selected='D', rejected=[],
                annot_label='Selects D\n(best ELBO, unsafe path)',
                annot_color='#e66a00', annot_xytext=(1.5, 0.3),
                show_ystar=True)
-    ax_l.set_ylabel('Outcome  $Y_s$', fontsize=13)
+    ax_l.set_ylabel('Outcome  $Y_s$', fontsize=19)
     ax_l.set_title('(a)  Point-Target ELBO Selection',
-                    fontsize=14, fontweight='bold', pad=10)
+                    fontsize=18, fontweight='bold', pad=10)
 
     # (b) RA picks A
     draw_panel(ax_r, selected='A', rejected=['B', 'D'],
@@ -163,15 +160,15 @@ def main():
                annot_color='#1a7832', annot_xytext=(1.2, 0.3),
                show_ystar=False)
     ax_r.set_title('(b)  Reach-Avoid Constrained Selection',
-                    fontsize=14, fontweight='bold', pad=10)
+                    fontsize=18, fontweight='bold', pad=10)
 
     # Shared legend
     handles, labels = ax_l.get_legend_handles_labels()
-    fig.legend(handles, labels, loc='lower center', ncol=4, fontsize=11,
+    fig.legend(handles, labels, loc='lower center', ncol=4, fontsize=15,
                frameon=True, fancybox=True, framealpha=0.95, edgecolor='#cccccc',
-               bbox_to_anchor=(0.5, -0.01), columnspacing=1.8, handletextpad=0.6)
+               bbox_to_anchor=(0.5, -0.01), columnspacing=1.5, handletextpad=0.5)
 
-    fig.subplots_adjust(bottom=0.16)
+    fig.subplots_adjust(bottom=0.18)
 
     for ext in ['pdf', 'png']:
         path = FIG_DIR / ('rc7_figure1_concept.' + ext)
