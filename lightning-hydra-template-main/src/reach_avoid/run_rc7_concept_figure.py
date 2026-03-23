@@ -76,7 +76,7 @@ def draw_panel(ax, selected, rejected, annot_label, annot_color,
                 color='#1a5e28', va='bottom', ha='left')
 
     # ── Region labels ──
-    ax.text(0.15, (T_lo + T_hi) / 2, r'$\mathcal{T}$',
+    ax.text(tau + 0.3, (T_lo + T_hi) / 2, r'$\mathcal{T}$',
             fontsize=26, fontweight='bold', color='#1a7832',
             va='center', ha='left', alpha=0.6)
     ax.text(tau + 0.3, (T_hi + S_hi) / 2, r'$\mathcal{S}$',
