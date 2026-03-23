@@ -35,24 +35,24 @@ Y_STAR = (T_lo + T_hi) / 2
 
 # ── Trajectories (well-separated terminals) ──
 traj = {
-    'A': np.array([8.2, 7.4, 6.2, 5.0, 4.2, 3.8]),    # safe → target (RA pick)
-    'B': np.array([7.5, 8.8, 11.2, 6.8, 4.2, 2.4]),    # violates S at s=2
-    'C': np.array([6.8, 7.0, 6.6, 6.3, 5.8, 5.5]),     # misses target
-    'D': np.array([9.2, 8.0, 6.8, 10.8, 4.8, 3.2]),    # best terminal, violates S at s=3
+    'A': np.array([8.2, 7.4, 6.2, 5.0, 4.2, 3.2]),    # safe → target, best ELBO (RA pick)
+    'B': np.array([7.0, 6.5, 5.8, 5.2, 4.8, 4.2]),    # safe → target, worse ELBO than A
+    'C': np.array([6.8, 7.0, 6.6, 6.3, 5.8, 5.5]),    # misses target
+    'D': np.array([9.2, 8.0, 6.8, 10.8, 4.8, 2.8]),   # best terminal, violates S at s=3
 }
 
 # ── Visual style ──
 STYLE = {
     'A': dict(color='#1a7832', ls='-',  lw=3.0, marker='o', ms=8, zorder=4),
-    'B': dict(color='#c4197d', ls='-',  lw=2.2, marker='s', ms=6, zorder=3),
+    'B': dict(color='#4575b4', ls='-',  lw=2.2, marker='s', ms=6, zorder=3),
     'C': dict(color='#888888', ls='--', lw=2.0, marker='^', ms=6, zorder=2),
     'D': dict(color='#e66a00', ls='-',  lw=2.5, marker='D', ms=6, zorder=3),
 }
 LABELS = {
-    'A': 'A: safe, reaches target',
-    'B': 'B: violates safety',
+    'A': 'A: safe, best ELBO in $\\mathcal{F}_{RA}$',
+    'B': 'B: safe, worse ELBO',
     'C': 'C: misses target',
-    'D': 'D: violates safety',
+    'D': 'D: best ELBO, violates safety',
 }
 
 
@@ -154,8 +154,8 @@ def main():
     ax_l.set_title('(a)  Point-Target ELBO Selection',
                     fontsize=18, fontweight='bold', pad=10)
 
-    # (b) RA picks A
-    draw_panel(ax_r, selected='A', rejected=['B', 'D'],
+    # (b) RA picks A (D rejected for safety; B feasible but worse ELBO)
+    draw_panel(ax_r, selected='A', rejected=['D'],
                annot_label='Selects A\n(best ELBO in feasible set)',
                annot_color='#1a7832', annot_xytext=(1.2, 0.3),
                show_ystar=False)
