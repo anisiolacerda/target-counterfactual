@@ -1,0 +1,4 @@
+2: Average rank of true sequences across all individuals: 6.41
+4: Average rank of true sequences across all individuals: 3.41
+6: Average rank of true sequences across all individuals: 1.77
+8: Average rank of true sequences across all individuals: 1.46

@@ -1,0 +1,7 @@
+- +dataset=cancer_sim_cont
+- +model=vcip
+- +model/hparams/cancer=4_ra
+- exp.seed=101010
+- dataset.coeff=4
+- exp.rank=True
+- exp.test=False

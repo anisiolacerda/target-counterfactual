@@ -24,8 +24,9 @@ With this goal in mind, the overall steps, currently, are:
 
 ## Remote Execution (Vast.ai)
 
-- **Current instance:** `ssh -p 20525 root@70.69.192.6` (2x RTX 3090, venv at `/root/vcip_env`)
-- **Previous instance (MIMIC):** `ssh -p 63498 root@142.112.39.215` (expired)
+- **Current instance:** `ssh -p 11299 root@70.69.192.6` (2x RTX 3090, venv at `/root/vcip_env`)
+- **Previous instances (expired):** port 20525 on same host; `ssh -p 63498 root@142.112.39.215`
+- **MIMIC data:** `all_hourly_data.h5` (7.3GB) + 10 other processed files on Seagate Expansion Drive (local copy). Also at `/root/mimic_extract_output/` on current instance.
 - **Remote code path:** `/root/VCIP/` (code + checkpoints, no `my_outputs` or `results` from local)
 - **Hydra config note:** `reach_avoid.*` params require `+` prefix (e.g., `+exp.reach_avoid.target_upper=65.45`) since they are not in the base YAML config.
 - **Python env:** Python 3.12, PyTorch 2.6.0+cu124 (NOT the pinned 2.0.1 — works fine for eval), venv instead of conda.

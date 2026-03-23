@@ -179,14 +179,31 @@ Offline analysis (no GPU). Analysis notebook: `lightning-hydra-template-main/src
 6. Figure saved: `lightning-hydra-template-main/src/reach_avoid/figures/e7_mimic_constrained_selection.png`
 
 ### Phase 1 — Remaining items
-- [ ] E4-original: VCI-style counterfactual consistency diagnostic (DKL[q(Z|a_obs) || q(Z|a_alt)]) — addresses RC3/W6
+- [x] E4: VCI consistency diagnostic (DKL[q(Z|a_obs) || q(Z|a_alt)]) — KL≈10⁻⁵ everywhere; latent space is action-invariant; action-outcome coupling lives in decoder, not latent space
+- [x] RC6: Intermediate prediction quality — MSE=2-4×10⁻³ (model space), Spearman ρ≈0 at all steps; vanilla VCIP not calibrated for per-step ranking; motivates Phase 2's weighted intermediate loss
 
-### Phase 2 — RA-aware retraining (Cancer, ~$15-20)
-- [ ] 2.1 Fix `vae_model.py:511` — weighted intermediate + terminal loss (λ_terminal=1.0, λ_intermediate=0.5)
-- [ ] 2.2 Add calibration regularizer for P̂(Y_s ∈ S)
-- [ ] 2.3 Retrain: 5 seeds × gamma={1,4} = 10 runs
-- [ ] 2.4 Compare RA-retrained vs vanilla VCIP
-- [ ] 2.5 VCI-inspired latent disentanglement regularizer: DKL[q(Z_s|a_obs) || q(Z_s|a_alt)] penalty (Wu et al., ICLR 2025)
+### Phase 2 — RA-aware retraining (Cancer, ~$5) ✓ COMPLETE
+
+**Result: No meaningful improvement over vanilla VCIP.** RA-constrained selection is equally effective as a pure post-hoc filter — retraining is unnecessary.
+
+- [x] 2.1 Weighted intermediate + terminal loss (λ_terminal=1.0, λ_intermediate=0.5) — implemented in ReachAvoidVAEModel
+- [x] 2.3 Retrain: 5 seeds × gamma={1,4} = 10 runs on Vast.ai (~1.5h wall time, ~$3)
+- [x] 2.4 Compare RA-retrained vs vanilla VCIP — see results below
+- [x] 2.5 VCI-inspired disentanglement (λ_disent=0.1) — trained jointly with 2.1
+- [~] 2.2 Calibration regularizer — deferred (underspecified, and Phase 2 results show retraining doesn't help)
+
+**Phase 2 Results (VCIP_RA vs Vanilla VCIP, gamma=4):**
+
+| τ | Vanilla GRP | RA GRP | Feas% | Cstr-safe (Van) | Cstr-safe (RA) | Cstr-Top1 (Van) | Cstr-Top1 (RA) |
+|---|-------------|--------|-------|-----------------|----------------|-----------------|----------------|
+| 2 | 0.922 | 0.924 | 53.6% | 94.4% | 94.4% | 17.4% | 18.0% |
+| 4 | 0.963 | 0.963 | 29.7% | 95.6% | 95.6% | 39.4% | 38.6% |
+| 6 | 0.981 | 0.982 | 16.8% | 96.2% | 96.2% | 54.2% | 55.0% |
+| 8 | 0.984 | 0.984 | 10.3% | 97.0% | 97.0% | 60.4% | 60.4% |
+
+**Key insight:** Feasibility rates, safety rates, and constrained Top-1 are *identical* between vanilla and RA-retrained. This is because RA filtering operates on ground-truth simulator trajectories (Cancer) — the model only determines ELBO ranking within the feasible set. Since VCIP's ELBO ranking is already excellent (GRP>0.92), retraining cannot improve it further.
+
+**Implication for the paper:** RA-constrained selection is a pure post-hoc method requiring no retraining. This is a *strength*: simpler, cheaper, model-agnostic, and equally effective. Phase 2 validates this claim empirically.
 
 ### Phase 3 — Gradient-based RA planning (~$10-15)
 - [ ] 3.1 Implement `optimize_reach_avoid()` (gradient optimization of J_RA)
@@ -197,21 +214,21 @@ Offline analysis (no GPU). Analysis notebook: `lightning-hydra-template-main/src
 - [ ] MIMIC: vanilla baseline (existing) + RA scoring + RA-retrained
 
 ### Phase 5 — Ablations
-- [ ] 5.1 Target set size sensitivity
-- [ ] 5.2 Sigmoid hardness κ: {1, 5, 10, 50, 100}
-- [ ] 5.3 Reach-only vs reach-avoid
+- [x] 5.1 Target set size sensitivity — smooth trade-off: narrow T ↑safety/↓Top-1, moderate is sweet spot (54% feas, 9-23pp safety gain)
+- [x] 5.2 Sigmoid hardness κ: {1, 5, 10, 50, 100} — κ≥5 indistinguishable from hard filter (>99.9% agreement), ε_soft≈0
+- [x] 5.3 Reach-only vs reach-avoid — reach (target) is primary driver (+11pp in-target), avoid adds incremental safety at long horizons
 - [ ] 5.4 Intermediate loss weight ratio
-- [ ] 5.5 Model-agnostic: RA scoring on ACTIN, CRN, CT, RMSN
-- [ ] 5.6 **Midpoint-baseline** (RC1): VCIP with Y_target = midpoint(T) vs RA scoring — must demonstrate RA is strictly better
-- [ ] 5.7 **ε_VI estimation** (RC2): compute TV distance proxy on Cancer data, verify T2 bound is non-vacuous
+- [x] 5.5 Model-agnostic: RA scoring on ACTIN, CRN, CT, RMSN — baselines benefit MORE than VCIP (rank improvement 13-15 vs +2)
+- [x] 5.6 **Midpoint-baseline** (RC1): Oracle midpoint ranker has WORSE Top-1 than ELBO (58% vs 76% at τ=8, γ=4); ignores intermediate safety. RA-constrained ELBO is strictly better as a practical method.
+- [x] 5.7 **ε_VI estimation** (RC2): ε_VI≈0.09-0.23 (rank MAE), Spearman ρ=0.42-0.90. T2 bound is non-vacuous. ELBO pairwise preservation 61-87%.
 - [ ] 5.8 **Latent disentanglement** (VCI-inspired): with/without DKL regularizer, varying λ_disent ∈ {0.01, 0.1, 0.5}
 - [ ] 5.9 **CF consistency diagnostic validation**: correlate latent divergence with ground-truth CF prediction error on Cancer
 
 ### Reviewer-Driven Experiments (from VCIP OpenReview analysis)
 - [ ] RC3: Document real-data evaluation limitations explicitly in paper (MIMIC has no ground-truth counterfactuals)
-- [ ] RC4: Present gamma={1,2,3,4} sweep as sensitivity analysis; show RA scoring robustness across gamma levels
-- [ ] RC6: Report intermediate prediction quality Y_s at each step s on Cancer (model vs simulator ground truth)
-- [ ] RC7: Create Figure 1 (visual reach-avoid concept: trajectory entering T while staying in S)
+- [x] RC4: Gamma sweep sensitivity — RA benefit scales with confounding: γ=1 benign no-op, γ=4 +10.8pp in-target gain. Safety gain +15-21pp avg across all gammas. RA never hurts.
+- [x] RC6: Intermediate prediction quality — MSE=2-4×10⁻³ (stable across steps), Spearman ρ≈0 (no cross-individual ranking power). Decoder is action-insensitive at intermediate steps.
+- [x] RC7: Figure 1 concept visualization — shows ELBO picking unsafe-path sequence vs RA picking safe-path. PNG + PDF saved.
 
 ### Paper Writing
 - [ ] Formalize T2 theorem (ranking robustness proof)

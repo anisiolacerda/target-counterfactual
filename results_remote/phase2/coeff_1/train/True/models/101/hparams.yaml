@@ -1,0 +1,130 @@
+model:
+  dim_treatments: 2
+  dim_vitals: 0
+  dim_static_features: 1
+  dim_outcomes: 1
+  _target_: src.reach_avoid.model.ReachAvoidVAEModel
+  name: VCIP_RA
+  z_dim: 16
+  auxiliary:
+    _target_: src.models.auxiliary_model.AuxiliaryModel
+    hidden_dim: 16
+    num_layers: 2
+    hiddens_G_y:
+    - 16
+    - 16
+    hiddens_G_x:
+    - 16
+    - 16
+    lr: 0.001
+  inference:
+    _target_: src.models.inference_model.InferenceModel
+    hidden_dim: 16
+    num_layers: 2
+    hiddens_F_mu:
+    - 16
+    hiddens_F_logvar:
+    - 16
+    predict_y_history:
+    - 16
+    do: true
+  generative:
+    _target_: src.models.generative_model.GenerativeModel
+    entropy_lambda: 1
+    hidden_dim: 16
+    treatment_hidden_dim: 16
+    num_layers: 2
+    hiddens_F_mu:
+    - 16
+    hiddens_F_logvar:
+    - 16
+    hiddens_decoder:
+    - 16
+    hidden_action_decoder:
+    - 16
+    hidden_action_decoder_step:
+    - 16
+  lr: 0.01
+dataset:
+  _target_: src.data.SyntheticCancerDatasetCollectionCont
+  name: tumor_generator
+  coeff: 1
+  chemo_coeff: 1
+  radio_coeff: 1
+  seed: 101
+  num_patients:
+    train: 1000
+    val: 100
+    test: 100
+  window_size: 15
+  lag: 0
+  max_seq_length: 60
+  projection_horizon: 5
+  cf_seq_mode: sliding_treatment
+  val_batch_size: 4096
+  treatment_mode: continuous
+  static_size: 1
+  treatment_size: 2
+  one_hot_treatment_size: 4
+  input_size: 0
+  output_size: 1
+  predict_X: false
+  autoregressive: true
+exp:
+  alpha: 1.0
+  update_alpha: true
+  alpha_rate: exp
+  bce_weight: false
+  unscale_rmse: true
+  percentage_rmse: true
+  processed_data_dir: /root/VCIP/data/processed/cancer_sim_cont/1/VCIP_RA
+  log_dir: my_outputs/cancer_sim_cont/22/coeff_1/VCIP_RA/train/True
+  device: cuda
+  gpus: 1
+  weights_ema: true
+  beta: 0.99
+  clear_tf: true
+  logging: false
+  current_date: '2026-03-22'
+  current_time: 22-50-44
+  mode: train
+  gpu_resources: 0.3
+  cpu_resources: 2
+  csv_dir: csvs/cancer_cont/gamma_1
+  max_epochs: 100
+  global_seed: 22
+  sam: true
+  load_data: true
+  seed: 101
+  tau: 6
+  repeats: 5
+  test: false
+  rank: true
+  batch_size: 256
+  batch_size_val: 128
+  num_samples: 10
+  dropout: 0.0
+  epochs: 100
+  patience: 20
+  lr: 0.01
+  weight_decay: 1.0e-05
+  lambda_X: 0.1
+  lambda_Y: 1
+  load_best: true
+  val: true
+  lambda_step: 1
+  lambda_kl: 1
+  lambda_reg: 1
+  lambda_action: 1
+  lambda_hy: 1
+  beta_bound: -1
+  remove_aux: false
+  entropy_reg: 1
+  lambda_terminal: 1.0
+  lambda_intermediate: 0.5
+  lambda_disent: 0.1
+  reach_avoid:
+    target_upper: 3.0
+    safety_volume_upper: 12.0
+    safety_chemo_upper: 5.0
+    kappa: 10.0

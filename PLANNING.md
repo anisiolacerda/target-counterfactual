@@ -186,15 +186,19 @@ Tested `score = ELBO + λ · RA_penalty` with λ ∈ {0, 0.01, ..., 50}.
 
 ~~**Decision gate after Phase 1:** If RA scoring does not substantially improve Top-1 agreement over ELBO on Cancer ground truth, reassess the approach before investing in retraining.~~
 
-#### Phase 2 — RA-aware retraining (Cancer, ~$15-20)
+#### Phase 2 — RA-aware retraining (Cancer, ~$5) ✓ COMPLETE
 
-Modify training to emphasize intermediate prediction quality:
+**Result: No meaningful improvement.** RA-constrained selection is equally effective as a post-hoc filter on vanilla VCIP — retraining is unnecessary. All metrics (GRP, feasibility, constrained safety, constrained Top-1) are identical within noise (±0.002 GRP, ±1.4pp Top-1).
 
-- [ ] **2.1** Fix `vae_model.py:511` — replace unconditional `reg_loss = reg_losses[-1]` with configurable weighted combination: `λ_terminal * reg_losses[-1] + λ_intermediate * mean(reg_losses[:-1])`. Default: λ_terminal=1.0, λ_intermediate=0.5. (VCI-inspired: intermediate predictions matter for counterfactual quality.)
-- [ ] **2.2** Add calibration regularizer: auxiliary loss penalizing miscalibration of P̂(Y_s ∈ S)
-- [ ] **2.3** Retrain VCIP with modifications: 5 seeds × gamma={1,4} = 10 runs (~20 GPU-hours, ~$5-8 on Vast.ai)
-- [ ] **2.4** Compare RA-retrained vs. vanilla VCIP on reach-avoid metrics
-- [ ] **2.5** VCI-inspired latent disentanglement regularizer: add DKL[q(Z_s|a_obs) || q(Z_s|a_alt)] penalty to training loss (Wu et al., ICLR 2025, Lemma 1). Ensures Z_s encodes patient features rather than treatment info — critical for RA safety constraint evaluation on counterfactual trajectories.
+**Why:** On Cancer, RA filtering operates on ground-truth simulator trajectories. The model only determines ELBO ranking within the feasible set. Since VCIP's ELBO ranking is already excellent (GRP>0.92 at γ=4), retraining cannot improve constrained selection further.
+
+**Implication for the paper:** RA-constrained selection is a pure post-hoc method. This is a strength: simpler, cheaper, model-agnostic. Phase 2 validates this claim empirically. Retraining may still matter for MIMIC (no simulator, model-predicted trajectories used for filtering).
+
+- [x] **2.1** Weighted intermediate + terminal loss (λ_terminal=1.0, λ_intermediate=0.5) in ReachAvoidVAEModel
+- [x] **2.3** Retrained: 5 seeds × gamma={1,4} = 10 runs (~1.5h wall time, ~$3 on Vast.ai)
+- [x] **2.4** Compared RA-retrained vs vanilla: all metrics identical within noise
+- [x] **2.5** Disentanglement (λ_disent=0.1) trained jointly — no effect on downstream RA selection
+- [~] **2.2** Calibration regularizer — deferred (retraining shown unnecessary)
 
 #### Phase 3 — Gradient-based RA planning (~$10-15)
 
@@ -210,7 +214,7 @@ Modify training to emphasize intermediate prediction quality:
 |---|---|---|---|
 | Vanilla VCIP baseline | 5 seeds × 4 gammas × 4 taus | 80 (existing) | $0 |
 | RA scoring on vanilla VCIP | Same, re-evaluate | 80 | ~$5 |
-| RA-aware retrained VCIP | 5 seeds × gamma={1,4} × 4 taus | 40 | ~$15 |
+| ~~RA-aware retrained VCIP~~ | ~~5 seeds × gamma={1,4} × 4 taus~~ | ~~40~~ | ~~$15~~ (Phase 2: no improvement) |
 | Gradient-based RA planning | 5 seeds × gamma={1,4} | 10 | ~$5 |
 
 **MIMIC-III:**
@@ -219,7 +223,7 @@ Modify training to emphasize intermediate prediction quality:
 |---|---|---|---|
 | Vanilla VCIP baseline | 5 seeds × 4 taus | 20 (existing) | $0 |
 | RA scoring on vanilla VCIP | Same, re-evaluate | 20 | ~$3 |
-| RA-aware retrained VCIP | 5 seeds × 4 taus | 20 | ~$15 |
+| ~~RA-aware retrained VCIP~~ | ~~5 seeds × 4 taus~~ | ~~20~~ | ~~$15~~ (Phase 2: likely unnecessary, but may matter for MIMIC since RA filter uses model predictions) |
 
 **Total estimated cost: ~$43-48** (remainder covers reruns, debugging, additional ablations)
 
