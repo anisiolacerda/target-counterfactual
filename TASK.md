@@ -231,13 +231,12 @@ Offline analysis (no GPU). Analysis notebook: `lightning-hydra-template-main/src
 - [x] RC7: Figure 1 concept visualization — shows ELBO picking unsafe-path sequence vs RA picking safe-path. PNG + PDF saved.
 
 ### Paper Writing
-- [ ] Formalize T2 theorem (ranking robustness proof)
-- [ ] Write Introduction — cite VCIP Reviewer ixW5's range-target concern + author acknowledgment as direct motivation
-- [ ] Write Section 3 (ELBO ranking failure motivation)
-- [ ] Write Method section (J_RA, soft indicators, RA-aware training) with intuitive interpretation before formal definition
-- [ ] Write Theory section (T2 theorem + corollary + "what it means" paragraph + empirical ε_VI verification)
-- [ ] Write Experiments section (include midpoint-baseline, intermediate quality, sensitivity analysis)
-- [ ] Write Discussion + Conclusion (explicit limitations: T/S specification, real-data evaluation, assumptions)
+- [x] Write full paper draft (Introduction through Discussion & Conclusion) — 9 content pages
+- [x] Figure 1: Reach-avoid concept visualization (rc7_figure1_concept.pdf)
+- [x] Extended Related Work (Appendix H) — comprehensive survey with 25+ new references
+- [x] Main-text Related Work — concise version citing key works across all areas
+- [ ] Formalize T2 theorem (ranking robustness proof) — written but needs review
+- [ ] Final polish pass — check all cross-references, consistent notation, caption clarity
 
 ---
 

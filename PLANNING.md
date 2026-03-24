@@ -393,6 +393,19 @@ VCIP was accepted as ICML 2025 poster with 4 weak accepts (one upgraded from wea
 
 Working title: *"Reach-Avoid Counterfactual Intervention Planning via Variational Latent Dynamics"*
 
+#### Paper Writing Status (2026-03-23)
+
+- **Full draft complete:** 9 content pages + references + checklist + 7 appendix sections (19 pages total)
+- **Figure 1:** Concept visualization with 4 trajectories, Y* marker, annotation arrows. PDF/PNG generated.
+- **Related work:** Main text (concise, ~1 page) + Appendix H (extended, ~3 pages, 6 subsections). 25+ new references added covering:
+  - Counterfactual outcome estimation (Shalit 2017, CEVAE, GANITE, SyncTwin, TSD, Causal CPC, etc.)
+  - Variational/generative causal inference (Deep SCMs, VCI, DECI, disentanglement)
+  - Dynamic treatment regimes (Nie et al. 2021, Le et al. 2019)
+  - Safe/constrained RL (CPO, RCPO, CUP, FISOR, Altman CMDPs)
+  - Reach-avoid control (DeepReach, ISAACS)
+  - Clinical AI safety (AI Clinician, Raghu et al.)
+- **Remaining:** Final polish pass, check all cross-references, verify notation consistency
+
 ---
 
 ### Key Files for Implementation
