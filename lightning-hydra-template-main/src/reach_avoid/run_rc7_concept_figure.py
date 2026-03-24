@@ -35,10 +35,10 @@ Y_STAR = (T_lo + T_hi) / 2
 
 # ── Trajectories (well-separated terminals) ──
 traj = {
-    'A': np.array([8.2, 7.4, 6.2, 5.0, 4.2, 3.0]),    # safe → target, close to Y* (RA pick)
-    'B': np.array([7.0, 6.5, 5.8, 5.2, 4.8, 4.3]),    # safe → target, farther from Y*
+    'A': np.array([8.2, 7.4, 6.2, 5.0, 3.8, 2.9]),    # safe → target, close to Y* (RA pick)
+    'B': np.array([7.0, 6.5, 5.8, 5.2, 4.8, 4.4]),    # safe → target, farther from Y*
     'C': np.array([6.8, 7.0, 6.6, 6.3, 5.8, 5.5]),    # misses target
-    'D': np.array([9.2, 8.0, 6.8, 10.8, 4.8, 3.2]),   # closest to Y* but violates S
+    'D': np.array([9.2, 8.0, 6.8, 10.8, 4.8, 3.3]),   # closest to Y* but violates S
 }
 
 # ── Visual style ──
@@ -70,16 +70,19 @@ def draw_panel(ax, selected, rejected, annot_label, annot_color,
     ax.axhline(T_hi, color='#28a745', ls='-',  lw=0.8, alpha=0.4, zorder=1)
     ax.axhline(T_lo, color='#28a745', ls='-',  lw=0.8, alpha=0.4, zorder=1)
 
-    # Y* line (always shown — it's the ELBO target)
+    # Y* line and point marker (right of terminals, clearly visible)
     ax.axhline(Y_STAR, color='#1a5e28', ls=':', lw=1.0, alpha=0.45, zorder=1)
-    ax.text(tau + 0.15, Y_STAR + 0.25, '$Y^*$', fontsize=18,
-            color='#1a5e28', va='bottom', ha='left')
+    ax.plot(tau + 0.5, Y_STAR, '*', color='#0d4a1a', markersize=20,
+            markeredgecolor='white', markeredgewidth=1.0, zorder=9,
+            clip_on=False)
+    ax.text(tau + 0.5, Y_STAR + 0.3, '$Y^*$', fontsize=18,
+            color='#0d4a1a', fontweight='bold', va='bottom', ha='center')
 
     # ── Region labels (shifted further right to avoid Y* overlap) ──
-    ax.text(tau + 0.55, (T_lo + T_hi) / 2, r'$\mathcal{T}$',
+    ax.text(tau + 0.85, (T_lo + T_hi) / 2, r'$\mathcal{T}$',
             fontsize=26, fontweight='bold', color='#1a7832',
             va='center', ha='left', alpha=0.6)
-    ax.text(tau + 0.55, (T_hi + S_hi) / 2, r'$\mathcal{S}$',
+    ax.text(tau + 0.85, (T_hi + S_hi) / 2, r'$\mathcal{S}$',
             fontsize=26, fontweight='bold', color='#555555',
             va='center', ha='left', alpha=0.4)
     ax.text(0.15, 11.5, 'Unsafe',
@@ -115,15 +118,10 @@ def draw_panel(ax, selected, rejected, annot_label, annot_color,
         zorder=8,
     )
 
-    # ── Rejection: large X on terminal points ──
-    for key in rejected:
-        y_rej = traj[key][-1]
-        ax.plot(tau, y_rej, 'o', color='white', markersize=15, zorder=5.5)
-        ax.plot(tau, y_rej, 'X', color='#cc0000', markersize=15,
-                markeredgewidth=3.0, zorder=6)
+    # ── Rejection: large X on terminal points (disabled) ──
 
     # ── Axes ──
-    ax.set_xlim(-0.4, tau + 1.0)
+    ax.set_xlim(-0.4, tau + 1.4)
     ax.set_ylim(-0.5, 12.5)
     ax.set_xticks(ts)
     xlabels = ['$t$'] + ['$t{\\!+\\!}' + str(s) + '$' for s in range(1, tau + 1)]
