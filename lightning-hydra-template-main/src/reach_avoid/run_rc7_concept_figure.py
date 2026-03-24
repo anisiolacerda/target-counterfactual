@@ -57,7 +57,7 @@ LABELS = {
 
 
 def draw_panel(ax, selected, rejected, annot_label, annot_color,
-               annot_xytext=(1.8, 0.5), show_ystar=False):
+               annot_xytext=(1.8, 0.5)):
 
     # ── Regions ──
     ax.axhspan(S_hi, 12.5, color='#fce4e4', zorder=0)     # unsafe top
@@ -70,16 +70,16 @@ def draw_panel(ax, selected, rejected, annot_label, annot_color,
     ax.axhline(T_hi, color='#28a745', ls='-',  lw=0.8, alpha=0.4, zorder=1)
     ax.axhline(T_lo, color='#28a745', ls='-',  lw=0.8, alpha=0.4, zorder=1)
 
-    if show_ystar:
-        ax.axhline(Y_STAR, color='#1a5e28', ls=':', lw=1.0, alpha=0.45, zorder=1)
-        ax.text(tau + 0.15, Y_STAR + 0.25, '$Y^*$', fontsize=18,
-                color='#1a5e28', va='bottom', ha='left')
+    # Y* line (always shown — it's the ELBO target)
+    ax.axhline(Y_STAR, color='#1a5e28', ls=':', lw=1.0, alpha=0.45, zorder=1)
+    ax.text(tau + 0.15, Y_STAR + 0.25, '$Y^*$', fontsize=18,
+            color='#1a5e28', va='bottom', ha='left')
 
-    # ── Region labels ──
-    ax.text(tau + 0.3, (T_lo + T_hi) / 2, r'$\mathcal{T}$',
+    # ── Region labels (shifted further right to avoid Y* overlap) ──
+    ax.text(tau + 0.55, (T_lo + T_hi) / 2, r'$\mathcal{T}$',
             fontsize=26, fontweight='bold', color='#1a7832',
             va='center', ha='left', alpha=0.6)
-    ax.text(tau + 0.3, (T_hi + S_hi) / 2, r'$\mathcal{S}$',
+    ax.text(tau + 0.55, (T_hi + S_hi) / 2, r'$\mathcal{S}$',
             fontsize=26, fontweight='bold', color='#555555',
             va='center', ha='left', alpha=0.4)
     ax.text(0.15, 11.5, 'Unsafe',
@@ -127,7 +127,7 @@ def draw_panel(ax, selected, rejected, annot_label, annot_color,
                 markeredgewidth=3.0, zorder=6)
 
     # ── Axes ──
-    ax.set_xlim(-0.4, tau + 0.7)
+    ax.set_xlim(-0.4, tau + 1.0)
     ax.set_ylim(-0.5, 12.5)
     ax.set_xticks(ts)
     xlabels = ['$t$'] + ['$t{\\!+\\!}' + str(s) + '$' for s in range(1, tau + 1)]
@@ -148,8 +148,7 @@ def main():
     # (a) ELBO picks D
     draw_panel(ax_l, selected='D', rejected=[],
                annot_label='Selects D\n(best ELBO, unsafe path)',
-               annot_color='#e66a00', annot_xytext=(1.5, 0.3),
-               show_ystar=True)
+               annot_color='#e66a00', annot_xytext=(1.5, 0.3))
     ax_l.set_ylabel('Outcome  $Y_s$', fontsize=19)
     ax_l.set_title('(a)  Point-Target ELBO Selection',
                     fontsize=18, fontweight='bold', pad=10)
@@ -157,8 +156,7 @@ def main():
     # (b) RA picks A (D rejected for safety; B feasible but worse ELBO)
     draw_panel(ax_r, selected='A', rejected=['D'],
                annot_label='Selects A\n(best ELBO in feasible set)',
-               annot_color='#1a7832', annot_xytext=(1.2, 0.3),
-               show_ystar=False)
+               annot_color='#1a7832', annot_xytext=(1.2, 0.3))
     ax_r.set_title('(b)  Reach-Avoid Constrained Selection',
                     fontsize=18, fontweight='bold', pad=10)
 
