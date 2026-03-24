@@ -101,15 +101,11 @@ def draw_panel(ax, selected, rejected, annot_label, annot_color,
                 ax.plot(i, y, 'X', color='#cc0000', markersize=12,
                         markeredgewidth=2.5, zorder=5)
 
-    # ── Selected: gold star ──
+    # ── Annotation arrow to selected terminal ──
     y_sel = traj[selected][-1]
-    ax.plot(tau, y_sel, '*', color='#FFD700', markersize=26,
-            markeredgecolor='black', markeredgewidth=1.2, zorder=7)
-
-    # ── Annotation: place BELOW the target region for clarity ──
     ax.annotate(
         annot_label,
-        xy=(tau - 0.15, y_sel),
+        xy=(tau, y_sel),
         xytext=annot_xytext,
         fontsize=16, fontweight='bold', color=annot_color,
         arrowprops=dict(arrowstyle='->', color=annot_color,
