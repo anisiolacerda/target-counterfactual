@@ -35,10 +35,10 @@ Y_STAR = (T_lo + T_hi) / 2
 
 # ── Trajectories (well-separated terminals) ──
 traj = {
-    'A': np.array([8.2, 7.4, 6.2, 5.0, 4.2, 3.2]),    # safe → target, best ELBO (RA pick)
-    'B': np.array([7.0, 6.5, 5.8, 5.2, 4.8, 4.2]),    # safe → target, worse ELBO than A
+    'A': np.array([8.2, 7.4, 6.2, 5.0, 4.2, 3.0]),    # safe → target, close to Y* (RA pick)
+    'B': np.array([7.0, 6.5, 5.8, 5.2, 4.8, 4.3]),    # safe → target, farther from Y*
     'C': np.array([6.8, 7.0, 6.6, 6.3, 5.8, 5.5]),    # misses target
-    'D': np.array([9.2, 8.0, 6.8, 10.8, 4.8, 2.8]),   # best terminal, violates S at s=3
+    'D': np.array([9.2, 8.0, 6.8, 10.8, 4.8, 3.2]),   # closest to Y* but violates S
 }
 
 # ── Visual style ──
