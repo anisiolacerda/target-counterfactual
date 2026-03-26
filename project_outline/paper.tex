@@ -74,8 +74,10 @@ Individualized treatment planning from observational data is a central challenge
 
 However, clinical treatment planning has two features that point-target ELBO optimization does not capture:
 
+\vspace{-0.8em}
 \paragraph{Range targets, not point targets.} Clinicians do not aim for a single number. They aim for an \emph{acceptable range}: diastolic blood pressure in $[60, 90]$~mmHg, tumor volume below a stage-dependent threshold, blood glucose within safe bounds. A treatment plan that overshoots the target by 1\% and one that undershoots it by 50\% receive the same ELBO penalty if they are equidistant from the point target, yet their clinical implications differ fundamentally. This limitation was explicitly identified in the VCIP peer review process, where a reviewer noted the restrictive nature of single-point targets for clinical applications and the authors acknowledged range-based targets as important future work.
 
+\vspace{-0.8em}
 \paragraph{Path safety, not just terminal achievement.} ELBO-based planning evaluates only the terminal outcome~$Y_{t+\tau}$. It is blind to what happens along the way. A chemotherapy regimen that produces dangerously high toxicity at step~$t{+}3$ before recovering at step~$t{+}\tau$ may rank identically to a safe regimen---both achieve the same terminal tumor volume. In clinical practice, intermediate safety violations are unacceptable: a patient whose blood pressure drops to dangerous levels during treatment has suffered harm regardless of the final reading.
 
 These concerns arise naturally from the reach-avoid control literature~\citep{mitchell2005reach, fisac2015reach}, where the objective is to steer a dynamical system into a target set while avoiding unsafe regions throughout the trajectory. Figure~\ref{fig:concept} illustrates the distinction: ELBO-based selection picks the sequence with the best terminal loss (D), ignoring its unsafe intermediate path, while reach-avoid constrained selection picks the best ELBO among sequences with safe trajectories (A).
@@ -87,6 +89,7 @@ These concerns arise naturally from the reach-avoid control literature~\citep{mi
 \label{fig:concept}
 \end{figure}
 
+\vspace{-0.8em}
 \paragraph{Our approach.} We propose \emph{reach-avoid constrained selection}: given a set of candidate treatment sequences ranked by ELBO, we filter out sequences that fail a reach-avoid feasibility criterion and select the best ELBO among the feasible set:
 \begin{equation}
 \label{eq:ra_selection}
@@ -96,6 +99,7 @@ where $\cF_{\mathrm{RA}} = \{\ba : Y_{t+\tau}[\ba] \in \cT \text{ and } Y_s[\ba]
 
 The simplicity is a feature. By separating safety (via the RA filter) from quality (via ELBO ranking), we avoid the failure mode we observed when attempting to use RA scoring as a \emph{replacement} for ELBO ranking: the RA score is near-binary (sequences are either clearly feasible or clearly not), providing no discrimination among candidates. ELBO ranking and RA feasibility are complementary---each does what the other cannot.
 
+\vspace{-0.8em}
 \paragraph{Contributions.}
 \begin{enumerate}
 \item \textbf{Problem formulation.} We formalize reach-avoid counterfactual intervention planning, connecting the clinical requirement of range targets with path safety to the reach-avoid framework from control theory (Section~\ref{sec:method}).
@@ -111,12 +115,16 @@ The simplicity is a feature. By separating safety (via the RA filter) from quali
 
 We provide a concise overview here; Appendix~\ref{app:extended_related_work} contains a comprehensive survey with additional references.
 
+\vspace{-0.8em}
 \paragraph{Counterfactual outcome estimation and planning.} A growing body of work estimates individualized treatment effects from longitudinal observational data, including balanced representations~\citep{shalit2017estimating, bica2020crn}, variational approaches~\citep{louizos2017cevae}, attention-based architectures~\citep{melnychuk2022causal}, recurrent methods~\citep{lim2018forecasting, li2021gnet}, continuous-time models~\citep{seedat2022actin}, and synthetic control~\citep{qian2021synctwin}. Recent advances address hidden confounding~\citep{bica2020tsd, frauen2023sharp} and employ contrastive~\citep{kim2024causalcpc} or generative~\citep{wu2024counterfactual, pawlowski2020deep} approaches. These methods estimate outcomes for \emph{given} treatments but do not optimize over treatment sequences. VCIP~\citep{melnychuk2025vcip} extends this line to \emph{planning}: it selects intervention sequences by ELBO minimization toward a point target. Our work keeps the VCIP planning infrastructure intact and adds a safety-aware selection layer.
 
+\vspace{-0.8em}
 \paragraph{Dynamic treatment regimes.} The DTR literature~\citep{murphy2003optimal, chakraborty2014dynamic, hernan2020causal} formalizes sequential treatment decisions under the potential outcomes framework, with recent work on when-to-treat policies~\citep{nie2021learning} and batch constrained learning~\citep{le2019batch}. Most DTR methods learn decision rules mapping states to actions, optimizing expected outcomes over the full trajectory. In contrast, VCIP and our extension operate in a \emph{counterfactual planning} mode: given a specific patient history, they evaluate and rank complete intervention sequences. The reach-avoid formulation adds the constraint that trajectories must remain safe---a concern shared with constrained DTR work but addressed here through a distinct mechanism (post-hoc filtering rather than constrained policy learning).
 
+\vspace{-0.8em}
 \paragraph{Safe and constrained sequential decision-making.} Safe reinforcement learning~\citep{garcia2015comprehensive, achiam2017constrained, tessler2019rcpo} constrains policies to satisfy safety specifications during execution, from Lyapunov-based methods~\citep{chow2018safe} to safety layers~\citep{dalal2018safe} to offline safe RL~\citep{zheng2024fisor}. These methods operate in the online or offline RL setting, requiring either environment interaction or fixed datasets of state-action trajectories. Our setting is fundamentally different: we select among candidate plans evaluated on a learned model, with no opportunity for policy-level correction. This distinction motivates a filter-based approach rather than constrained policy optimization. The \emph{reach-avoid} concept from control theory~\citep{mitchell2005reach, fisac2015reach, bansal2021deepreach} formalizes the objective of reaching a target set while avoiding unsafe regions. We import this concept into the variational counterfactual planning framework, replacing the continuous reachability computation with a discrete feasibility check over candidate sequences.
 
+\vspace{-0.8em}
 \paragraph{Variational causal inference.} CEVAE~\citep{louizos2017cevae} pioneered VAE-based causal inference under hidden confounding; Deep SCMs~\citep{pawlowski2020deep} extended this to full counterfactual reasoning via normalizing flows. VCI~\citep{wu2025vci} derives an ELBO for individual-level counterfactual likelihoods in a static setting, introducing latent disentanglement via $D_{\KL}[q(z|y,t,x) \| q(z|y',t',x)]$. We draw on VCI's insight that latent action-sensitivity is a diagnostic for counterfactual model quality (Section~\ref{sec:e4_diagnostic}), adapting it to the sequential setting. Our diagnostic reveals that VCIP's latent space is nearly action-invariant ($D_{\KL} \approx 10^{-5}$), with action-outcome coupling residing entirely in the decoder.
 
 
@@ -126,8 +134,10 @@ We provide a concise overview here; Appendix~\ref{app:extended_related_work} con
 
 We briefly review the VCIP framework~\citep{melnychuk2025vcip} to establish notation.
 
+\vspace{-0.8em}
 \paragraph{Setting.} Consider a longitudinal observational dataset with patient histories $\bH_t = (X_1, A_1, Y_1, \ldots, X_t, A_t, Y_t)$, where $X_s \in \R^p$ are time-varying covariates, $A_s \in \cA$ are treatments (binary or categorical), and $Y_s \in \R^d$ are outcomes of interest. Given a patient's history $\bH_t$ up to time $t$ and a planning horizon $\tau$, the goal is to select an intervention sequence $\ba = (a_{t+1}, \ldots, a_{t+\tau}) \in \cA^\tau$ that optimizes the counterfactual outcome $Y_{t+\tau}[\ba]$.
 
+\vspace{-0.8em}
 \paragraph{Latent dynamics model.} VCIP posits a latent state $Z_s \in \R^{d_z}$ with:
 \begin{itemize}
     \item Generative transition: $p_\theta(Z_{s+1} \mid Z_s, a_s)$, modeling how latent states evolve under treatment,
@@ -140,6 +150,7 @@ The model is trained by maximizing an ELBO on observed trajectories:
 \mathcal{L}(\theta, \phi) = \E_{q_\phi}\!\left[\sum_{s=t+1}^{t+\tau} \log p_\theta(Y_s \mid Z_s)\right] - D_{\KL}\!\left[q_\phi(Z_{t:t+\tau} \mid \bH_t, \ba) \,\|\, p_\theta(Z_{t:t+\tau} \mid \bH_t, \ba)\right].
 \end{equation}
 
+\vspace{-0.8em}
 \paragraph{Planning by ELBO minimization.} Given a patient history $\bH_t$, VCIP generates $k$ candidate treatment sequences (via perturbation of the observed treatments) and selects the one minimizing the ELBO loss with respect to a point target $Y^*$:
 \begin{equation}
 \label{eq:vcip_selection}
@@ -287,6 +298,7 @@ where $C_d = \sup_{\ba} \mathrm{Var}_{p_\theta}(\|Y_{t+\tau}[\ba] - Y^*\|^2 \mid
 In the hard-filter limit ($\kappa \to \infty$, so $\varepsilon_{\mathrm{soft}} = 0$), reach-avoid ranking is preserved whenever $|P(\ba_1) - P(\ba_2)| > 2\varepsilon_{\mathrm{VI}}$. For deterministic trajectories (as in the Cancer simulator), feasibility is binary ($P \in \{0, 1\}$), so the filter is exact whenever $\varepsilon_{\mathrm{VI}} < 0.5$.
 \end{corollary}
 
+\vspace{-0.8em}
 \paragraph{Empirical verification.} We estimate $\varepsilon_{\mathrm{VI}}$ on the Cancer simulator using rank mean absolute error as a proxy (Section~\ref{sec:ablation_eps}). We find $\varepsilon_{\mathrm{VI}} \approx 0.09$--$0.23$ across confounding strengths, with ELBO pairwise ranking preservation at 61--87\%. The bound is non-vacuous: for pairs differing in feasibility status (margin $= 1$), the condition $m > 2\varepsilon_{\mathrm{VI}} \approx 0.18$--$0.46$ is easily satisfied. Notably, $\varepsilon_{\mathrm{VI}}$ \emph{decreases} with confounding strength $\gamma$ (the model is better calibrated when treatment effects are stronger), meaning the bound is tightest precisely where RA filtering is most valuable.
 
 
@@ -299,14 +311,19 @@ We evaluate reach-avoid constrained selection on two datasets: (1)~a cancer tumo
 \subsection{Setup}
 \label{sec:setup}
 
+\vspace{-0.8em}
 \paragraph{Cancer simulator.} The simulator models tumor growth under chemotherapy and radiotherapy~\citep{geng2017cancer, bica2020cancer}. Treatment assignment is confounded by a parameter $\gamma \in \{1, 2, 3, 4\}$: higher $\gamma$ means patients with larger tumors receive more aggressive treatment, creating stronger confounding between treatment assignment and outcomes. We use the VCIP~\citep{melnychuk2025vcip} implementation with 5 random seeds per configuration, $k = 100$ candidate sequences per patient, $n = 100$ evaluation patients, and planning horizons $\tau \in \{2, 4, 6, 8\}$.
 
+\vspace{-0.8em}
 \paragraph{Cancer thresholds.} Calibrated from the data distribution: target set $\cT$: tumor volume $\leq 3.0$ (below the 60th percentile, corresponding to a clinically manageable stage). Safety set $\cS$: tumor volume $\leq 12.0$ (below the 95th percentile) and chemotherapy dosage $\leq 5.0$ (below the toxic threshold) at all intermediate steps.
 
+\vspace{-0.8em}
 \paragraph{MIMIC-III.} We use the MIMIC-Extract pipeline~\citep{wang2020mimic} to extract 34,472 ICU patients with hourly measurements from the MIMIC-III database~\citep{johnson2016mimic}. The outcome is diastolic blood pressure (DBP). Target set: DBP $\in [60, 90]$~mmHg (normotensive range). Safety set: DBP $\in [40, 120]$~mmHg at all steps (avoids dangerous hypo-/hypertension). We train VCIP models with 5 seeds and evaluate with $\tau \in \{2, 3, 4, 5\}$.
 
+\vspace{-0.8em}
 \paragraph{Baselines.} We compare five counterfactual estimation models, each evaluated with and without RA-constrained selection: VCIP~\citep{melnychuk2025vcip}, CRN~\citep{bica2020crn}, Causal Transformer (CT)~\citep{melnychuk2022causal}, RMSN~\citep{lim2018forecasting}, and ACTIN~\citep{seedat2022actin}.
 
+\vspace{-0.8em}
 \paragraph{Metrics.} (1)~\emph{GRP}: ground-truth rank percentile of the selected sequence among $k$ candidates (higher = better; available on Cancer only). (2)~\emph{Top-1 accuracy}: fraction of patients for whom the selected sequence is the ground-truth best. (3)~\emph{Safety rate}: fraction where all intermediate safety constraints hold. (4)~\emph{In-target rate}: fraction where the terminal outcome lies in $\cT$. (5)~\emph{Feasibility}: fraction of candidate sequences passing the RA filter.
 
 
@@ -334,6 +351,7 @@ $\tau$ & Feas.\% & ELBO Top-1 & RA Top-1 & ELBO Safe & RA Safe & ELBO In-T & RA 
 
 RA-constrained selection consistently improves safety and in-target rates by 9--12~pp across all horizons, at the cost of 1--15~pp in Top-1 accuracy. The trade-off is most favorable at shorter horizons ($\tau = 2$: $+$9.4~pp safety for $-$1.4~pp Top-1) where feasibility is highest (54\%), and becomes more aggressive at longer horizons where fewer candidates pass intermediate safety across all steps.
 
+\vspace{-0.8em}
 \paragraph{Confounding strength sensitivity.} Table~\ref{tab:gamma_sweep} shows results across all $\gamma$ values. At $\gamma = 1$ (weak confounding), the constraint is nearly a no-op---ELBO already selects safe plans. At $\gamma = 4$, the benefit is substantial: $+$10.8~pp in-target gain, $+$15.2~pp safety gain. The method never hurts: worst-case Top-1 cost is 7~pp with 15~pp safety gain.
 
 \begin{table}[t]
@@ -378,7 +396,7 @@ $\tau$ & Feas.\% & ELBO In-T & RA In-T & $\Delta$ In-T & ELBO DBP & RA DBP \\
 \end{tabular}
 \end{table}
 
-RA-constrained selection also shifts predicted treatment patterns: constrained selections have substantially lower vasopressor rates (0.01--0.29 vs.\ 0.29--0.79 under ELBO), suggesting the constraint preferentially removes aggressive treatment plans that risk hypotension. While we cannot verify ground-truth safety on real data (counterfactual trajectories are unobservable), the treatment pattern shift is clinically plausible: lower vasopressor use is consistent with avoiding blood pressure drops.
+RA-constrained selection also shifts predicted treatment patterns: constrained selections have substantially lower vasopressor rates (0.01--0.29 vs.\ 0.29--0.79 under ELBO), suggesting the constraint preferentially removes aggressive treatment plans that risk hypotension. This aligns with recent clinical evidence favoring conservative vasopressor management in hemodynamically stable patients. The 99--100\% in-target rate means nearly all selected plans keep blood pressure within the normotensive range, while the reduced vasopressor selection indicates fewer aggressive interventions---exactly the combination a clinician would seek. While we cannot verify ground-truth safety on real data (counterfactual trajectories are unobservable), the treatment pattern shift is clinically plausible and demonstrates practical value: the RA filter produces plans that are both effective and conservative.
 
 
 \subsection{Model-Agnostic Evaluation}
@@ -404,7 +422,7 @@ RMSN  & 0.578 & 2.8\%  & 2.0\%  & 49.0\% & 72.2\% & $-$13.2 \\
 \end{tabular}
 \end{table}
 
-This demonstrates that RA-constrained selection is truly model-agnostic: the safety filter operates on ground-truth trajectories (in the Cancer simulator), independent of which model provides the ELBO ranking. Any model---no matter how poorly it ranks---benefits from having its worst selections removed.
+This demonstrates that RA-constrained selection is truly model-agnostic: the safety filter operates on ground-truth trajectories (in the Cancer simulator), independent of which model provides the ELBO ranking. Any model---no matter how poorly it ranks---benefits from having its worst selections removed. Computationally, the RA filter adds negligible overhead: it evaluates pre-computed trajectories against threshold conditions, requiring $< 1$~minute per full configuration on a single CPU---in contrast to constrained RL methods that require complete retraining when safety specifications change.
 
 
 \subsection{Hard Filter vs.\ Soft Constraint}
@@ -418,24 +436,30 @@ At $\gamma = 4$ and comparable safety (${\sim}86\%$), hard filtering achieves 32
 \subsection{Ablations}
 \label{sec:ablations}
 
+\vspace{-0.8em}
 \paragraph{Target set size sensitivity.}
 \label{sec:ablation_target}
 The method offers a smooth, continuously tunable trade-off (Table~\ref{tab:target_size}, Appendix~\ref{app:ablation_tables}): narrow targets ($\cT_u = 1.5$) yield $+$27~pp safety at $\tau = 8$ but only 1.7\% feasibility; broad targets ($\cT_u = 10$) become near-no-ops. Our moderate default ($\cT_u = 3.0$) balances safety gain ($+$9--23~pp) with feasibility (10--54\%).
 
+\vspace{-0.8em}
 \paragraph{Sigmoid hardness $\kappa$.}
 \label{sec:ablation_kappa}
 For $\kappa \geq 5$, soft indicator selection agrees with the hard filter at $> 99.9\%$ (Table~\ref{tab:kappa}, Appendix~\ref{app:ablation_tables}). This validates Assumption~\ref{ass:soft_error}: $\varepsilon_{\text{soft}}(\kappa) \approx 0$ for all practical purposes.
 
+\vspace{-0.8em}
 \paragraph{Reach-only vs.\ reach-avoid decomposition.}
 The target constraint (reach) drives most of the in-target improvement: 85\% $\to$ 96--99\% (Table~\ref{tab:decomp}, Appendix~\ref{app:ablation_tables}). The safety constraint (avoid) adds incremental value at longer horizons where trajectories pass through unsafe intermediate states. Both components are justified: reach provides the primary clinical benefit, avoid provides the formal path-safety guarantee.
 
+\vspace{-0.8em}
 \paragraph{$\varepsilon_{\mathrm{VI}}$ estimation and bound verification.}
 \label{sec:ablation_eps}
 We estimate $\varepsilon_{\mathrm{VI}}$ using rank MAE as a proxy (Table~\ref{tab:eps_vi}, Appendix~\ref{app:ablation_tables}). The variational gap decreases with $\gamma$ ($\hat{\varepsilon}_{\mathrm{VI}} = 0.23$ at $\gamma{=}1$ to $0.11$ at $\gamma{=}4$), meaning the Theorem~\ref{thm:ranking_robustness} bound is tightest where RA filtering is most valuable. ELBO pairwise ranking preservation is 61--87\%, and the bound is non-vacuous: for feasibility-differing pairs ($m = 1$), $m > 2\varepsilon_{\mathrm{VI}}$ is easily satisfied.
 
+\vspace{-0.8em}
 \paragraph{Midpoint-baseline comparison.}
 An \emph{oracle} midpoint ranker using \emph{ground-truth} terminal values achieves worse Top-1 than ELBO (58.2\% vs.\ 75.8\% at $\tau = 8$) because midpoint distance $\neq$ ground-truth loss (Appendix~\ref{app:midpoint}). RA-constrained ELBO matches the oracle's in-target rate ($\sim$94--97\%) without oracle information, while additionally enforcing path safety.
 
+\vspace{-0.8em}
 \paragraph{Intermediate prediction quality.}
 VCIP's per-step predictions $\hat{Y}_s$ show near-zero Spearman correlation with simulator ground-truth across individuals ($\rho \approx 0$ at all steps), confirming vanilla VCIP is not calibrated for intermediate predictions. RA filtering does \emph{not} rely on this: on Cancer it uses simulator ground-truth trajectories, and on MIMIC it uses model-predicted trajectories evaluated after the full forward pass.
 
@@ -444,13 +468,20 @@ VCIP's per-step predictions $\hat{Y}_s$ show near-zero Spearman correlation with
 \section{Discussion and Conclusion}
 \label{sec:discussion}
 
+\vspace{-0.8em}
 \paragraph{When does RA help most?} The benefit scales with confounding strength (Table~\ref{tab:gamma_sweep}): at $\gamma = 1$, ELBO already selects safe plans; at $\gamma \geq 3$, RA filtering provides 12--33~pp safety improvement---most valuable where planning is most challenging.
 
+\vspace{-0.8em}
 \paragraph{The cost of safety.} The Top-1 cost (1--15~pp at $\gamma = 4$) is broadly distributed across patients (82/100 affected; Appendix~\ref{app:heterogeneity}), reflecting a fundamental property of hard constraints rather than a correctable estimation error.
 
+\vspace{-0.8em}
 \paragraph{Separation of concerns.} Using RA scoring as a \emph{replacement} for ELBO ranking fails (RA Top-1 $\approx 1\%$): RA scores are near-binary. ELBO ranking and RA feasibility are complementary.
 
-\paragraph{Limitations and future work.} (1)~$\cT$ and $\cS$ require domain expertise (Table~\ref{tab:target_size} shows robustness). (2)~On MIMIC-III, counterfactuals are unobservable. (3)~Feasibility drops at long horizons. (4)~Sequential ignorability is assumed. Future work includes formal sensitivity analysis, multi-outcome targets, and adaptive threshold selection.
+\vspace{-0.8em}
+\paragraph{Toward clinical guardrails.} The post-hoc filtering paradigm we propose is an instance of \emph{guardrails} for AI-driven treatment planning, analogous to shielding in safe RL~\citep{alshiekh2018shielding}: rather than training the model to be safe, we add an external safety check on its outputs. This separation has practical deployment advantages: safety thresholds can be adjusted by clinicians without retraining the model, and the same base model can operate under different constraint profiles for different patient populations or clinical contexts.
+
+\vspace{-0.8em}
+\paragraph{Limitations and future work.} (1)~$\cT$ and $\cS$ require domain expertise (Table~\ref{tab:target_size} shows robustness). (2)~On MIMIC-III, counterfactuals are unobservable. (3)~Feasibility drops at long horizons. (4)~Sequential ignorability is assumed. Future work includes formal sensitivity analysis, multi-outcome targets, and adaptive threshold selection. Despite these limitations, reach-avoid constrained selection demonstrates that meaningful safety improvements in counterfactual planning can be achieved through principled post-hoc filtering, without any modification to the underlying generative model.
 
 
 %% ============================================================
@@ -459,64 +490,90 @@ VCIP's per-step predictions $\hat{Y}_s$ show near-zero Spearman correlation with
 
 
 %% ============================================================
-\section*{Checklist}
+\section*{NeurIPS Paper Checklist}
 
 \begin{enumerate}
-\item For all authors...
-\begin{enumerate}
-  \item Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
-    \answerYes{See Sections~\ref{sec:theory} and~\ref{sec:experiments}.}
-  \item Did you describe the limitations of your work?
-    \answerYes{See Section~\ref{sec:discussion}, ``Limitations'' paragraph.}
-  \item Did you discuss any potential negative societal impacts of your work?
-    \answerYes{See Section~\ref{sec:discussion}, ``Broader impact'' paragraph.}
-  \item Have you read the ethics review guidelines and ensured that your paper conforms to them?
-    \answerYes{}
-\end{enumerate}
 
-\item If you are including theoretical results...
-\begin{enumerate}
-  \item Did you state the full set of assumptions of all theoretical results?
-    \answerYes{Assumptions~\ref{ass:vi_gap} and~\ref{ass:soft_error}.}
-  \item Did you include complete proofs of all theoretical results?
-    \answerYes{Proof sketch in Section~\ref{sec:theory}; full proof in Appendix~\ref{app:proofs}.}
-\end{enumerate}
+\item {\bf Claims}
+    \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: The abstract and introduction claim (1)~a reach-avoid constrained selection formulation, (2)~ranking robustness theory, (3)~18--33~pp safety improvement on Cancer and 99--100\% in-target on MIMIC-III, and (4)~model-agnostic post-hoc applicability. All are supported by Sections~\ref{sec:method},~\ref{sec:theory}, and~\ref{sec:experiments}.
 
-\item If you ran experiments...
-\begin{enumerate}
-  \item Did you include the code, data, and instructions needed to reproduce the main experimental results?
-    \answerYes{Code will be released upon acceptance. Cancer simulator is publicly available. MIMIC-III requires PhysioNet credentialed access.}
-  \item Did you specify all the training details?
-    \answerYes{Section~\ref{sec:setup} and Appendix~\ref{app:details}.}
-  \item Did you report error bars?
-    \answerYes{All results averaged over 5 seeds. Standard deviations reported in Appendix~\ref{app:details}.}
-  \item Did you include the total amount of compute?
-    \answerYes{See Appendix~\ref{app:details}.}
-\end{enumerate}
+\item {\bf Limitations}
+    \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: Section~\ref{sec:discussion} (``Limitations and future work'') discusses four limitations: domain expertise for threshold selection, unobservable counterfactuals on MIMIC-III, feasibility drop at long horizons, and the sequential ignorability assumption.
 
-\item If you are using existing assets...
-\begin{enumerate}
-  \item If your work uses existing assets, did you cite the creators?
-    \answerYes{VCIP~\citep{melnychuk2025vcip}, MIMIC-III~\citep{johnson2016mimic}, MIMIC-Extract~\citep{wang2020mimic}, Cancer simulator~\citep{bica2020cancer}.}
-  \item Did you mention the license of the assets?
-    \answerYes{MIMIC-III: PhysioNet Credentialed Health Data License 1.5.0.}
-  \item Did you include any new assets?
-    \answerYes{Code will be released upon acceptance.}
-  \item Did you discuss whether and how consent was obtained from people whose data you're using/curating?
-    \answerNA{MIMIC-III is de-identified with established IRB approval; Cancer simulator is fully synthetic.}
-  \item Did you discuss whether the data contains personally identifiable information?
-    \answerNA{MIMIC-III is de-identified per HIPAA Safe Harbor; Cancer simulator is synthetic.}
-\end{enumerate}
+\item {\bf Theory assumptions and proofs}
+    \item[] Question: For each theoretical result, does the paper provide the full set of assumptions and a complete (and correct) proof?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: Theorem~\ref{thm:ranking_robustness} states two assumptions (Assumptions~\ref{ass:vi_gap} and~\ref{ass:soft_error}). A proof sketch is in Section~\ref{sec:theory}; the full proof is in Appendix~\ref{app:proofs}.
 
-\item If you used crowdsourcing or conducted research with human subjects...
-\begin{enumerate}
-  \item Did you include the full text of instructions given to participants?
-    \answerNA{}
-  \item Did you describe any potential participant risks?
-    \answerNA{}
-  \item Did you include the estimated hourly wage paid to participants?
-    \answerNA{}
-\end{enumerate}
+\item {\bf Experimental result reproducibility}
+    \item[] Question: Does the paper fully disclose all the information needed to reproduce the main experimental results of the paper to the extent that it affects the main claims and/or conclusions of the paper (regardless of whether the code and data are provided or not)?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: Section~\ref{sec:setup} specifies datasets, thresholds, baselines, and metrics. Appendix~\ref{app:details} provides all hyperparameters, candidate generation procedure, and compute budget. The Cancer simulator is publicly available; MIMIC-III requires PhysioNet credentialed access.
+
+\item {\bf Open access to data and code}
+    \item[] Question: Does the paper provide open access to the data and code, with sufficient instructions to faithfully reproduce the main experimental results, as described in supplemental material?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: Code will be released upon acceptance. The Cancer simulator is publicly available~\citep{bica2020cancer}. MIMIC-III~\citep{johnson2016mimic} is available via PhysioNet credentialed access. MIMIC-Extract preprocessing~\citep{wang2020mimic} is open-source.
+
+\item {\bf Experimental setting/details}
+    \item[] Question: Does the paper specify all the training and test details (e.g., data splits, hyperparameters, how they were chosen, type of optimizer) necessary to understand the results?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: Section~\ref{sec:setup} and Appendix~\ref{app:details} specify all model configurations, training details, and evaluation procedures.
+
+\item {\bf Experiment statistical significance}
+    \item[] Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: All results are averaged over 5 random seeds. Table~\ref{tab:main_cancer} reports mean $\pm$ std. Appendix~\ref{app:details} provides full standard deviations for all metrics.
+
+\item {\bf Experiments compute resources}
+    \item[] Question: For each experiment, does the paper provide sufficient information on the computer resources (type of compute workers, memory, time of execution) needed to reproduce the experiments?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: Appendix~\ref{app:details} reports GPU types (RTX 2060, RTX 3090), wall-clock times, and estimated costs for all training and evaluation phases.
+
+\item {\bf Code of ethics}
+    \item[] Question: Does the research conducted in the paper conform, in every respect, with the NeurIPS Code of Ethics?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: The work uses de-identified clinical data (MIMIC-III) under appropriate data use agreements and a fully synthetic simulator. No human subjects were involved.
+
+\item {\bf Broader impacts}
+    \item[] Question: Does the paper discuss both potential positive societal impacts and negative societal impacts of the work performed?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: Section~\ref{sec:discussion} (``Toward clinical guardrails'') discusses positive impacts (safer treatment planning, clinician-adjustable constraints). The method is designed to \emph{improve} safety of AI-driven treatment recommendations. A potential negative impact is over-reliance on the safety filter without clinical validation; this is mitigated by the method's transparency (explicit threshold parameters) and the requirement for domain expertise in setting $\cT$ and $\cS$.
+
+\item {\bf Safeguards}
+    \item[] Question: Does the paper describe safeguards that have been put in place for responsible release of data or models that have a high risk for misuse?
+    \item[] Answer: \answerNA{}
+    \item[] Justification: The method is a post-hoc selection filter, not a pre-trained model or dataset. It poses no risk for misuse beyond the underlying treatment planning models it operates on.
+
+\item {\bf Licenses for existing assets}
+    \item[] Question: Are the creators or original owners of assets used in the paper properly credited and are the license and terms of use explicitly mentioned and properly respected?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: VCIP~\citep{melnychuk2025vcip}, MIMIC-III~\citep{johnson2016mimic} (PhysioNet Credentialed Health Data License 1.5.0), MIMIC-Extract~\citep{wang2020mimic}, and the Cancer simulator~\citep{bica2020cancer} are all properly cited.
+
+\item {\bf New assets}
+    \item[] Question: Are new assets introduced in the paper well documented and is the documentation provided alongside the assets?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: Code implementing the reach-avoid constrained selection filter will be released upon acceptance with documentation and instructions for reproduction.
+
+\item {\bf Crowdsourcing and research with human subjects}
+    \item[] Question: For crowdsourcing experiments and research with human subjects, does the paper include the full text of instructions given to participants and screenshots, if applicable, as well as details about compensation (if any)?
+    \item[] Answer: \answerNA{}
+    \item[] Justification: No crowdsourcing or human subjects research was conducted.
+
+\item {\bf Institutional review board (IRB) approvals or equivalent for research with human subjects}
+    \item[] Question: Does the paper describe potential risks incurred by study participants, whether such risks were disclosed to the subjects, and whether Institutional Review Board (IRB) approvals were obtained?
+    \item[] Answer: \answerNA{}
+    \item[] Justification: No human subjects research was conducted. MIMIC-III is a de-identified retrospective dataset with its own IRB approval.
+
+\item {\bf Declaration of LLM usage}
+    \item[] Question: Does the paper describe the usage of LLMs if it is an important, original, or non-standard component of the core methods in this research?
+    \item[] Answer: \answerNA{}
+    \item[] Justification: LLMs are not a component of the core methodology. LLMs were used only for writing assistance and do not impact the scientific rigor or originality of the research.
+
 \end{enumerate}
 
 
