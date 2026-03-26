@@ -241,90 +241,258 @@ Tested `score = ELBO + λ · RA_penalty` with λ ∈ {0, 0.01, ..., 50}.
 
 ---
 
-### Anticipated Reviewer Concerns (from VCIP OpenReview analysis, 2026-03-15)
+### Simulated NeurIPS Reviewer Analysis (2026-03-24)
 
-VCIP was accepted as ICML 2025 poster with 4 weak accepts (one upgraded from weak reject). The OpenReview discussion reveals specific criticisms that will transfer to or inform our paper. Source: `literature_review/pdfs/VCIP discussion on OpenReview.pdf`.
+A structured pre-submission review simulating a senior NeurIPS reviewer (Score: 3 — Borderline Reject on the 2025 6-point scale). Sources: (1) NeurIPS 2025 reviewer guidelines (6-point rubric: Quality, Clarity, Significance, Originality), (2) OpenReview discussions from VCIP at ICML 2025 (3 reviews). Reviewer persona: senior researcher in safe RL / constrained MDPs / clinical AI, skeptical of simple methods.
 
-#### RC1 — "Why not just use the midpoint of the range?" (HIGHEST PRIORITY)
+#### Simulated Scores
 
-**Source:** Reviewer ixW5 noted that "in medicine usually there is no single target we want to optimise for, but rather a range of values." The VCIP authors responded: *"a straightforward approach would be taking a value from the 'range of values' as the target, such as the midpoint of the interval."*
+| Criterion | Score | Rationale |
+|-----------|-------|-----------|
+| **Overall** | **3 (Borderline Reject)** | Reasons to reject (limited novelty, trivial theory, oracle-dependent evaluation) slightly outweigh reasons to accept (clean formulation, thorough ablations) |
+| Quality | 4/6 | Technically sound but relies on oracle trajectories (Cancer) and lacks validation (MIMIC) |
+| Clarity | 5/6 | Well-written, good figure, clear algorithm |
+| Significance | 2/6 | Threshold-filtering with formal framing — closer to application note than methods paper |
+| Originality | 2/6 | "Reach-avoid" imports control theory language but actual computation is a threshold check |
 
-**Risk:** This is the simplest objection to our paper. A reviewer can argue that VCIP with Y_target = midpoint(T) is a trivial baseline that might perform comparably.
+#### Weakness Inventory (W1–W12)
 
-**Defense (must be demonstrated experimentally in ablation 5.6):**
-1. Midpoint targeting ignores safety constraints entirely — no intermediate Y_s monitoring.
-2. Midpoint targeting treats barely-in-range and comfortably-in-range identically — it ranks a sequence achieving Y = T_lower_bound the same as Y = midpoint, even though the latter is clinically safer.
-3. Midpoint targeting still suffers from ELBO ranking inconsistency (W1) at short horizons — RA scoring addresses this by construction (T2 theorem).
-4. When multiple sequences achieve similar distance to midpoint, ELBO-based ranking is degenerate (many ties or near-ties) — RA scoring distinguishes by safety constraint satisfaction.
+| ID | Severity | Weakness | Paper section(s) | Status |
+|----|----------|----------|-------------------|--------|
+| W1 | CRITICAL | **"Just threshold filtering"** — method is `argmin ELBO s.t. values in range`. Algorithm 1 is 7 lines. κ≥5 ≡ hard threshold. Any practitioner would add safety checks. | Intro, Method, Discussion | Needs text reframing (A1) |
+| W2 | HIGH | **Trivial theory** — Theorem 1 is a standard TV bound on bounded vs unbounded test functions. Part (c) is geometrically obvious. | Theory (Sec 5) | Needs framing edits (A2) |
+| W3 | CRITICAL | **Oracle dependency** — Cancer uses ground-truth trajectories for RA filtering. Safety improvement is mechanically guaranteed. The meaningful question (quality of constrained selection) shows consistent degradation. | Setup (Sec 6.1), Discussion | Needs clarification (A3) |
+| W4 | HIGH | **Weak MIMIC eval** — no ground-truth CFs. Predicted DBP range ~52-63 mmHg (narrow). 99-100% in-target may just be boundary noise selection. DBP shift <1.5 mmHg is clinically negligible. | MIMIC (Sec 6.2) | Needs new analysis (B1) |
+| W5 | MEDIUM-HIGH | **Single simulator** — only Cancer has ground truth. NeurIPS expects multiple evaluation domains. | Experiments (Sec 6) | Optional new experiment (B2) |
+| W6 | MEDIUM-HIGH | **No constrained RL comparison** — paper discusses CPO/RCPO/FISOR but never compares empirically. | Related Work, Experiments | Needs argument or impl (B3) |
+| W7 | MEDIUM | **Feasibility collapse** — at γ=4, τ=8: only 10.3% feasible (~10/100 candidates). Method degrades to near-random at long horizons. | Results (Table 1), Discussion | Text edit (C1) |
+| W8 | MEDIUM | **ε_VI proxy** — rank MAE ≠ TV distance. Connection not established. Cannot estimate on MIMIC. | Ablations (Sec 6.5) | Appendix addition (C2) |
+| W9 | MEDIUM | **Ignorability untested** — gamma sweep ≠ sensitivity analysis for assumption violation. **Current paper text (line 374) is factually incorrect** on this point. | Discussion | **Critical text fix** (C3) |
+| W10 | MEDIUM | **"Model-agnostic" overstated** — all 5 models share same pipeline, simulator, thresholds. "No retraining" ≠ "model-agnostic." | Contributions, Sec 6.3 | Text precision (lower priority) |
+| W11 | LOW-MED | **Single author** — absence of clinical or control theory collaborator. | Meta | Cannot change |
+| W12 | LOW | **Related work gaps** — missing: threshold-based clinical decision rules, MPC with constraints, safe Bayesian optimization. | Related Work | Text edits (lower priority) |
 
-#### RC2 — "Is the T2 bound vacuous?" (HIGH PRIORITY)
+#### Mapping to Previous VCIP OpenReview Concerns (RC1–RC7)
 
-**Source:** Reviewer g91d raised the same concern about VCIP's Theorem 4.1: *"if ELBO₁ is not maximized, ε₁ can be arbitrarily large."* This was the most critical concern in the entire review (initially scored weak reject).
+The original RC1–RC7 (identified 2026-03-15 from VCIP's ICML review) are subsumed:
 
-**Risk:** Reviewers will ask: "What are typical values of ε_VI? Is the ranking preservation condition m > 2ε_VI + 2τ·ε_soft ever satisfied in practice?"
+| Old ID | New ID(s) | Note |
+|--------|-----------|------|
+| RC1 ("Why not midpoint?") | W1 | Midpoint-baseline ablation (5.6) already addresses empirically |
+| RC2 ("Is bound vacuous?") | W8 | Ablation 5.7 partially addresses; rank MAE→TV link needs formalization |
+| RC3 ("MIMIC has no ground-truth CFs") | W3 + W4 | W3 is new (applies to Cancer too via oracle dependency) |
+| RC4 ("Causal assumptions?") | W9 | **Gamma sweep is NOT a sensitivity analysis** — must correct |
+| RC5 ("Model-agnostic?") | W10 | Sec 6.3 partially addresses; language needs tightening |
+| RC6 ("Intermediate prediction quality") | Addressed | Paper documents ρ≈0 intermediates; RA filter uses simulator trajectories |
+| RC7 ("Paper clarity") | Addressed | Figure 1 + intuitive theorem interpretation in draft |
 
-**Defense (must be demonstrated in ablation 5.7):**
-1. Estimate ε_VI empirically on Cancer data where we have both model predictions and ground-truth outcomes (compute TV distance or related divergence).
-2. Compute the margin distribution for all pairwise comparisons under RA scoring.
-3. Show the fraction of pairs where m > 2ε_VI + 2τ·ε_soft, and compare to the analogous fraction under point-target ranking.
-4. If the bound is tight for a substantial fraction of pairs, the theorem is actionable. If not, present it as an asymptotic guarantee and emphasize the empirical improvements.
+#### Reviewer Defense Strategy
 
-#### RC3 — "How do you evaluate on MIMIC without ground-truth counterfactuals?"
+##### Phase 1: Score 3 → 4 (Borderline Accept) — ~2 weeks
 
-**Source:** Reviewer whTh asked why RCS was not reported for MIMIC. VCIP authors explained that RCS requires computing true potential outcomes for each candidate sequence, which is only possible with simulated data.
+**Priority A — Critical (text edits + one key experiment)**
 
-**Risk:** Same limitation applies to us. We cannot compute ground-truth attainment/violation rates on MIMIC.
+- **A1 (W1): Reframe contribution.** [TEXT] Acknowledge simplicity explicitly. Contribution is: (1) formalization separating safety from quality, (2) empirical Pareto-dominance over alternatives, (3) first systematic safety evaluation of counterfactual planners. Location: Introduction (~line 103), Discussion (~line 478).
 
-**Defense:**
-1. Report cross-seed ranking stability (already planned in E3) — does RA produce more consistent recommendations?
-2. Report clinical plausibility: do RA-recommended sequences fall within medically reasonable action patterns?
-3. Acknowledge explicitly as a shared limitation of all counterfactual planning methods on observational data.
-4. Note that our Cancer results (with ground truth) provide the evidential backbone; MIMIC demonstrates feasibility and plausibility.
+- **A2 (W2): Strengthen theory framing.** [TEXT] Reposition theorem as *design principle*, not mathematical breakthrough. Emphasize quantitative margin condition connecting to γ-sweep results. Location: Theory, after Theorem 1 (~line 302).
 
-#### RC4 — "What are the causal assumptions? Sensitivity analysis?"
+- **A3 (W3): Oracle-vs-model experiment.** [NEW EXPERIMENT] Run RA filtering on **model-predicted trajectories** (decoder outputs) instead of simulator ground truth on Cancer. Compare safety/Top-1/feasibility between oracle-filtered and model-predicted-filtered. Creates 3-level validation: oracle → model-predicted synthetic → model-predicted real (MIMIC).
+  - **Infrastructure:** MIMIC's `extract_predicted_dbp()` (`scripts/mimic_ra/eval_mimic_traj.py:32-113`) already does this. Build parallel `extract_predicted_cv()` for Cancer using `generative_model.py:476` (`decode_p_a`) and `reach_avoid/model.py:174-320` step loop.
+  - **Effort:** ~3-5 days. Run on existing 5 seeds × 4 gammas, no retraining needed.
+  - **Expected:** Model-predicted RA less effective than oracle but direction of improvement holds. The gap itself is a novel finding.
 
-**Source:** Reviewer XzCZ criticized VCIP for *"implicitly assuming consistency, positivity, and sequential ignorability without extensive empirical or theoretical exploration of sensitivity to these assumptions."* VCIP authors admitted they couldn't test sequential ignorability violations.
+**Priority B — High (new experiments + analysis)**
 
-**Risk:** We inherit VCIP's backbone and assumptions. Reviewers will ask the same question.
+- **B1 (W4): MIMIC calibration + correction rate analysis.** [NEW ANALYSIS, no retraining] Using existing pickles in `results_remote/mimic_ra/`:
+  1. Report full predicted DBP distribution (mean, std, percentiles)
+  2. Compare predicted vs. observed DBP distributions (calibration)
+  3. Compute correction rate: fraction of out-of-target ELBO selections corrected by RA
+  4. Analyze whether filter discriminates meaningfully or exploits boundary noise
+  - **Effort:** ~1-2 days. All data available locally.
 
-**Defense:**
-1. We already have a gamma={1,2,3,4} sweep (confounding strength sensitivity) — present this as a partial sensitivity analysis.
-2. Show RA scoring performance across all gamma levels — if it is robust across gamma, this addresses the concern.
-3. Explicitly list all assumptions: consistency, positivity, sequential ignorability (inherited from VCIP) + T and S clinically specified (new) + soft indicator approximation (controlled by κ).
-4. Note that the confounding robustness extension (IDEA1/R²-VCIP) is structured future work that would directly address sequential ignorability violations.
+- **B3 (W6): Reframe E6 as constrained RL comparison.** [TEXT + ANALYSIS] The soft-constraint Lagrangian experiment (E6, Sec 6.4) IS the constrained RL analogue: `score = -ELBO + λ·safety_penalty` ≡ RCPO/CPO-Lagrangian. Reframe explicitly. Paper already shows hard filtering Pareto-dominates.
+  - **Effort:** ~1 day text edits.
 
-#### RC5 — "Does RA scoring benefit only VCIP, or is it model-agnostic?"
+- **B4 (W7): k-expansion experiment.** [NEW EXPERIMENT, quick] Re-run Cancer γ=4, τ=8 with k ∈ {100, 250, 500, 1000}. Show feasibility scales linearly with k.
+  - **Infrastructure:** Change perturbation count in `optimize_interventions_discrete_onetime()`. No retraining.
+  - **Effort:** ~2-4 hours.
 
-**Source:** Reviewer g91d questioned whether VCIP's gradient optimization approach had specific advantages over applying the same optimization to other models' likelihoods.
+**Priority C — Medium (text + appendix)**
 
-**Risk:** If RA scoring only improves VCIP but not baselines, it may be seen as VCIP-specific rather than a general contribution.
+- **C1 (W5): "Standard practice" argument.** [TEXT] Note VCIP/CT/CRN precedent. Cancer spans 400+ configurations.
+- **C2 (W8): ε_VI proxy formalization.** [APPENDIX] Relate rank MAE to TV via DKW inequality, or honest "practical diagnostic" framing.
+- **C3 (W9): Fix sensitivity analysis claim.** [CRITICAL TEXT FIX] Remove factually incorrect claim (line 374). Gamma ≠ ignorability. Cite Frauen et al. 2023.
+- **C4 (W10): Tighten "model-agnostic" language.** [TEXT] Replace with "requires no retraining" where appropriate.
 
-**Defense (ablation 5.5):**
-1. Apply RA scoring to ACTIN, CRN, CT, RMSN.
-2. If RA scoring improves all models: strengthens paper (method-agnostic contribution).
-3. If RA scoring especially benefits VCIP: explain that VCIP's latent dynamics produce better intermediate Y_s predictions because the architecture was designed for sequential trajectory modeling (KL-regularized latent transitions), while baselines use sequential prediction without the same latent structure.
+##### Phase 2: Score 4 → 5 (Accept) — ~3-5 weeks additional
 
-#### RC6 — "Intermediate prediction quality"
+Three independent paths, each sufficient alone. All three together make it a strong accept.
 
-**Source:** Not directly raised for VCIP, but follows logically from our approach. VCIP was designed to optimize terminal Y_{t+τ}; intermediate predictions are regularization only (line 511: `reg_loss = reg_losses[-1]`).
+- **S5.1: Clinical evaluation on MIMIC.** [NEW EXPERIMENT + EXTERNAL COLLABORATION]
+  Recruit 1-2 ICU clinicians (intensivists) to evaluate RA-recommended treatment plans.
+  - **S5.1a: Clinician plausibility assessment.** Present ~30-50 patient cases with ELBO-selected vs. RA-selected treatment sequences (blinded). Clinician rates each plan on a 5-point Likert scale (1=dangerous, 5=clinically appropriate). Report inter-rater agreement (if 2 clinicians) and mean plausibility scores.
+  - **S5.1b: Outcome correlation analysis.** For MIMIC patients with observed good outcomes (e.g., DBP stabilized in [60,90] within 24h, survived ICU), compare RA-selected treatment sequences against their actual observed treatments. Report Jaccard similarity or treatment overlap. If RA selects treatments similar to what *actually worked*, this is strong indirect validation.
+  - **S5.1c: Guideline concordance.** Compare RA-recommended vasopressor/fluid patterns against published clinical guidelines (e.g., Surviving Sepsis Campaign 2021 for vasopressor escalation). Report concordance rate.
+  - **Infrastructure:** Existing MIMIC pickle data contains full treatment sequences. Need clinical collaborator(s) + IRB-exempt review for secondary data analysis (MIMIC already de-identified).
+  - **Effort:** ~2-3 weeks (mostly coordination with clinicians; analysis is straightforward once ratings collected).
+  - **Impact:** Directly addresses RC-post-2 (MIMIC lacks clinical validation). Transforms MIMIC from "feasibility demonstration" to "clinically validated."
 
-**Risk:** If VCIP's intermediate predictions are poor, RA scoring based on those predictions will be unreliable. Safety constraints require accurate Y_s at all steps, not just Y_{t+τ}.
+- **S5.2: Second evaluation domain with ground truth.** [NEW EXPERIMENT + IMPLEMENTATION]
+  Implement a second treatment-response simulator with known counterfactual outcomes.
+  - **S5.2a: Candidate simulators (ranked by feasibility):**
+    1. **Glucose-insulin simulator** (Hovorka et al. 2004, or simpler Bergman minimal model). 1D outcome (blood glucose), 1D treatment (insulin dose). Target: glucose ∈ [70, 180] mg/dL. Safety: glucose ∈ [50, 250] mg/dL (avoid hypo/hyperglycemia). Well-studied, simple dynamics, public implementations available (e.g., `simglucose` Python package).
+    2. **Pharmacokinetic/pharmacodynamic (PK/PD) model.** 2-compartment model with drug concentration as outcome, dosing as treatment. Target: therapeutic window. Safety: avoid toxic concentrations. Standard in pharmacology; can be implemented from equations.
+    3. **Sepsis simulator** (based on AI Clinician reward model or ObSTL). More complex, 2D treatment (fluid + vasopressor), multi-dimensional state. Closer to MIMIC setting but harder to implement from scratch.
+  - **S5.2b: Evaluation plan.** Train VCIP + at least 2 baselines on generated data. Apply RA-constrained selection. Report same metrics (GRP, Top-1, safety, in-target, feasibility) + oracle-vs-model comparison (reusing A3 infrastructure).
+  - **Infrastructure:** Simulator implementation + VCIP training pipeline (existing, just new data). Need Vast.ai GPU time for training (~$10-20).
+  - **Effort:** ~2-3 weeks (1 week simulator + data generation, 1 week model training, 1 week analysis + writing).
+  - **Impact:** Eliminates W5 entirely. Demonstrates generalization across clinical domains. Strongest single improvement for reviewer confidence.
 
-**Defense:**
-1. Report intermediate prediction quality on Cancer data (compare model-predicted Y_s against simulator ground truth at each step s).
-2. If quality is poor at intermediate steps, this motivates Phase 2 (RA-aware retraining) and makes the contribution more substantial.
-3. This is actually an advantage for our paper: we demonstrate the problem (poor intermediates) and provide the fix (RA-aware training).
+- **S5.3: Stronger theoretical contribution.** [NEW THEORY]
+  Develop one of the following theoretical results (ranked by feasibility):
+  - **S5.3a: Finite-sample constrained selection bound.** Given $n$ i.i.d. patients and $k$ candidate sequences per patient, bound the probability that constrained selection picks a truly-unsafe sequence. Key ingredients: uniform convergence over the candidate set + concentration inequality for the feasibility indicator. Related to PAC-Bayes or uniform convergence in binary classification. This gives a *deployment guarantee*: "with probability $1-\delta$, the constrained selector picks a safe plan for at least $(1-\alpha)$ fraction of future patients."
+  - **S5.3b: Connection to chance-constrained optimization.** Frame Eq. 5 as an empirical approximation to chance-constrained optimization: $\min_{\bar{a}} \text{ELBO}(\bar{a})$ s.t. $\Pr(E(\bar{a})) \geq 1 - \alpha$. Derive the sample complexity (in $k$) needed for the empirical feasibility check to approximate the true chance constraint within tolerance $\epsilon$. This connects the reach-avoid framework to the well-studied chance-constrained optimization literature (Nemirovski & Shapiro 2006).
+  - **S5.3c: Regret bound for constrained selection.** Define regret relative to the oracle constrained selector (which knows the true feasibility). Bound the expected regret in terms of $\varepsilon_{\text{VI}}$, $k$, and $\tau$. Show the regret vanishes as model quality improves ($\varepsilon_{\text{VI}} \to 0$) or candidate pool grows ($k \to \infty$).
+  - **Effort:** ~2-4 weeks (theory development + proof writing + empirical verification).
+  - **Impact:** Elevates the paper from "empirical contribution with modest theory" to "principled framework with deployment guarantees." Addresses the novelty concern (W1) from a completely different angle.
 
-#### RC7 — "Paper clarity and exposition"
+##### Phase 3: Score 5 → 6 (Strong Accept) — ~3-4 weeks additional
 
-**Source:** Program Chairs noted VCIP was "somewhat hard to read." Reviewer g91d: "the paper is difficult to understand."
+**Core problem:** After Phases 1-2, the paper is solidly executed but not *exciting*. The method is still `argmin ELBO s.t. values in range`. Score 6 requires something that makes the reviewer think "I didn't expect that" or "the community needs to see this."
 
-**Action items for our paper:**
-1. Include a visual figure showing reach-avoid concept (patient trajectory entering T while staying in S).
-2. Provide intuitive interpretation of J_RA before the formal definition.
-3. Make table captions self-contained.
-4. Give the T2 theorem an intuitive "what it means" paragraph immediately after the formal statement.
-5. Use the VCIP authors' own acknowledgment of the range-target limitation (from their rebuttal to Reviewer ixW5) as direct motivation in our Introduction.
+**Key optimization: S5.3 (Phase 2 theory) is subsumed by S6.1.** The conformal certificate IS a finite-sample guarantee, done properly and more powerfully. Skip S5.3 as a separate task; go directly to S6.1.
+
+- **S6.1: Conformal safety certificates.** [NEW THEORY + EXPERIMENT] ★ PRIMARY CONTRIBUTION
+  Replace the fixed threshold δ with distribution-free safety certificates via conformal prediction. Instead of "this plan passes the filter," provide: "with probability ≥ 1-α, this plan's true outcomes will stay in the safety region."
+  - **Technical approach:**
+    1. Split data into train/calibration/test. On calibration set, compute nonconformity scores: s_i = max(max_s |Y_s[ā] - boundary_S|₋, |Y_{t+τ}[ā] - boundary_T|₋)
+    2. For new patients, the conformal prediction set C_α = {ā : s(ā) ≤ q̂_{1-α}} where q̂ is the calibrated quantile
+    3. Safety certificate: ā is "certified safe at level α" if conformal prediction set ⊆ T × S^τ
+    4. For causal setting: use weighted conformal (Lei & Candès 2021) with propensity reweighting
+    5. Integration: F_conf = {ā : certified safe at level α}, then ā* = argmin_{ā ∈ F_conf} ELBO(ā)
+  - **Key theorem:** Coverage guarantee: P(Y_true[ā*] ∈ T ∩ S^τ) ≥ 1-α (distribution-free)
+  - **Why transformative:** Addresses W1 (novelty), W2 (theory depth), W8 (replaces ε_VI proxy with rigorous guarantee) simultaneously. First distribution-free safety certificates for counterfactual treatment planning.
+  - **Key references:** Lei & Candès 2021, Angelopoulos & Bates 2023, Vovk et al. 2005
+  - **Effort:** ~3-4 weeks (theory: 1 week, implementation: 1-2 weeks, experiments: 1 week)
+
+- **S6.2: Systematic failure taxonomy.** [NEW ANALYSIS]
+  Characterize *when, why, and for whom* existing planners produce dangerous recommendations.
+  - Identify patients where ELBO-optimal plan is unsafe across all 5 models × 4 gammas × 4 horizons
+  - Cluster failures by patient features (CART/decision tree on danger rate)
+  - Classify modes: "aggressive-harmful," "conservative-insufficient," "model-confused"
+  - Show failures are correlated across models (structural, not model-specific)
+  - **Effort:** ~1-2 weeks (uses existing Cancer experiment data)
+  - **Impact:** Transforms narrative from "we add safety" to "we discover a systematic safety blind spot"
+
+- **S6.3: DRO interpretation (remark within S6.1).** [THEORY, minor]
+  The TV bound in Theorem 1 gives a distributionally robust interpretation: reach-avoid selection with threshold δ is equivalent to DRO safety check P̂(E(ā)) ≥ 1-δ+ε_VI under TV ambiguity set. One-paragraph connection, not a separate section.
+
+##### Phase 4: Score 6 → 7 (Oral / Top 1-2%) — ~4-6 weeks additional
+
+**Core challenge:** Score 7 requires a contribution that opens a new research direction or provides a tight theoretical characterization. Qualitatively different from "better experiments."
+
+- **S7.2: Safe planning under hidden confounding.** [NEW THEORY + EXPERIMENT] ★ KEY CONTRIBUTION
+  Develop safety guarantees valid even when unmeasured confounders exist (sequential ignorability fails).
+  - **Γ-sensitivity model:** Parameterize hidden confounding by Γ ≥ 1 (Rosenbaum 2002). Unobserved confounders can shift treatment assignment odds by factor Γ. When Γ=1, ignorability holds.
+  - **Identified set:** Under bounded confounding Γ, counterfactual outcome Y[ā] lies in a set [Y_lower(Γ), Y_upper(Γ)]. Derive sharp bounds for sequential treatments.
+  - **Γ-robust conformal certificate:** Target theorem: P(Y_true[ā] ∈ S | confounding ≤ Γ) ≥ 1-α with Γ-adjusted quantile. Extends S6.1 naturally.
+  - **Key challenge:** Sensitivity compounds over τ steps. Mitigation: use Markov property (next-step sensitivity depends only on current state) or present results for small τ first.
+  - **Validation on Cancer:** Artificial hidden confounding (hold out a covariate from model training). Verify coverage holds across Γ levels. Also validate on gamma sweep (natural confounding variation).
+  - **Key references:** Rosenbaum 2002, Tan 2006, Kallus & Zhou 2021, Yadlowsky et al. 2022
+  - **Effort:** ~4-6 weeks (theory: 2-3 weeks, implementation: 1-2 weeks, experiments: 1 week)
+  - **Impact:** First distribution-free safety guarantee for counterfactual planning under hidden confounding. Addresses W9 from a completely new angle.
+
+- **S7.1: Minimax optimality bounds (if time).** [NEW THEORY]
+  Prove tight lower + upper bounds on achievable safety rate:
+  - Lower bound: no selection rule can achieve safety > 1-Ω(ε_VI/√k) (information-theoretic limit)
+  - Upper bound: conformal-RA achieves safety ≥ 1-O(ε_VI/√k + 1/√n_cal)
+  - Corollary: conformal-RA is minimax optimal as n_cal → ∞
+  - **Effort:** ~4-6 weeks (hard theory). **Secondary priority — pursue only if S7.2 completes early.**
+
+##### Phase 5: Score 7 → 8 (Best Paper) — exploration only
+
+- **S8.1: "The Safety Tax" — fundamental quality-safety tradeoff.** [THEORY, exploratory]
+  Prove: any counterfactual selector with safety rate ≥ 1-δ incurs quality regret ≥ Ω(f(ε_VI, δ, k, τ)). Show conformal-RA achieves this bound. The function f reveals the minimum quality sacrifice for guaranteed safety — analogous to "price of fairness."
+  - **Realistic assessment:** Explore in Week 5. If a clean result emerges, include. If not, frame as open question in discussion. Score 8 cannot be planned — it requires breakthrough insight.
+
+#### Impact Assessment (Full Strategy: Phases 1-5)
+
+| Phase | Actions | Score | Cumulative effort |
+|-------|---------|-------|-------------------|
+| **Current paper** | — | **3 (Borderline Reject)** | — |
+| **Phase 1** | A1-A3, B1, B3, B4, C1-C4 | **4 (Borderline Accept)** | ~1 week |
+| **Phase 2** | + S5.1 (clinical) + S5.2 (simulator) | **5 (Accept)** | +2 weeks |
+| **Phase 3** | + S6.1 (conformal) + S6.2 (failure taxonomy) | **6 (Strong Accept)** | +2 weeks |
+| **Phase 4** | + S7.2 (hidden confounding) | **6-7 (Strong Accept / Oral)** | +2 weeks |
+| **Phase 5** | + S8.1 (safety tax, if works) | **7-8 (Oral / Best Paper)** | +1 week |
+| **Total** | — | **6-7 (realistic) / 7-8 (optimistic)** | **~6 weeks (May 06 deadline)** |
+
+**Note:** S5.3 (Phase 2 theory) is subsumed by S6.1. S6.3 (DRO) is a remark within S6.1. This saves ~2 weeks.
+
+**Recommended strategy (NeurIPS 2025, deadline May 06):** All phases in parallel where possible. Critical path: S6.1 theory (W1) → S6.1 implementation (W2) → S7.2 theory (W3) → S7.2 experiments (W4) → paper (W5-6).
+
+#### Week-by-Week Schedule (Mar 26 → May 06, 41 days)
+
+| Week | Dates | Tasks | Deliverables | Target score |
+|------|-------|-------|-------------|-------------|
+| **1** | Mar 26 – Apr 2 | Phase 1 text edits + A3 + B4 + B1 + S6.1 theory start | Phase 1 complete; S6.1 theorem draft | 4 |
+| **2** | Apr 2 – Apr 9 | S6.1 Cancer/MIMIC impl + S5.2 start + S6.2 failure taxonomy | S6.1 working; S6.2 done | 5 |
+| **3** | Apr 9 – Apr 16 | S5.2 complete + S7.2 theory development | Second simulator done; S7.2 framework | 5-6 |
+| **4** | Apr 16 – Apr 23 | S7.2 experiments + paper integration | S7.2 validated; full draft | 6-7 |
+| **5** | Apr 23 – Apr 30 | S8.1 exploration + S5.1 (if collaborator) + polish | Near-final paper | 6-7 |
+| **6** | Apr 30 – May 6 | Final experiments, polishing, submission | **Submitted** | **6-7** |
+
+#### Post-Improvement Simulated Review (All Phases)
+
+| Criterion | Before | After Phase 1 | After Phase 3 (S6.1) | After Phase 4 (S7.2) |
+|-----------|--------|---------------|----------------------|----------------------|
+| **Overall** | **3** | **4** | **6 (Strong Accept)** | **6-7 (Oral candidate)** |
+| Quality | 4/6 | 5/6 | 6/6 | 6/6 |
+| Clarity | 5/6 | 5/6 | 5/6 | 5/6 |
+| Significance | 2/6 | 3/6 | 5/6 | 5-6/6 |
+| Originality | 2/6 | 3/6 | 5/6 | 6/6 |
+
+**Per-weakness resolution status (all phases):**
+
+| ID | Before | After Phase 1 | After Phase 3 | After Phase 4 |
+|----|--------|---------------|---------------|---------------|
+| W1 | CRITICAL | MEDIUM | **RESOLVED** (conformal certificates are genuinely novel) | **RESOLVED** |
+| W2 | HIGH | LOW | **RESOLVED** (coverage theorem is substantive) | **RESOLVED** (+ Γ-robust theory) |
+| W3 | CRITICAL | **RESOLVED** | **RESOLVED** | **RESOLVED** |
+| W4 | HIGH | MEDIUM | MEDIUM | **RESOLVED** (S5.1 if collaborator; otherwise conformal calibration helps) |
+| W5 | MED-HIGH | MEDIUM | MEDIUM | **RESOLVED** (S5.2 second simulator) |
+| W6 | MED-HIGH | LOW | LOW | LOW |
+| W7 | MEDIUM | **RESOLVED** | **RESOLVED** | **RESOLVED** |
+| W8 | MEDIUM | LOW | **RESOLVED** (conformal replaces ε_VI proxy entirely) | **RESOLVED** |
+| W9 | MEDIUM | **RESOLVED** (text fix) | **RESOLVED** | **RESOLVED** (+ Γ-robust guarantees address it substantively) |
+| W10 | MEDIUM | LOW | **RESOLVED** (S5.2 second domain) | **RESOLVED** |
+| W11 | LOW-MED | LOW-MED | LOW | LOW |
+| W12 | LOW | **RESOLVED** | **RESOLVED** | **RESOLVED** |
+
+#### Revised Paper Structure (After All Phases)
+
+```
+Main Paper (9 pages):
+1. Introduction — safety blind spot in counterfactual planning
+2. Background — VCIP, potential outcomes, reach-avoid formulation
+3. Method
+   3.1 Reach-avoid constrained selection (existing, condensed)
+   3.2 Conformal safety certificates (S6.1) ★ KEY CONTRIBUTION
+   3.3 Robust safety under hidden confounding (S7.2) ★ KEY CONTRIBUTION
+4. Theory
+   4.1 Ranking robustness (existing Thm 1, reframed as design principle)
+   4.2 Coverage guarantee (new, from S6.1)
+   4.3 Γ-robust coverage (new, from S7.2)
+5. Experiments
+   5.1 Cancer simulator — RA + conformal + oracle-vs-model + Γ-robustness
+   5.2 Glucose-insulin simulator — cross-domain validation
+   5.3 MIMIC-III — clinical application + conformal calibration
+   5.4 When do planners fail? (failure taxonomy highlight)
+6. Discussion + Limitations
+
+Appendix: Proofs, full failure taxonomy, glucose-insulin details,
+          MIMIC extended results, all ablations, model-agnostic results
+```
 
 ---
 
@@ -393,18 +561,14 @@ VCIP was accepted as ICML 2025 poster with 4 weak accepts (one upgraded from wea
 
 Working title: *"Reach-Avoid Counterfactual Intervention Planning via Variational Latent Dynamics"*
 
-#### Paper Writing Status (2026-03-23)
+#### Paper Writing Status (2026-03-24)
 
-- **Full draft complete:** 9 content pages + references + checklist + 7 appendix sections (19 pages total)
+- **Full draft complete:** 9 content pages + references + NeurIPS checklist + 7 appendix sections (21 pages total)
 - **Figure 1:** Concept visualization with 4 trajectories, Y* marker, annotation arrows. PDF/PNG generated.
-- **Related work:** Main text (concise, ~1 page) + Appendix H (extended, ~3 pages, 6 subsections). 25+ new references added covering:
-  - Counterfactual outcome estimation (Shalit 2017, CEVAE, GANITE, SyncTwin, TSD, Causal CPC, etc.)
-  - Variational/generative causal inference (Deep SCMs, VCI, DECI, disentanglement)
-  - Dynamic treatment regimes (Nie et al. 2021, Le et al. 2019)
-  - Safe/constrained RL (CPO, RCPO, CUP, FISOR, Altman CMDPs)
-  - Reach-avoid control (DeepReach, ISAACS)
-  - Clinical AI safety (AI Clinician, Raghu et al.)
-- **Remaining:** Final polish pass, check all cross-references, verify notation consistency
+- **Related work:** Main text (concise, ~1 page) + Appendix H (extended, ~3 pages, 6 subsections). 25+ new references added.
+- **NeurIPS checklist:** Updated to current 16-question format with `\answerYes{}`/`\answerNo{}`/`\answerNA{}` and justifications referencing specific sections.
+- **Simulated reviewer analysis (2026-03-24):** 12 weaknesses (W1–W12) identified from senior NeurIPS reviewer perspective. Priority A defensive edits (A1–A3) are submission-blocking text changes. See "Simulated NeurIPS Reviewer Analysis" section above.
+- **Remaining:** Priority A defensive edits (A1: reframe contribution, A2: theory framing, A3: oracle clarification), Priority B analysis (B1: MIMIC strengthening), C3 critical fix (gamma ≠ sensitivity analysis), final polish pass
 
 ---
 
