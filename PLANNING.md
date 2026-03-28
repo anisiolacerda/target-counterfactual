@@ -313,9 +313,7 @@ The original RC1–RC7 (identified 2026-03-15 from VCIP's ICML review) are subsu
 - **B3 (W6): Reframe E6 as constrained RL comparison.** [TEXT + ANALYSIS] The soft-constraint Lagrangian experiment (E6, Sec 6.4) IS the constrained RL analogue: `score = -ELBO + λ·safety_penalty` ≡ RCPO/CPO-Lagrangian. Reframe explicitly. Paper already shows hard filtering Pareto-dominates.
   - **Effort:** ~1 day text edits.
 
-- **B4 (W7): k-expansion experiment.** [NEW EXPERIMENT, quick] Re-run Cancer γ=4, τ=8 with k ∈ {100, 250, 500, 1000}. Show feasibility scales linearly with k.
-  - **Infrastructure:** Change perturbation count in `optimize_interventions_discrete_onetime()`. No retraining.
-  - **Effort:** ~2-4 hours.
+- **B4 (W7): k-expansion experiment.** ✓ COMPLETE (2026-03-27). Ran Cancer γ=4, τ=8 with k ∈ {100, 250, 500, 1000}, 5 seeds × 100 patients. **Result:** Feasibility stable ~70% (moderate thresholds); N_feasible scales linearly (69.8→710.3); safety/in-target stable at ~90.6%; Top-1 slightly decreases with k (32.8%→26.0%) due to noisier ELBO ranking over larger feasible pool. Per-patient heterogeneity is large (0%–90%+). Data: `results_remote/b4/b4_k_expansion_gamma4_tau8.pkl`.
 
 **Priority C — Medium (text + appendix)**
 
@@ -337,16 +335,23 @@ Three independent paths, each sufficient alone. All three together make it a str
   - **Effort:** ~2-3 weeks (mostly coordination with clinicians; analysis is straightforward once ratings collected).
   - **Impact:** Directly addresses RC-post-2 (MIMIC lacks clinical validation). Transforms MIMIC from "feasibility demonstration" to "clinically validated."
 
-- **S5.2: Second evaluation domain with ground truth.** [NEW EXPERIMENT + IMPLEMENTATION]
-  Implement a second treatment-response simulator with known counterfactual outcomes.
-  - **S5.2a: Candidate simulators (ranked by feasibility):**
-    1. **Glucose-insulin simulator** (Hovorka et al. 2004, or simpler Bergman minimal model). 1D outcome (blood glucose), 1D treatment (insulin dose). Target: glucose ∈ [70, 180] mg/dL. Safety: glucose ∈ [50, 250] mg/dL (avoid hypo/hyperglycemia). Well-studied, simple dynamics, public implementations available (e.g., `simglucose` Python package).
-    2. **Pharmacokinetic/pharmacodynamic (PK/PD) model.** 2-compartment model with drug concentration as outcome, dosing as treatment. Target: therapeutic window. Safety: avoid toxic concentrations. Standard in pharmacology; can be implemented from equations.
-    3. **Sepsis simulator** (based on AI Clinician reward model or ObSTL). More complex, 2D treatment (fluid + vasopressor), multi-dimensional state. Closer to MIMIC setting but harder to implement from scratch.
-  - **S5.2b: Evaluation plan.** Train VCIP + at least 2 baselines on generated data. Apply RA-constrained selection. Report same metrics (GRP, Top-1, safety, in-target, feasibility) + oracle-vs-model comparison (reusing A3 infrastructure).
-  - **Infrastructure:** Simulator implementation + VCIP training pipeline (existing, just new data). Need Vast.ai GPU time for training (~$10-20).
-  - **Effort:** ~2-3 weeks (1 week simulator + data generation, 1 week model training, 1 week analysis + writing).
-  - **Impact:** Eliminates W5 entirely. Demonstrates generalization across clinical domains. Strongest single improvement for reviewer confidence.
+- **S5.2: Second evaluation domain with ground truth.** [NEW EXPERIMENT + IMPLEMENTATION] ✓ **COMPLETE (2026-03-27)**
+  Implemented Bergman minimal model glucose-insulin simulator as second evaluation domain.
+  - **Simulator:** Bergman minimal model (3 ODEs: glucose, insulin action, plasma insulin). 1D outcome (blood glucose), 1D treatment (insulin dose). Confounding mechanism: sicker patients (higher baseline glucose) receive more insulin.
+  - **Constraints:** Target: glucose ∈ [70, 180] mg/dL at terminal step. Safety: glucose ∈ [50, 250] mg/dL at all intermediate steps.
+  - **Data:** 500 patients × 48 timesteps, γ=4 confounding strength. Train/test split.
+  - **Training:** VCIP trained with 5 seeds × 100 epochs on Vast.ai (~5 min/seed). Models at `/root/VCIP/my_outputs/glucose_sim/22/coeff_4/VCIP/train/True/models/{seed}/model.ckpt`.
+  - **Evaluation:** Custom eval script (`results_remote/glucose/eval_glucose_vcip.py`) with manual OmegaConf config construction (avoids Hydra interpolation issues). Used `optimize_a=False` in ELBO to avoid simulator dependency.
+  - **Results (γ=4, 5 seeds pooled):**
+    | τ | Spearman ρ | Top-1 (ELBO) | Top-1 (RA) | Δ Top-1 | In-target (ELBO) | In-target (RA) | Δ In-target | Feasibility |
+    |---|-----------|-------------|-----------|---------|-----------------|---------------|-------------|-------------|
+    | 2 | 0.63 | 24.4% | 22.8% | -1.6pp | 79.0% | 79.8% | +0.8pp | 82.6% |
+    | 4 | 0.43 | 10.2% | 9.6% | -0.6pp | 70.0% | 72.0% | +2.0pp | 62.4% |
+    | 6 | 0.34 | 8.6% | 8.0% | -0.6pp | 64.2% | 66.0% | +1.8pp | 49.0% |
+    | 8 | 0.24 | 8.2% | 7.2% | -1.0pp | 62.6% | 63.8% | +1.2pp | 40.2% |
+  - **Key findings:** RA constraint consistently improves in-target rates (+0.8 to +2.0 pp) with minimal Top-1 cost. Feasibility drops with horizon (82.6% → 40.2%). Spearman ρ lower than Cancer (0.24–0.63 vs 0.75–0.90), suggesting harder prediction task.
+  - **Paper integration:** New Appendix section "Second Evaluation Domain: Glucose-Insulin Simulator" (`\label{app:glucose}`) with Bergman ODEs, confounding mechanism, results table, key findings. Discussion cross-references glucose results. `bergman1979quantitative` BibTeX entry added.
+  - **Impact:** Partially addresses W5 (second domain with ground truth). Demonstrates cross-domain generalization of RA-constrained selection.
 
 - **S5.3: Stronger theoretical contribution.** [NEW THEORY]
   Develop one of the following theoretical results (ranked by feasibility):
@@ -362,7 +367,7 @@ Three independent paths, each sufficient alone. All three together make it a str
 
 **Key optimization: S5.3 (Phase 2 theory) is subsumed by S6.1.** The conformal certificate IS a finite-sample guarantee, done properly and more powerfully. Skip S5.3 as a separate task; go directly to S6.1.
 
-- **S6.1: Conformal safety certificates.** [NEW THEORY + EXPERIMENT] ★ PRIMARY CONTRIBUTION
+- **S6.1: Conformal safety certificates.** [NEW THEORY + EXPERIMENT] ★ PRIMARY CONTRIBUTION — **INVESTIGATED (2026-03-27), result: too conservative for current setting**
   Replace the fixed threshold δ with distribution-free safety certificates via conformal prediction. Instead of "this plan passes the filter," provide: "with probability ≥ 1-α, this plan's true outcomes will stay in the safety region."
   - **Technical approach:**
     1. Split data into train/calibration/test. On calibration set, compute nonconformity scores: s_i = max(max_s |Y_s[ā] - boundary_S|₋, |Y_{t+τ}[ā] - boundary_T|₋)
@@ -374,6 +379,7 @@ Three independent paths, each sufficient alone. All three together make it a str
   - **Why transformative:** Addresses W1 (novelty), W2 (theory depth), W8 (replaces ε_VI proxy with rigorous guarantee) simultaneously. First distribution-free safety certificates for counterfactual treatment planning.
   - **Key references:** Lei & Candès 2021, Angelopoulos & Bates 2023, Vovk et al. 2005
   - **Effort:** ~3-4 weeks (theory: 1 week, implementation: 1-2 weeks, experiments: 1 week)
+  - **Preliminary finding (2026-03-27):** Conformal certificates implemented and tested on Cancer data. The calibrated quantile thresholds are extremely conservative — the nonconformity scores from the calibration set are large enough that conformal filtering admits very few candidates (near-zero feasibility at standard α levels like 0.05 or 0.10). This is because the model's trajectory predictions have high variance across patients, making the conformal prediction sets very wide. **Status:** Written up as Appendix section in paper (honest negative result: "conformal certificates are theoretically valid but practically too conservative with current model quality"). The core RA threshold-based filter remains the practical method. Conformal certificates may become practical with improved trajectory models or larger calibration sets. This finding itself is informative — it quantifies the gap between distribution-free guarantees and practical utility in this setting.
 
 - **S6.2: Systematic failure taxonomy.** [NEW ANALYSIS]
   Characterize *when, why, and for whom* existing planners produce dangerous recommendations.
@@ -415,29 +421,30 @@ Three independent paths, each sufficient alone. All three together make it a str
   Prove: any counterfactual selector with safety rate ≥ 1-δ incurs quality regret ≥ Ω(f(ε_VI, δ, k, τ)). Show conformal-RA achieves this bound. The function f reveals the minimum quality sacrifice for guaranteed safety — analogous to "price of fairness."
   - **Realistic assessment:** Explore in Week 5. If a clean result emerges, include. If not, frame as open question in discussion. Score 8 cannot be planned — it requires breakthrough insight.
 
-#### Impact Assessment (Full Strategy: Phases 1-5)
+#### Impact Assessment (Full Strategy: Phases 1-5) — Updated 2026-03-27
 
-| Phase | Actions | Score | Cumulative effort |
-|-------|---------|-------|-------------------|
-| **Current paper** | — | **3 (Borderline Reject)** | — |
-| **Phase 1** | A1-A3, B1, B3, B4, C1-C4 | **4 (Borderline Accept)** | ~1 week |
-| **Phase 2** | + S5.1 (clinical) + S5.2 (simulator) | **5 (Accept)** | +2 weeks |
-| **Phase 3** | + S6.1 (conformal) + S6.2 (failure taxonomy) | **6 (Strong Accept)** | +2 weeks |
-| **Phase 4** | + S7.2 (hidden confounding) | **6-7 (Strong Accept / Oral)** | +2 weeks |
-| **Phase 5** | + S8.1 (safety tax, if works) | **7-8 (Oral / Best Paper)** | +1 week |
-| **Total** | — | **6-7 (realistic) / 7-8 (optimistic)** | **~6 weeks (May 06 deadline)** |
+| Phase | Actions | Score | Cumulative effort | Status |
+|-------|---------|-------|-------------------|--------|
+| **Current paper** | — | **3 (Borderline Reject)** | — | Baseline |
+| **Phase 1** | A1-A3, B1, B3, B4, C1-C4 | **4 (Borderline Accept)** | ~1-2 weeks | **IN PROGRESS** (B4 started, text edits pending) |
+| **Phase 2** | + S5.1 (clinical) + S5.2 (simulator) | **4-5 (Accept candidate)** | +1 week | **S5.2 ✓ COMPLETE** (glucose). S5.1 needs collaborator. |
+| **Phase 3** | + ~~S6.1 (conformal)~~ + S6.2 (failure taxonomy) + S5.3 (theory) | **5 (Accept)** | +2 weeks | S6.1 too conservative (appendix only). S6.2/S5.3 remain. |
+| **Phase 4** | + S7.2 (hidden confounding) | **5-6 (Accept / Strong Accept)** | +2 weeks | Not started |
+| **Phase 5** | + S8.1 (safety tax, if works) | **6-7 (Strong Accept / Oral)** | +1 week | Not started |
+| **Total** | — | **5-6 (realistic) / 6-7 (optimistic)** | **~6 weeks (May 06 deadline)** | |
 
-**Note:** S5.3 (Phase 2 theory) is subsumed by S6.1. S6.3 (DRO) is a remark within S6.1. This saves ~2 weeks.
+**Key recalibration (2026-03-27):** S6.1 conformal certificates proved too conservative for practical use (near-zero feasibility at standard α levels). This was the planned Score 5→6 upgrade. Without it as primary contribution, the score ceiling from experiments alone is ~5. Reaching Score 6+ now requires either: (a) S7.2 hidden confounding theory succeeds, (b) S5.3 finite-sample bounds produce non-trivial results, or (c) a new theoretical direction emerges.
 
-**Recommended strategy (NeurIPS 2025, deadline May 06):** All phases in parallel where possible. Critical path: S6.1 theory (W1) → S6.1 implementation (W2) → S7.2 theory (W3) → S7.2 experiments (W4) → paper (W5-6).
+**Revised critical path:** Phase 1 text edits + A3 (Week 2) → S6.2 failure taxonomy (Week 2) → S5.3 or S7.2 theory (Weeks 3-4) → paper integration (Week 5) → polish + submit (Week 6).
 
 #### Week-by-Week Schedule (Mar 26 → May 06, 41 days)
 
 | Week | Dates | Tasks | Deliverables | Target score |
 |------|-------|-------|-------------|-------------|
-| **1** | Mar 26 – Apr 2 | Phase 1 text edits + A3 + B4 + B1 + S6.1 theory start | Phase 1 complete; S6.1 theorem draft | 4 |
-| **2** | Apr 2 – Apr 9 | S6.1 Cancer/MIMIC impl + S5.2 start + S6.2 failure taxonomy | S6.1 working; S6.2 done | 5 |
-| **3** | Apr 9 – Apr 16 | S5.2 complete + S7.2 theory development | Second simulator done; S7.2 framework | 5-6 |
+| **1** | Mar 26 – Apr 2 | ~~Phase 1 text edits + A3 + B4 + B1 + S6.1 theory start~~ | ~~Phase 1 complete; S6.1 theorem draft~~ | 4 |
+| | | **ACTUAL:** S5.2 complete (glucose simulator: Bergman model, VCIP training 5 seeds, RA eval, paper appendix). S6.1 investigated (conformal certificates too conservative — honest negative result, written as appendix). B4 k=1000 started (cancer). | S5.2 ✓ DONE. S6.1 appendix ✓ DONE. Phase 1 text edits PENDING. A3/B1 PENDING. | 3→4 (partial) |
+| **2** | Apr 2 – Apr 9 | Phase 1 text edits (A1, A2, C3) + A3 oracle-vs-model + B1 MIMIC analysis + B4 completion + S6.2 failure taxonomy | Phase 1 complete; S6.2 done | 4-5 |
+| **3** | Apr 9 – Apr 16 | S7.2 theory development + remaining text edits (B3, C1, C2, C4, W10, W12) | S7.2 framework drafted; all text edits done | 5-6 |
 | **4** | Apr 16 – Apr 23 | S7.2 experiments + paper integration | S7.2 validated; full draft | 6-7 |
 | **5** | Apr 23 – Apr 30 | S8.1 exploration + S5.1 (if collaborator) + polish | Near-final paper | 6-7 |
 | **6** | Apr 30 – May 6 | Final experiments, polishing, submission | **Submitted** | **6-7** |
@@ -460,7 +467,7 @@ Three independent paths, each sufficient alone. All three together make it a str
 | W2 | HIGH | LOW | **RESOLVED** (coverage theorem is substantive) | **RESOLVED** (+ Γ-robust theory) |
 | W3 | CRITICAL | **RESOLVED** | **RESOLVED** | **RESOLVED** |
 | W4 | HIGH | MEDIUM | MEDIUM | **RESOLVED** (S5.1 if collaborator; otherwise conformal calibration helps) |
-| W5 | MED-HIGH | MEDIUM | MEDIUM | **RESOLVED** (S5.2 second simulator) |
+| W5 | MED-HIGH | MEDIUM | **LOW** (S5.2 glucose simulator ✓) | **RESOLVED** (S5.2 second simulator) |
 | W6 | MED-HIGH | LOW | LOW | LOW |
 | W7 | MEDIUM | **RESOLVED** | **RESOLVED** | **RESOLVED** |
 | W8 | MEDIUM | LOW | **RESOLVED** (conformal replaces ε_VI proxy entirely) | **RESOLVED** |
@@ -561,14 +568,19 @@ Appendix: Proofs, full failure taxonomy, glucose-insulin details,
 
 Working title: *"Reach-Avoid Counterfactual Intervention Planning via Variational Latent Dynamics"*
 
-#### Paper Writing Status (2026-03-24)
+#### Paper Writing Status (2026-03-27)
 
-- **Full draft complete:** 9 content pages + references + NeurIPS checklist + 7 appendix sections (21 pages total)
+- **Full draft complete:** 9 content pages + references + NeurIPS checklist + 9 appendix sections (25 pages total)
 - **Figure 1:** Concept visualization with 4 trajectories, Y* marker, annotation arrows. PDF/PNG generated.
 - **Related work:** Main text (concise, ~1 page) + Appendix H (extended, ~3 pages, 6 subsections). 25+ new references added.
 - **NeurIPS checklist:** Updated to current 16-question format with `\answerYes{}`/`\answerNo{}`/`\answerNA{}` and justifications referencing specific sections.
 - **Simulated reviewer analysis (2026-03-24):** 12 weaknesses (W1–W12) identified from senior NeurIPS reviewer perspective. Priority A defensive edits (A1–A3) are submission-blocking text changes. See "Simulated NeurIPS Reviewer Analysis" section above.
-- **Remaining:** Priority A defensive edits (A1: reframe contribution, A2: theory framing, A3: oracle clarification), Priority B analysis (B1: MIMIC strengthening), C3 critical fix (gamma ≠ sensitivity analysis), final polish pass
+- **S5.2 glucose appendix (2026-03-27):** New appendix section "Second Evaluation Domain: Glucose-Insulin Simulator" (`\label{app:glucose}`) with Bergman minimal model ODEs, confounding mechanism, constraint specification, full results table (5 seeds × 4 taus), key findings paragraph. Discussion section updated with cross-reference to glucose results. `bergman1979quantitative` BibTeX entry added. Paper compiles cleanly at 25 pages.
+- **S6.1 conformal appendix (2026-03-27):** Conformal safety certificates investigated and written up as appendix section. Result: certificates are theoretically valid but practically too conservative with current model quality (near-zero feasibility at standard α levels). Presented as honest negative result — informative finding about the gap between distribution-free guarantees and practical utility.
+- **A3 oracle-vs-model (2026-03-27):** Experiment complete. Model-predicted RA filtering has near-zero feasibility (0.1-0.2%) on Cancer due to high scaling variance (std=53.176). Oracle feasibility ~70%. Quantifies structural oracle gap — valuable negative result for paper. Data: `results_remote/a3/a3_oracle_vs_model_gamma4.pkl`.
+- **B4 k-expansion (2026-03-27):** Experiment complete. Feasibility stable ~70% with moderate thresholds, N_feasible scales linearly with k. Top-1 decreases slightly with k (noisier ELBO ranking). Data: `results_remote/b4/b4_k_expansion_gamma4_tau8.pkl`.
+- **Phase 1 defensive edits COMPLETE (2026-03-27):** All Priority A (A1-A3), B (B1, B3, B4), and C (C1, C3, C4/W10) text edits done. S6.2 failure taxonomy completed and integrated as new Discussion paragraph. "First systematic safety evaluation" added to abstract. RLHF rejection sampling cite added. Failure modes: conservative undershoot dominates at short τ, toxic path grows at long τ. B1 MIMIC calibration validates all paper claims. Paper compiles at 25 pages.
+- **Remaining for submission:** C2 (ε_VI formalization, optional appendix), W12 (related work gap fills), S7.2 theory (if time), final polish pass. **All GPU experiments complete — Vast.ai instance shut down.**
 
 ---
 
