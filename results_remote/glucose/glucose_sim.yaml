@@ -1,0 +1,50 @@
+# @package _global_
+dataset:
+  _target_: src.data.glucose.GlucoseDatasetCollection
+  name: glucose_simulator
+  data_dir: glucose_data
+  gamma: 4
+  seed: ${exp.seed}
+  projection_horizon: 5
+  treatment_mode: continuous
+  val_batch_size: 4096
+  static_size: 1
+  treatment_size: 1
+  one_hot_treatment_size: 1
+  input_size: 0
+  output_size: 1
+  predict_X: False
+  autoregressive: True
+
+model:
+  dim_treatments: 1
+  dim_vitals: 0
+  dim_static_features: 1
+  dim_outcomes: 1
+
+exp:
+  unscale_rmse: True
+  percentage_rmse: False
+  processed_data_dir: data/processed/glucose_sim/${toint:${dataset.gamma}}/${model.name}
+  log_dir: my_outputs/glucose_sim/${exp.global_seed}/coeff_${toint:${dataset.gamma}}/${model.name}/${exp.mode}/${exp.sam}
+  device: cuda
+  gpus: 1
+  weights_ema: True
+  beta: 0.99
+  clear_tf: True
+  logging: False
+  current_date: ${now:%Y-%m-%d}
+  current_time: ${now:%H-%M-%S}
+  mode: train
+  gpu_resources: 0.3
+  cpu_resources: 2
+  csv_dir: csvs/glucose/gamma_${toint:${dataset.gamma}}
+  max_epochs: 100
+  global_seed: 22
+  sam: True
+  load_data: True
+  seed: 10
+  tau: 6
+  repeats: 5
+  test: False
+  rank: True

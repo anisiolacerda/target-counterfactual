@@ -169,4 +169,11 @@ results_remote/results.tar.gz
 results_remote/all_results.tgz
 results_remote/r/
 results_remote/mimic_extract/
+results_remote/a3_results/
+results_remote/a3_all.tar.gz
+results_remote/b4_results/
+results_remote/b4_pickles.tar.gz
+results_remote/glucose/glucose_data/
+results_remote/glucose/glucose_data_tau2/
+results_remote/glucose/glucose_sim_models/
 commands.txt
