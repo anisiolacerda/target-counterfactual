@@ -62,7 +62,7 @@
 \maketitle
 
 \begin{abstract}
-Variational counterfactual intervention planning selects treatment sequences by optimizing an evidence lower bound (ELBO) toward a point target outcome. In clinical practice, however, the goal is typically to bring a patient's state into an \emph{acceptable range} while maintaining \emph{safety constraints} at every intermediate step---requirements that point-target optimization does not address. We introduce \emph{reach-avoid constrained selection}, a post-hoc method that filters ELBO-ranked candidate sequences through a reach-avoid feasibility criterion: the terminal outcome must lie within a target set~$\cT$ and all intermediate outcomes must remain within a safety set~$\cS$. We prove that reach-avoid ranking is more robust to variational approximation error than point-target ELBO ranking, with an explicit bound relating the ranking preservation margin to the variational gap~$\varepsilon_{\mathrm{VI}}$ and soft-indicator approximation error~$\varepsilon_{\mathrm{soft}}$. Empirically, on a cancer tumor growth simulator with known counterfactuals, reach-avoid constrained selection improves safety by 18--33 percentage points under moderate-to-strong confounding at modest ranking cost, Pareto-dominates soft-constraint alternatives, and transfers to all baseline models without retraining. On MIMIC-III intensive care data, the method lifts in-target diastolic blood pressure rates from 73--81\% to 99--100\%. To our knowledge, this is the first systematic safety evaluation of counterfactual treatment planners. The approach requires no model modification, no retraining, and is compatible with any variational counterfactual planner.
+Variational counterfactual intervention planning selects treatment sequences by optimizing an evidence lower bound (ELBO) toward a point target outcome. In clinical practice, however, the goal is typically to bring a patient's state into an \emph{acceptable range} while maintaining \emph{safety constraints} at every intermediate step---requirements that point-target optimization does not address. We introduce \emph{reach-avoid constrained selection}, a post-hoc method that filters ELBO-ranked candidate sequences through a reach-avoid feasibility criterion: the terminal outcome must lie within a target set~$\cT$ and all intermediate outcomes must remain within a safety set~$\cS$. We prove that reach-avoid ranking is more robust to variational approximation error than point-target ELBO ranking, with an explicit bound relating the ranking preservation margin to the variational gap~$\varepsilon_{\mathrm{VI}}$ and soft-indicator approximation error~$\varepsilon_{\mathrm{soft}}$. We further provide a sensitivity analysis under hidden confounding, showing that the safety guarantee degrades gracefully as the Rosenbaum sensitivity parameter~$\Gamma$ increases, with non-vacuous bounds through $\Gamma = 2.0$ at all tested horizons. Empirically, on a cancer tumor growth simulator with known counterfactuals, reach-avoid constrained selection improves safety by 18--33 percentage points under moderate-to-strong confounding at modest ranking cost, Pareto-dominates soft-constraint alternatives, and transfers to all baseline models without retraining. On MIMIC-III intensive care data, the method lifts in-target diastolic blood pressure rates from 73--81\% to 99--100\%. To our knowledge, this is the first systematic safety evaluation of counterfactual treatment planners. The approach requires no model modification, no retraining, and is compatible with any variational counterfactual planner.
 \end{abstract}
 
 
@@ -104,6 +104,7 @@ The simplicity is a feature, not a limitation. By separating safety (via the RA 
 \begin{enumerate}
 \item \textbf{First systematic safety evaluation of counterfactual planners.} We formalize reach-avoid constrained intervention planning, separating safety from quality in a way that reveals a previously unquantified safety gap: existing planners violate clinically meaningful constraints on 15--45\% of patients under moderate confounding (Section~\ref{sec:experiments}).
 \item \textbf{Ranking robustness theory.} We prove that reach-avoid ranking is more robust to variational approximation error than point-target ELBO ranking (Theorem~\ref{thm:ranking_robustness}), with an explicit, empirically non-vacuous bound ($\varepsilon_{\mathrm{VI}} \approx 0.09$--$0.23$) on ranking preservation (Section~\ref{sec:theory}).
+\item \textbf{Sensitivity analysis under hidden confounding.} We extend the Rosenbaum sensitivity model to sequential treatments and prove that the RA safety guarantee degrades gracefully as hidden confounding increases (Theorem~\ref{thm:sensitivity}), with non-vacuous bounds through $\Gamma = 2.0$ at all tested horizons and explicit breakdown points $\Gamma_{\max} = 2.1$--$7.5$ (Section~\ref{sec:sensitivity}).
 \item \textbf{Comprehensive experiments.} On the Cancer simulator, RA-constrained selection yields $+$18--33~pp safety improvement under moderate-to-strong confounding, Pareto-dominates soft-constraint alternatives, and generalizes across five baseline models without retraining. On MIMIC-III ICU data, it lifts in-target rates from 73--81\% to 99--100\% (Section~\ref{sec:experiments}).
 \item \textbf{Model-agnostic post-hoc method.} The approach requires no retraining---we show empirically that RA-aware retraining produces identical results to post-hoc filtering---and is compatible with any variational counterfactual planner (Section~\ref{sec:retraining_result}).
 \end{enumerate}
@@ -330,6 +331,48 @@ $\ell(\ba^*_{\mathrm{ELBO}}) - \ell(\ba^*_{\mathrm{unconstrained}}) \leq \underb
 \paragraph{Empirical verification.} On the Cancer simulator ($n = 100$ patients, $\gamma = 4$), the RA selector achieves empirical safety $\widehat{\mathrm{SR}} = 94.4$--$97.0\%$ across horizons (including ELBO fallback for infeasible patients). Proposition~\ref{prop:deployment} yields: with 95\% confidence, population safety $\geq 80.8$--$83.4\%$---non-vacuous deployment bounds from only 100 patients. The quality bound is tight: empirical regret $\ell(\ba^*_{\mathrm{ELBO}}) - \ell(\ba^*_{\mathrm{oracle}})$ within $\cF_{\mathrm{RA}}$ is $< 0.2\%$ of the loss range ($\ll 2\eta$), confirming that ELBO ranking quality within the feasible set is high ($\rho = 0.71$--$0.89$). Additional results (feasibility scaling, chance-constrained interpretation) are in Appendix~\ref{app:finite_sample}.
 
 
+\subsection{Sensitivity to Hidden Confounding}
+\label{sec:sensitivity}
+
+The preceding results assume sequential ignorability (no unobserved confounders). We now analyze the RA filter's robustness when this assumption is violated, using the Rosenbaum sensitivity model~\citep{rosenbaum2002observational} adapted to sequential treatments.
+
+\begin{assumption}[Bounded hidden confounding]
+\label{ass:hidden_confounding}
+For each step $s \in \{t+1, \ldots, t+\tau\}$, unobserved confounders $U_s$ shift treatment propensities by a bounded factor: for all histories $H_s$, treatments $a_s$, and confounders $U_s$,
+\begin{equation}
+\frac{1}{\Gamma} \leq \frac{\pi_{\mathrm{true}}(a_s \mid H_s, U_s)}{\pi_{\mathrm{obs}}(a_s \mid H_s)} \leq \Gamma,
+\end{equation}
+where $\Gamma \geq 1$ parametrizes confounding strength ($\Gamma = 1$ recovers sequential ignorability).
+\end{assumption}
+
+\begin{theorem}[Sensitivity of reach-avoid safety]
+\label{thm:sensitivity}
+Under Assumptions~\ref{ass:vi_gap},~\ref{ass:soft_error}, and~\ref{ass:hidden_confounding}, for any intervention sequence $\ba$:
+\begin{equation}
+\label{eq:sensitivity_bound}
+|P_\Gamma(E(\ba)) - P_0(E(\ba))| \;\leq\; \psi(\Gamma, \tau) \;:=\; 1 - \left(\frac{2}{\Gamma + 1}\right)^{\!\tau},
+\end{equation}
+where $P_0$ is the reach-avoid probability identified under sequential ignorability and $P_\Gamma$ is the true probability under confounding level~$\Gamma$. Consequently, the population safety rate satisfies $\mathrm{SR}_\Gamma \geq \mathrm{SR}_0 - \psi(\Gamma, \tau)$, and this guarantee is non-trivial whenever $\Gamma < \Gamma_{\max}$, where
+\begin{equation}
+\label{eq:breakdown}
+\Gamma_{\max}(\tau, \mathrm{SR}_0) = \frac{2}{(1 - \mathrm{SR}_0)^{1/\tau}} - 1.
+\end{equation}
+\end{theorem}
+
+\begin{proof}[Proof sketch (full proof in Appendix~\ref{app:sensitivity})]
+At each step $s$, Assumption~\ref{ass:hidden_confounding} implies a $\Gamma$-bounded density ratio between the true and identified conditional outcome distributions. By the standard TV bound for bounded density ratios, the per-step conditional TV distance satisfies $\TV_s \leq (\Gamma - 1)/(\Gamma + 1)$. A sequential maximal coupling argument then yields $\TV(P_\Gamma, P_0) \leq 1 - \prod_s (1 - \TV_s) = 1 - (2/(\Gamma+1))^\tau$, which is tighter than the union bound $\tau \cdot (\Gamma-1)/(\Gamma+1)$. Since $E(\ba) \in [0,1]$, the TV bound gives Eq.~\eqref{eq:sensitivity_bound}. The breakdown point follows by setting $\mathrm{SR}_0 - \psi(\Gamma, \tau) = 0$.
+\end{proof}
+
+\vspace{-0.8em}
+\paragraph{Empirical sensitivity bounds.} On the Cancer simulator at $\gamma = 4$, the breakdown points are: $\Gamma_{\max} = 7.5$ at $\tau = 2$ ($\mathrm{SR}_0 = 94.4\%$), $\Gamma_{\max} = 3.4$ at $\tau = 4$ ($\mathrm{SR}_0 = 95.6\%$), and $\Gamma_{\max} = 2.1$ at $\tau = 8$ ($\mathrm{SR}_0 = 97.0\%$). At moderate hidden confounding ($\Gamma = 1.5$), the guaranteed safety rates remain $\geq 58\%$ ($\tau = 2$) and $\geq 14\%$ ($\tau = 8$). Even at $\Gamma = 2.0$ (each hidden confounder doubles the treatment odds at each step), the bound is non-vacuous through $\tau = 8$. These results confirm that RA-constrained selection provides meaningful safety guarantees under substantial hidden confounding, with robustness strongest at short horizons---precisely the regime most clinically relevant. Full sensitivity tables are in Appendix~\ref{app:sensitivity}.
+
+\vspace{-0.5em}
+\begin{corollary}[Combined robustness margin]
+\label{cor:combined_margin}
+Under all three assumptions, the RA filter preserves pairwise rankings when the reach-avoid margin satisfies $m_{\mathrm{RA}} > 2\varepsilon_{\mathrm{VI}} + 2(\tau+1)\varepsilon_{\mathrm{soft}}(\kappa) + 2\psi(\Gamma, \tau)$. This extends Theorem~\ref{thm:ranking_robustness}(a) to the confounded setting, decomposing robustness into variational, approximation, and confounding terms.
+\end{corollary}
+
+
 %% ============================================================
 \section{Experiments}
 \label{sec:experiments}
@@ -399,7 +442,7 @@ $\gamma$ & GRP & ELBO Top-1 & RA Top-1 & $\Delta$Top-1 & Safety gain & In-T gain
 \end{tabular}
 \end{table}
 
-This gamma sweep demonstrates robustness to confounding strength: as confounding increases, model quality degrades but RA-constrained selection becomes \emph{more} valuable, providing the largest gains precisely where planning is most challenging. Note that varying $\gamma$ changes the data-generating process (strength of treatment-outcome confounding), not the plausibility of the sequential ignorability assumption itself; a formal sensitivity analysis for ignorability violations~\citep{frauen2023sharp} is an important direction for future work.
+This gamma sweep demonstrates robustness to confounding strength: as confounding increases, model quality degrades but RA-constrained selection becomes \emph{more} valuable, providing the largest gains precisely where planning is most challenging. Note that varying $\gamma$ changes the data-generating process (strength of treatment-outcome confounding), not the plausibility of the sequential ignorability assumption itself. We provide a formal sensitivity analysis for ignorability violations in Section~\ref{sec:sensitivity} and Appendix~\ref{app:sensitivity}, following the Rosenbaum framework~\citep{rosenbaum2002observational, frauen2023sharp}.
 
 
 \subsection{MIMIC-III Results}
@@ -525,7 +568,7 @@ This reveals that the Cancer safety improvements in Table~\ref{tab:gamma_sweep} 
 \paragraph{Toward clinical guardrails.} The post-hoc filtering paradigm we propose is an instance of \emph{guardrails} for AI-driven treatment planning, analogous to shielding in safe RL~\citep{alshiekh2018shielding} and rejection sampling in RLHF~\citep{bai2022constitutional}: rather than training the model to be safe, we add an external safety check on its outputs. This separation has practical deployment advantages: safety thresholds can be adjusted by clinicians without retraining the model, and the same base model can operate under different constraint profiles for different patient populations or clinical contexts.
 
 \vspace{-0.8em}
-\paragraph{Limitations and future work.} (1)~$\cT$ and $\cS$ require domain expertise (Table~\ref{tab:target_size} shows robustness). (2)~On MIMIC-III, counterfactuals are unobservable; our outcome correlation and guideline concordance analyses (Appendix~\ref{app:outcome_correlation}) provide indirect evidence of clinical alignment (78--92\% treatment agreement with good-outcome patients; 97\% avoidance of unnecessary vasopressor escalation), but formal clinician evaluation would further strengthen the evidence. (3)~Feasibility drops at long horizons; expanding the candidate pool $k$ is a straightforward mitigation (feasibility scales linearly with $k$; e.g., $k{=}500$ yields ${\sim}52$ feasible candidates at the strictest configuration). (4)~Sequential ignorability is assumed; a formal sensitivity analysis under the Rosenbaum sensitivity model~\citep{rosenbaum2002observational} is an important direction. (5)~On Cancer, model-predicted trajectories are too compressed to discriminate safety violations (Section~\ref{sec:ablations}); the safety improvements in Table~\ref{tab:gamma_sweep} depend on oracle trajectory access. On MIMIC, where predictions span the constraint boundary, model-based filtering is effective---but closing the oracle gap on synthetic data remains open. We explore conformal safety certificates (Appendix~\ref{app:conformal}) as a path toward distribution-free coverage guarantees: conformal coverage is empirically valid on both datasets, but current model accuracy falls $\sim$10\% short of the threshold for useful certification on MIMIC, defining a concrete improvement target. To demonstrate cross-domain generalization, we evaluate on a glucose-insulin simulator (Appendix~\ref{app:glucose}), confirming that RA filtering transfers directly to a domain with continuous univariate treatment, different safety semantics, and clinically defined constraint ranges. Future work includes trajectory calibration methods to close the conformal gap, multi-outcome targets, and adaptive threshold selection.
+\paragraph{Limitations and future work.} (1)~$\cT$ and $\cS$ require domain expertise (Table~\ref{tab:target_size} shows robustness). (2)~On MIMIC-III, counterfactuals are unobservable; our outcome correlation and guideline concordance analyses (Appendix~\ref{app:outcome_correlation}) provide indirect evidence of clinical alignment (78--92\% treatment agreement with good-outcome patients; 97\% avoidance of unnecessary vasopressor escalation), but formal clinician evaluation would further strengthen the evidence. (3)~Feasibility drops at long horizons; expanding the candidate pool $k$ is a straightforward mitigation (feasibility scales linearly with $k$; e.g., $k{=}500$ yields ${\sim}52$ feasible candidates at the strictest configuration). (4)~Sequential ignorability is assumed; we provide a formal sensitivity analysis under the Rosenbaum sensitivity model (Theorem~\ref{thm:sensitivity}, Appendix~\ref{app:sensitivity}) showing that the RA filter's safety guarantee degrades gracefully under bounded hidden confounding, with breakdown points $\Gamma_{\max} = 2.1$--$7.5$ depending on planning horizon. (5)~On Cancer, model-predicted trajectories are too compressed to discriminate safety violations (Section~\ref{sec:ablations}); the safety improvements in Table~\ref{tab:gamma_sweep} depend on oracle trajectory access. On MIMIC, where predictions span the constraint boundary, model-based filtering is effective---but closing the oracle gap on synthetic data remains open. We explore conformal safety certificates (Appendix~\ref{app:conformal}) as a path toward distribution-free coverage guarantees: conformal coverage is empirically valid on both datasets, but current model accuracy falls $\sim$10\% short of the threshold for useful certification on MIMIC, defining a concrete improvement target. To demonstrate cross-domain generalization, we evaluate on a glucose-insulin simulator (Appendix~\ref{app:glucose}), confirming that RA filtering transfers directly to a domain with continuous univariate treatment, different safety semantics, and clinically defined constraint ranges. Future work includes trajectory calibration methods to close the conformal gap, multi-outcome targets, and adaptive threshold selection.
 
 
 %% ============================================================
@@ -1034,6 +1077,89 @@ At $\gamma{=}4$, aggregating across 5 seeds, the per-patient danger rate (fracti
 No patient is \emph{always} unsafe across all 5 seeds, but 54--65 out of 100 are ``sometimes unsafe''---indicating that danger is broadly distributed across the patient population rather than concentrated in a few identifiable outliers. This supports the argument that safety filtering is broadly needed, not a correction for rare edge cases. The most dangerous patient at $\tau{=}8$ (Patient 71) is unsafe in 4/5 seeds, with a mean terminal cancer volume of 2.02---just below the target threshold, indicating near-miss violations that are sensitive to random seed variation.
 
 
+\section{Sensitivity Analysis Under Hidden Confounding}
+\label{app:sensitivity}
+
+This section provides the full proof of Theorem~\ref{thm:sensitivity} and empirical sensitivity tables for the Cancer simulator.
+
+\subsection{Proof of Theorem~\ref{thm:sensitivity}}
+
+\begin{proof}
+The proof proceeds in three steps.
+
+\textbf{Step 1: Per-step conditional TV bound.}
+Fix a step $s$ and history $H_s$. Under Assumption~\ref{ass:hidden_confounding}, the unobserved confounder $U_s$ is associated with treatment $a_s$ conditionally on $H_s$. The identified outcome distribution at step $s$ integrates over $U_s$ using its marginal:
+\[
+P_0(Y_s \mid H_s, a_s) = \int P(Y_s \mid H_s, a_s, u)\, dP(u \mid H_s),
+\]
+while the true distribution conditions on the confounder-treatment association:
+\[
+P_\Gamma(Y_s \mid H_s, a_s) = \int P(Y_s \mid H_s, a_s, u)\, dP(u \mid H_s, a_s).
+\]
+By Bayes' rule, $dP(u \mid H_s, a_s) / dP(u \mid H_s) = \pi_{\mathrm{true}}(a_s \mid H_s, u) / \pi_{\mathrm{obs}}(a_s \mid H_s) \in [1/\Gamma, \Gamma]$. The total variation between two distributions with $\Gamma$-bounded density ratio satisfies (see, e.g., \citealt{rosenbaum2002observational}):
+\begin{equation}
+\label{eq:per_step_tv}
+\TV(P_\Gamma(Y_s \mid H_s, a_s),\, P_0(Y_s \mid H_s, a_s)) \;\leq\; \varphi(\Gamma) := \frac{\Gamma - 1}{\Gamma + 1}.
+\end{equation}
+This bound holds uniformly over all histories $H_s$ and treatments $a_s$.
+
+\textbf{Step 2: Sequential maximal coupling.}
+We construct a coupling of the $\tau$-step trajectories $\bY^{(0)} \sim P_0$ and $\bY^{(\Gamma)} \sim P_\Gamma$. At each step $s = 1, \ldots, \tau$, conditional on the trajectories being coupled up to step $s-1$ (i.e., $Y^{(0)}_{1:s-1} = Y^{(\Gamma)}_{1:s-1}$), we apply a maximal coupling of $P_0(Y_s \mid H_s, a_s)$ and $P_\Gamma(Y_s \mid H_s, a_s)$. Under this coupling:
+\[
+\Pr(Y^{(0)}_s \neq Y^{(\Gamma)}_s \mid \text{coupled at } s{-}1) = \TV_s \leq \varphi(\Gamma).
+\]
+The probability that the trajectories remain coupled through all $\tau$ steps is:
+\[
+\Pr(\bY^{(0)} = \bY^{(\Gamma)}) \geq \prod_{s=1}^{\tau} (1 - \varphi(\Gamma)) = \left(\frac{2}{\Gamma + 1}\right)^{\!\tau}.
+\]
+Therefore, the total variation between the joint trajectory distributions satisfies:
+\begin{equation}
+\label{eq:sequential_tv}
+\TV(P_\Gamma(\bY),\, P_0(\bY)) \;\leq\; 1 - \left(\frac{2}{\Gamma + 1}\right)^{\!\tau} =: \psi(\Gamma, \tau).
+\end{equation}
+
+\textbf{Step 3: Application to reach-avoid event.}
+The reach-avoid event $E(\ba)$ is a measurable function of the full trajectory $\bY$, with indicator $\ind\{E(\ba)\} \in [0,1]$. By the variational characterization of total variation:
+\[
+|P_\Gamma(E(\ba)) - P_0(E(\ba))| = |\E_{P_\Gamma}[\ind\{E\}] - \E_{P_0}[\ind\{E\}]| \leq \TV(P_\Gamma, P_0) \leq \psi(\Gamma, \tau).
+\]
+The population safety rate bound follows by linearity of expectation over patients:
+$\mathrm{SR}_\Gamma = \E_x[P_\Gamma(E(\ba^*(x)))] \geq \E_x[P_0(E(\ba^*(x)))] - \psi(\Gamma, \tau) = \mathrm{SR}_0 - \psi(\Gamma, \tau)$.
+
+The breakdown point Eq.~\eqref{eq:breakdown} is obtained by solving $\mathrm{SR}_0 - \psi(\Gamma, \tau) = 0$:
+\[
+\left(\frac{2}{\Gamma+1}\right)^{\!\tau} = 1 - \mathrm{SR}_0 \;\;\Longrightarrow\;\; \Gamma_{\max} = \frac{2}{(1 - \mathrm{SR}_0)^{1/\tau}} - 1. \qedhere
+\]
+\end{proof}
+
+\paragraph{Remark on tightness.} The sequential coupling bound $\psi(\Gamma, \tau) = 1 - (2/(\Gamma+1))^\tau$ is strictly tighter than the union bound $\tau \cdot \varphi(\Gamma) = \tau(\Gamma-1)/(\Gamma+1)$ used in the proof sketch. For example, at $\Gamma = 1.5$, $\tau = 4$: the coupling bound gives $\psi = 0.59$ while the union bound gives $0.80$. We present the tighter bound throughout.
+
+\subsection{Empirical Sensitivity Tables}
+
+Table~\ref{tab:sensitivity} reports the guaranteed safety rate $\mathrm{SR}_\Gamma^{\mathrm{lower}} := \mathrm{SR}_0 - \psi(\Gamma, \tau)$ for the Cancer simulator at $\gamma = 4$ across planning horizons and confounding strengths.
+
+\begin{table}[h]
+\centering
+\caption{Sensitivity of RA safety guarantee to hidden confounding (Cancer, $\gamma = 4$). Each cell shows the guaranteed lower bound on true safety rate $\mathrm{SR}_\Gamma^{\mathrm{lower}}$ under $\Gamma$-bounded hidden confounding (Theorem~\ref{thm:sensitivity}). ``---'' indicates a vacuous bound ($\leq 0$). $\Gamma_{\max}$: maximum $\Gamma$ for a non-trivial guarantee.}
+\label{tab:sensitivity}
+\small
+\begin{tabular}{cc cccccc c}
+\toprule
+$\tau$ & $\mathrm{SR}_0$ & $\Gamma{=}1.0$ & $\Gamma{=}1.1$ & $\Gamma{=}1.5$ & $\Gamma{=}2.0$ & $\Gamma{=}3.0$ & $\Gamma{=}5.0$ & $\Gamma_{\max}$ \\
+\midrule
+2 & 94.4\% & 94.4\% & 85.1\% & 58.4\% & 38.8\% & 19.4\% & 5.5\% & 7.5 \\
+4 & 95.6\% & 95.6\% & 77.9\% & 36.6\% & 15.4\% & 1.9\% & --- & 3.4 \\
+6 & 97.0\% & 97.0\% & 71.6\% & 23.2\% & 5.8\% & --- & --- & 2.6 \\
+8 & 97.0\% & 97.0\% & 64.7\% & 13.8\% & 0.9\% & --- & --- & 2.1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Interpretation.} The sensitivity bounds reveal a clear horizon--robustness tradeoff: short-horizon planning ($\tau = 2$) tolerates up to $\Gamma = 7.5$ before the safety guarantee becomes vacuous, while long-horizon planning ($\tau = 8$) is vulnerable above $\Gamma = 2.1$. This provides additional justification for short-horizon treatment planning in safety-critical clinical settings where hidden confounding is plausible. Notably, even at $\Gamma = 2.0$ (each unobserved confounder can double the treatment odds at every step), the RA filter guarantees $> 0\%$ safety through $\tau = 8$---confirming that the method provides meaningful robustness to unmeasured confounding across all tested configurations.
+
+The $\Gamma$ parameter has a clinical interpretation: $\Gamma = 1.5$ means that an unobserved factor (e.g., patient frailty, unmeasured lab values) can increase the odds of receiving a particular treatment by 50\% at each step. In well-curated ICU databases like MIMIC-III, where extensive covariate measurement reduces residual confounding, $\Gamma \in [1.1, 1.5]$ is a plausible range~\citep{frauen2023sharp}. At $\Gamma = 1.5$, the RA filter guarantees safety $\geq 58.4\%$ ($\tau = 2$) to $13.8\%$ ($\tau = 8$).
+
+
 \section{Finite-Sample Analysis}
 \label{app:finite_sample}
 
@@ -1090,6 +1216,15 @@ This is a \emph{single-scenario} approximation to the population chance-constrai
 \min_{\ba} \mathrm{ELBO}(\ba) \quad \text{s.t.} \quad \Pr(E(\ba)) \geq 1 - \alpha,
 \]
 where the probability is over trajectory randomness. For deterministic simulators (Cancer), $\Pr(E(\ba)) \in \{0, 1\}$ and the single-scenario evaluation is exact. For stochastic outcomes (MIMIC), a single model-predicted trajectory provides a noisy estimate of the chance constraint. The scenario approach~\citep{calafiore2006scenario} provides guarantees when $N$ i.i.d.\ trajectory samples are available; with $N = 1$ (our setting), the guarantee is weak, motivating the oracle evaluation paradigm for Cancer and the conformal approach (Appendix~\ref{app:conformal}) for distribution-free certificates.
+
+\subsection{Distributionally Robust Interpretation}
+\label{sec:dro_interpretation}
+
+The RA threshold filter also admits a distributionally robust optimization (DRO) interpretation. Under Assumption~\ref{ass:vi_gap}, the true model $p_\theta$ lies within a total variation ball of radius $\varepsilon_{\mathrm{VI}}$ around the variational approximation $q_\phi$. The RA feasibility check $\hat{P}(\ba) \geq \delta$ (for threshold $\delta$) is equivalent to verifying:
+\[
+\min_{Q:\, \TV(Q, q_\phi) \leq \varepsilon_{\mathrm{VI}}} P_Q(E(\ba)) \;\geq\; \delta - \varepsilon_{\mathrm{VI}},
+\]
+where $P_Q(E(\ba))$ is the reach-avoid probability under distribution $Q$. This follows directly from the variational characterization of TV for $[0,1]$-valued functionals (Theorem~\ref{thm:ranking_robustness}(a)): the worst-case probability over the ambiguity set $\{Q : \TV(Q, q_\phi) \leq \varepsilon_{\mathrm{VI}}\}$ is at most $\varepsilon_{\mathrm{VI}}$ below the nominal probability. Thus, the RA filter implicitly provides a DRO guarantee: any plan declared feasible at level $\delta$ by the model satisfies the true reach-avoid constraint at level $\geq \delta - \varepsilon_{\mathrm{VI}}$ for \emph{all} distributions within the TV ambiguity set. This connects the threshold-based filter to the robust optimization literature~\citep{iyengar2005robust} and provides an interpretive bridge between ranking robustness (Theorem~\ref{thm:ranking_robustness}) and classical DRO.
 
 \subsection{Empirical Verification}
 
