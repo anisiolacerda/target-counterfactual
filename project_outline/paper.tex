@@ -505,7 +505,7 @@ RMSN  & 0.578 & 2.8\%  & 2.0\%  & 49.0\% & 72.2\% & $-$13.2 \\
 \end{tabular}
 \end{table}
 
-This demonstrates that RA-constrained selection is truly model-agnostic: the safety filter operates on ground-truth trajectories (in the Cancer simulator), independent of which model provides the ELBO ranking. Any model---no matter how poorly it ranks---benefits from having its worst selections removed. Computationally, the RA filter adds negligible overhead: it evaluates pre-computed trajectories against threshold conditions, requiring $< 1$~minute per full configuration on a single CPU---in contrast to constrained RL methods that require complete retraining when safety specifications change.
+This demonstrates that RA-constrained selection is truly model-agnostic: the safety filter operates on ground-truth trajectories (in the Cancer simulator), independent of which model provides the ELBO ranking. Any model---no matter how poorly it ranks---benefits from having its worst selections removed. Notably, the underlying ranking quality varies dramatically: VCIP achieves Spearman $\rho = 0.84$ between ELBO and oracle rankings, while CT achieves $\rho \approx 0$---yet both benefit from safety filtering (Appendix~\ref{app:cross_model}). Cross-model failure patterns are partially correlated but not universal, supporting the model-agnostic design. Computationally, the RA filter adds negligible overhead: it evaluates pre-computed trajectories against threshold conditions, requiring $< 1$~minute per full configuration on a single CPU---in contrast to constrained RL methods that require complete retraining when safety specifications change.
 
 
 \subsection{Hard Filter vs.\ Soft Constraint (Constrained RL Analogue)}
@@ -1085,6 +1085,37 @@ At $\gamma{=}4$, aggregating across 5 seeds, the per-patient danger rate (fracti
 \end{itemize}
 
 No patient is \emph{always} unsafe across all 5 seeds, but 54--65 out of 100 are ``sometimes unsafe''---indicating that danger is broadly distributed across the patient population rather than concentrated in a few identifiable outliers. This supports the argument that safety filtering is broadly needed, not a correction for rare edge cases. The most dangerous patient at $\tau{=}8$ (Patient 71) is unsafe in 4/5 seeds, with a mean terminal cancer volume of 2.02---just below the target threshold, indicating near-miss violations that are sensitive to random seed variation.
+
+\subsection{Cross-Model Failure Analysis}
+\label{app:cross_model}
+
+To assess whether failure modes are structural (inherent to the planning problem) or model-specific, we compare selection quality and failure patterns across all five baseline models at $\gamma = 4$.
+
+\paragraph{Ranking quality varies dramatically across models.} Table~\ref{tab:cross_model_quality} reports the Spearman correlation between each model's ELBO rankings and the oracle true-loss rankings. VCIP substantially outperforms all other models: $\rho = 0.75$--$0.90$ across horizons, compared to CRN ($0.12$--$0.33$), RMSN ($-0.07$--$0.29$), ACTIN ($0.15$--$0.28$), and CT ($\approx 0.00$). VCIP's zero-regret rate (fraction of patients where the ELBO-best plan coincides with the oracle-best) ranges from 22\% ($\tau{=}2$) to 77\% ($\tau{=}8$), while CT achieves only 3--10\%. This implies that RA-constrained selection is most valuable when paired with a model that provides meaningful surrogate rankings---without ranking quality, filtering selects randomly within the feasible set.
+
+\begin{table}[h]
+\centering
+\caption{Cross-model selection quality (Cancer, $\gamma = 4$). Spearman($\rho$): rank correlation between model ELBO and oracle true loss. \% zero: fraction of patients with zero selection regret. VCIP's ranking quality is 2--8$\times$ higher than all competitors.}
+\label{tab:cross_model_quality}
+\small
+\begin{tabular}{l cccc cccc}
+\toprule
+& \multicolumn{4}{c}{Spearman $\rho$ (ELBO vs.\ oracle)} & \multicolumn{4}{c}{\% zero regret} \\
+\cmidrule(lr){2-5} \cmidrule(lr){6-9}
+Model & $\tau{=}2$ & $\tau{=}4$ & $\tau{=}6$ & $\tau{=}8$ & $\tau{=}2$ & $\tau{=}4$ & $\tau{=}6$ & $\tau{=}8$ \\
+\midrule
+VCIP  & 0.75 & 0.84 & 0.89 & 0.90 & 22\% & 44\% & 64\% & 77\% \\
+CRN   & 0.33 & 0.25 & 0.17 & 0.12 &  4\% & 11\% & 14\% & 18\% \\
+CT    & $-$0.01 & $-$0.01 & 0.01 & 0.02 &  3\% &  7\% &  9\% & 10\% \\
+RMSN  & 0.29 & 0.12 & $-$0.02 & $-$0.07 & 10\% & 19\% & 19\% & 22\% \\
+ACTIN & 0.28 & 0.25 & 0.19 & 0.15 &  4\% & 10\% & 14\% & 12\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Models learn nearly independent ranking functions.} The pairwise Spearman correlation between model ELBO rankings (over $k = 100$ candidates, averaged across patients) is near zero for all model pairs: $\rho \in [-0.05, 0.22]$. VCIP--ACTIN show the highest agreement ($\rho \approx 0.19$), while CT's rankings are essentially independent of all other models. Despite learning from identical training data, these five architectures produce fundamentally different approximations of the treatment-outcome mapping, suggesting that ranking quality is highly sensitive to architectural choices.
+
+\paragraph{Failure overlap is moderate, not universal.} We define a patient as ``dangerous'' under a given model if, averaged across seeds, the ELBO-selected plan ranks in the worse half by true loss. No patient is dangerous under all 5 models simultaneously. At $\tau{=}2$, 16 patients are dangerous under $\geq 3$ models, and 10 are safe under all 5. The Spearman correlation of per-patient regret vectors across model pairs is moderate ($\rho = 0.1$--$0.5$), indicating partial structural overlap: the same patients tend to be \emph{harder} across models, but each model fails in different ways. This supports the model-agnostic design of the RA filter: a post-hoc safety layer that does not depend on \emph{which} model is used upstream.
 
 
 \section{Sensitivity Analysis Under Hidden Confounding}
