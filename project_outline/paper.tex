@@ -43,6 +43,9 @@
 \newcommand{\cQ}{\mathcal{Q}}
 \newcommand{\cA}{\mathcal{A}}
 \newcommand{\ind}{\mathbf{1}}
+\newcommand{\cP}{\mathcal{P}}
+\newcommand{\bY}{\bar{Y}}
+\newcommand{\Var}{\mathrm{Var}}
 
 
 \title{Reach-Avoid Constrained Selection for Safe Counterfactual Intervention Planning}
@@ -62,7 +65,7 @@
 \maketitle
 
 \begin{abstract}
-Variational counterfactual intervention planning selects treatment sequences by optimizing an evidence lower bound (ELBO) toward a point target outcome. In clinical practice, however, the goal is typically to bring a patient's state into an \emph{acceptable range} while maintaining \emph{safety constraints} at every intermediate step---requirements that point-target optimization does not address. We introduce \emph{reach-avoid constrained selection}, a post-hoc method that filters ELBO-ranked candidate sequences through a reach-avoid feasibility criterion: the terminal outcome must lie within a target set~$\cT$ and all intermediate outcomes must remain within a safety set~$\cS$. We prove that reach-avoid ranking is more robust to variational approximation error than point-target ELBO ranking, with an explicit bound relating the ranking preservation margin to the variational gap~$\varepsilon_{\mathrm{VI}}$ and soft-indicator approximation error~$\varepsilon_{\mathrm{soft}}$. We further provide a sensitivity analysis under hidden confounding, showing that the safety guarantee degrades gracefully as the Rosenbaum sensitivity parameter~$\Gamma$ increases, with non-vacuous bounds through $\Gamma = 2.0$ at all tested horizons. Empirically, on a cancer tumor growth simulator with known counterfactuals, reach-avoid constrained selection improves safety by 18--33 percentage points under moderate-to-strong confounding at modest ranking cost, Pareto-dominates soft-constraint alternatives, and transfers to all baseline models without retraining. On MIMIC-III intensive care data, the method lifts in-target diastolic blood pressure rates from 73--81\% to 99--100\%. To our knowledge, this is the first systematic safety evaluation of counterfactual treatment planners. The approach requires no model modification, no retraining, and is compatible with any variational counterfactual planner.
+Variational counterfactual intervention planning selects treatment sequences by optimizing an evidence lower bound (ELBO) toward a point target outcome. In clinical practice, however, the goal is typically to bring a patient's state into an \emph{acceptable range} while maintaining \emph{safety constraints} at every intermediate step---requirements that point-target optimization does not address. We introduce \emph{reach-avoid constrained selection}, a post-hoc method that filters ELBO-ranked candidate sequences through a reach-avoid feasibility criterion: the terminal outcome must lie within a target set~$\cT$ and all intermediate outcomes must remain within a safety set~$\cS$. We prove that reach-avoid ranking is more robust to variational approximation error than point-target ELBO ranking, with an explicit bound relating the ranking preservation margin to the variational gap~$\varepsilon_{\mathrm{VI}}$ and soft-indicator approximation error~$\varepsilon_{\mathrm{soft}}$. We further provide a sensitivity analysis under hidden confounding, showing that the safety guarantee degrades gracefully as the Rosenbaum sensitivity parameter~$\Gamma$ increases, with non-vacuous bounds through $\Gamma = 2.0$ at all tested horizons. Empirically, on a cancer tumor growth simulator with known counterfactuals, reach-avoid constrained selection improves safety by 9--11 percentage points for VCIP and up to 24 percentage points across all baseline models under strong confounding, Pareto-dominates soft-constraint alternatives, and transfers to all baseline models without retraining. On MIMIC-III intensive care data, the method lifts in-target diastolic blood pressure rates from 73--81\% to 99--100\%. To our knowledge, this is the first systematic safety evaluation of counterfactual treatment planners. The approach requires no model modification, no retraining, and is compatible with any variational counterfactual planner.
 \end{abstract}
 
 
@@ -105,7 +108,7 @@ The simplicity is a feature, not a limitation. By separating safety (via the RA 
 \item \textbf{First systematic safety evaluation of counterfactual planners.} We formalize reach-avoid constrained intervention planning, separating safety from quality in a way that reveals a previously unquantified safety gap: existing planners violate clinically meaningful constraints on 15--45\% of patients under moderate confounding (Section~\ref{sec:experiments}).
 \item \textbf{Ranking robustness theory.} We prove that reach-avoid ranking is more robust to variational approximation error than point-target ELBO ranking (Theorem~\ref{thm:ranking_robustness}), with an explicit, empirically non-vacuous bound ($\varepsilon_{\mathrm{VI}} \approx 0.09$--$0.23$) on ranking preservation (Section~\ref{sec:theory}).
 \item \textbf{Sensitivity analysis under hidden confounding.} We extend the Rosenbaum sensitivity model to sequential treatments and prove that the RA safety guarantee degrades gracefully as hidden confounding increases (Theorem~\ref{thm:sensitivity}), with non-vacuous bounds through $\Gamma = 2.0$ at all tested horizons and explicit breakdown points $\Gamma_{\max} = 2.1$--$7.5$ (Section~\ref{sec:sensitivity}).
-\item \textbf{Comprehensive experiments.} On the Cancer simulator, RA-constrained selection yields $+$18--33~pp safety improvement under moderate-to-strong confounding, Pareto-dominates soft-constraint alternatives, and generalizes across five baseline models without retraining. On MIMIC-III ICU data, it lifts in-target rates from 73--81\% to 99--100\% (Section~\ref{sec:experiments}).
+\item \textbf{Comprehensive experiments.} On the Cancer simulator, RA-constrained selection yields $+$9--11~pp safety improvement for VCIP and up to $+$24~pp across all five baseline models under strong confounding, Pareto-dominates soft-constraint alternatives, and generalizes without retraining. On MIMIC-III ICU data, it lifts in-target rates from 73--81\% to 99--100\% (Section~\ref{sec:experiments}).
 \item \textbf{Model-agnostic post-hoc method.} The approach requires no retraining---we show empirically that RA-aware retraining produces identical results to post-hoc filtering---and is compatible with any variational counterfactual planner (Section~\ref{sec:retraining_result}).
 \end{enumerate}
 
@@ -430,7 +433,7 @@ $\tau$ & Feas.\% & ELBO Top-1 & RA Top-1 & ELBO Safe & RA Safe & ELBO In-T & RA 
 \end{tabular}
 \end{table}
 
-RA-constrained selection consistently improves safety and in-target rates by 9--12~pp across all horizons, at the cost of 1--15~pp in Top-1 accuracy. The trade-off is most favorable at shorter horizons ($\tau = 2$: $+$9.4~pp safety for $-$1.4~pp Top-1) where feasibility is highest (54\%), and becomes more aggressive at longer horizons where fewer candidates pass intermediate safety across all steps.
+RA-constrained selection consistently improves safety and in-target rates by 9--11~pp across all horizons, at the cost of 1--15~pp in Top-1 accuracy. The trade-off is most favorable at shorter horizons ($\tau = 2$: $+$9.4~pp safety for $-$1.4~pp Top-1) where feasibility is highest (54\%), and becomes more aggressive at longer horizons where fewer candidates pass intermediate safety across all steps.
 
 \vspace{-0.8em}
 \paragraph{Confounding strength sensitivity.} Table~\ref{tab:gamma_sweep} shows results across all $\gamma$ values. At $\gamma = 1$ (weak confounding), the constraint is nearly a no-op---ELBO already selects safe plans. At $\gamma = 4$, the benefit is substantial: $+$10.8~pp in-target gain, $+$15.2~pp safety gain. The method never hurts: worst-case Top-1 cost is 7~pp with 15~pp safety gain.
@@ -563,7 +566,7 @@ This reveals that the Cancer safety improvements in Table~\ref{tab:gamma_sweep} 
 \label{sec:discussion}
 
 \vspace{-0.8em}
-\paragraph{When does RA help most?} The benefit scales with confounding strength (Table~\ref{tab:gamma_sweep}): at $\gamma = 1$, ELBO already selects safe plans; at $\gamma \geq 3$, RA filtering provides 12--33~pp safety improvement---most valuable where planning is most challenging.
+\paragraph{When does RA help most?} The benefit scales with confounding strength (Table~\ref{tab:gamma_sweep}): at $\gamma = 1$, ELBO already selects safe plans; at $\gamma \geq 3$, RA filtering provides 12--15~pp average safety improvement across horizons---most valuable where planning is most challenging.
 
 \vspace{-0.8em}
 \paragraph{Failure taxonomy.} We categorize unsafe ELBO selections into three modes (Appendix~\ref{app:failure_taxonomy}): (A)~\emph{aggressive overshoot}---high treatment intensity but tumor exceeds target; (B)~\emph{conservative undershoot}---insufficient treatment, tumor grows uncontrolled; (C)~\emph{toxic path}---terminal outcome is acceptable but intermediate states violate safety. At $\gamma{=}4$, mode~B dominates at short horizons (100\% of failures at $\tau{=}2$) while mode~C grows at longer horizons (44\% at $\tau{=}8$), confirming that path safety becomes critical for multi-step planning. Most patients (54--65/100) are ``sometimes unsafe'' across seeds---the danger is distributed, not concentrated in a few outliers---indicating that safety filtering is broadly needed rather than a correction for rare edge cases.
@@ -594,17 +597,17 @@ This reveals that the Cancer safety improvements in Table~\ref{tab:gamma_sweep} 
 \item {\bf Claims}
     \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
     \item[] Answer: \answerYes{}
-    \item[] Justification: The abstract and introduction claim (1)~a reach-avoid constrained selection formulation, (2)~ranking robustness theory, (3)~18--33~pp safety improvement on Cancer and 99--100\% in-target on MIMIC-III, and (4)~model-agnostic post-hoc applicability. All are supported by Sections~\ref{sec:method},~\ref{sec:theory}, and~\ref{sec:experiments}.
+    \item[] Justification: The abstract and introduction claim (1)~a reach-avoid constrained selection formulation, (2)~ranking robustness theory (Theorem~\ref{thm:ranking_robustness}), (3)~sensitivity analysis under hidden confounding (Theorem~\ref{thm:sensitivity}), (4)~safety improvement on Cancer and 99--100\% in-target on MIMIC-III, and (5)~model-agnostic post-hoc applicability. All are supported by Sections~\ref{sec:method},~\ref{sec:theory},~\ref{sec:sensitivity}, and~\ref{sec:experiments}.
 
 \item {\bf Limitations}
     \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
     \item[] Answer: \answerYes{}
-    \item[] Justification: Section~\ref{sec:discussion} (``Limitations and future work'') discusses four limitations: domain expertise for threshold selection, unobservable counterfactuals on MIMIC-III, feasibility drop at long horizons, and the sequential ignorability assumption.
+    \item[] Justification: Section~\ref{sec:discussion} (``Limitations and future work'') discusses five limitations: domain expertise for threshold selection, unobservable counterfactuals on MIMIC-III, feasibility drop at long horizons, the sequential ignorability assumption (with formal sensitivity analysis in Theorem~\ref{thm:sensitivity}), and oracle trajectory dependence on the Cancer simulator.
 
 \item {\bf Theory assumptions and proofs}
     \item[] Question: For each theoretical result, does the paper provide the full set of assumptions and a complete (and correct) proof?
     \item[] Answer: \answerYes{}
-    \item[] Justification: Theorem~\ref{thm:ranking_robustness} states two assumptions (Assumptions~\ref{ass:vi_gap} and~\ref{ass:soft_error}). A proof sketch is in Section~\ref{sec:theory}; the full proof is in Appendix~\ref{app:proofs}.
+    \item[] Justification: Theorem~\ref{thm:ranking_robustness} states two assumptions (Assumptions~\ref{ass:vi_gap} and~\ref{ass:soft_error}), with proof sketch in Section~\ref{sec:theory} and full proof in Appendix~\ref{app:proofs}. Theorem~\ref{thm:sensitivity} adds a third assumption (Assumption~\ref{ass:hidden_confounding}), with proof sketch in Section~\ref{sec:sensitivity} and full proof in Appendix~\ref{app:sensitivity}. Propositions~\ref{prop:deployment}--\ref{prop:quality} are proved in Appendix~\ref{app:finite_sample}.
 
 \item {\bf Experimental result reproducibility}
     \item[] Question: Does the paper fully disclose all the information needed to reproduce the main experimental results of the paper to the extent that it affects the main claims and/or conclusions of the paper (regardless of whether the code and data are provided or not)?
