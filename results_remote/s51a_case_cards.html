@@ -74,10 +74,10 @@
             <div class="progress-bar-bg">
                 <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
             </div>
-            <div class="progress-text" id="progress-text">0/20 cases completed (0%)</div>
+            <div class="progress-text" id="progress-text">0/27 cases completed (0%)</div>
         </div>
         <button class="download-btn disabled" id="download-btn" onclick="downloadCSV()" disabled>
-            Download CSV (0/20)
+            Download CSV (0/27)
         </button>
         <button class="download-btn save-btn" onclick="saveToLocalStorage()">Save Progress</button>
         <span id="save-status" style="font-size:0.8em;color:#666;"></span>
@@ -103,7 +103,7 @@
             <li><strong>Blinding:</strong> Plans A and B are randomly assigned. You do not know which method generated each plan.</li>
             <li><strong>Saving:</strong> Your progress is auto-saved in the browser. You can close the page and return later — your ratings will be restored.</li>
             <li><strong>When done:</strong> Click the <strong>"Download CSV"</strong> button at the top to export your ratings, then email the CSV file back.</li>
-            <li><strong>Time:</strong> ~1–2 minutes per case, 20 cases total (~30 minutes).</li>
+            <li><strong>Time:</strong> ~1–2 minutes per case, 27 cases total (~30 minutes).</li>
         </ul>
     </div>
     
@@ -119,11 +119,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>58 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>95 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>7/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>6/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -136,9 +136,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
 </tbody>
     </table>
     
@@ -146,8 +145,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">60.3 mmHg</span>
-        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+        <span class="dbp-label">58.0 mmHg</span>
+        <div class="dbp-bar" style="width:48%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -169,9 +168,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
-<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>1.00</td><td>No</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -179,8 +177,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">55.6 mmHg</span>
-        <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
+        <span class="dbp-label">60.7 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -221,11 +219,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>61 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>52 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>2/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>5/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -238,9 +236,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
-<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
 </tbody>
     </table>
     
@@ -248,8 +245,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">61.6 mmHg</span>
-        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+        <span class="dbp-label">56.6 mmHg</span>
+        <div class="dbp-bar" style="width:47%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -271,9 +268,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
-<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>1.00</td><td>No</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -281,8 +277,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">55.4 mmHg</span>
-        <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
+        <span class="dbp-label">60.3 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -323,11 +319,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>45 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>46 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>17/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>8/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -340,9 +336,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
 </tbody>
     </table>
     
@@ -350,8 +345,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">61.2 mmHg</span>
-        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+        <span class="dbp-label">57.1 mmHg</span>
+        <div class="dbp-bar" style="width:48%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -374,8 +369,7 @@
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -383,8 +377,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">58.8 mmHg</span>
-        <div class="dbp-bar" style="width:49%;background:#78909c;"></div>
+        <span class="dbp-label">60.0 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -425,11 +419,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>55 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>60 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>6/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>27/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -444,7 +438,6 @@
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
 <tr><td>Hour 2</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -452,8 +445,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">62.0 mmHg</span>
-        <div class="dbp-bar" style="width:52%;background:#78909c;"></div>
+        <span class="dbp-label">60.1 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -475,9 +468,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
-<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>1.00</td><td>Yes</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
 </tbody>
     </table>
     
@@ -485,7 +477,7 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">57.1 mmHg</span>
+        <span class="dbp-label">57.7 mmHg</span>
         <div class="dbp-bar" style="width:48%;background:#78909c;"></div>
     </div>
     
@@ -527,11 +519,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>63 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>53 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>29/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>26/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -546,7 +538,6 @@
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
 <tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
 </tbody>
     </table>
     
@@ -554,8 +545,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">59.1 mmHg</span>
-        <div class="dbp-bar" style="width:49%;background:#78909c;"></div>
+        <span class="dbp-label">57.2 mmHg</span>
+        <div class="dbp-bar" style="width:48%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -579,7 +570,6 @@
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
 <tr><td>Hour 2</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -587,8 +577,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">63.1 mmHg</span>
-        <div class="dbp-bar" style="width:53%;background:#78909c;"></div>
+        <span class="dbp-label">60.0 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -629,11 +619,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>58 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>64 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>6/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>3/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -646,9 +636,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -656,7 +645,7 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">61.7 mmHg</span>
+        <span class="dbp-label">61.2 mmHg</span>
         <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
     </div>
     
@@ -681,7 +670,6 @@
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
 <tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>1.00</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -689,7 +677,7 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">56.0 mmHg</span>
+        <span class="dbp-label">56.1 mmHg</span>
         <div class="dbp-bar" style="width:47%;background:#78909c;"></div>
     </div>
     
@@ -731,11 +719,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>76 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>39 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>7/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>2/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -750,7 +738,6 @@
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
 <tr><td>Hour 2</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -758,8 +745,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">61.5 mmHg</span>
-        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+        <span class="dbp-label">60.2 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -781,9 +768,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
-<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>1.00</td><td>Yes</td></tr>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -791,8 +777,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">57.4 mmHg</span>
-        <div class="dbp-bar" style="width:48%;background:#78909c;"></div>
+        <span class="dbp-label">55.0 mmHg</span>
+        <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -833,11 +819,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>44 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>60 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>10/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>4/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -850,9 +836,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
-<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -860,7 +845,7 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">60.6 mmHg</span>
+        <span class="dbp-label">60.2 mmHg</span>
         <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
     </div>
     
@@ -883,9 +868,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
-<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>1.00</td><td>Yes</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
 </tbody>
     </table>
     
@@ -893,8 +877,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">56.1 mmHg</span>
-        <div class="dbp-bar" style="width:47%;background:#78909c;"></div>
+        <span class="dbp-label">58.3 mmHg</span>
+        <div class="dbp-bar" style="width:49%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -935,11 +919,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>52 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>68 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>10/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>25/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -954,7 +938,6 @@
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
 <tr><td>Hour 2</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
 </tbody>
     </table>
     
@@ -962,7 +945,7 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">61.0 mmHg</span>
+        <span class="dbp-label">61.1 mmHg</span>
         <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
     </div>
     
@@ -985,9 +968,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
-<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>1.00</td><td>No</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
 </tbody>
     </table>
     
@@ -995,8 +977,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">54.6 mmHg</span>
-        <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
+        <span class="dbp-label">57.4 mmHg</span>
+        <div class="dbp-bar" style="width:48%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1037,11 +1019,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>78 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>54 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>20/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>4/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -1056,7 +1038,6 @@
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
 <tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
 </tbody>
     </table>
     
@@ -1064,8 +1045,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">59.6 mmHg</span>
-        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+        <span class="dbp-label">56.7 mmHg</span>
+        <div class="dbp-bar" style="width:47%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1089,7 +1070,6 @@
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
 <tr><td>Hour 2</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -1097,8 +1077,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">62.5 mmHg</span>
-        <div class="dbp-bar" style="width:52%;background:#78909c;"></div>
+        <span class="dbp-label">60.0 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1139,11 +1119,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>51 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>46 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>7/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>2/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -1156,9 +1136,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
-<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>1.00</td><td>No</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -1166,8 +1145,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">54.9 mmHg</span>
-        <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
+        <span class="dbp-label">60.4 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1189,9 +1168,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -1199,8 +1177,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">60.4 mmHg</span>
-        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+        <span class="dbp-label">55.0 mmHg</span>
+        <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1241,11 +1219,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>50 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>60 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>35/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>6/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -1259,8 +1237,7 @@
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -1268,8 +1245,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">58.7 mmHg</span>
-        <div class="dbp-bar" style="width:49%;background:#78909c;"></div>
+        <span class="dbp-label">60.1 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1291,9 +1268,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
 </tbody>
     </table>
     
@@ -1301,8 +1277,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">61.0 mmHg</span>
-        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+        <span class="dbp-label">57.5 mmHg</span>
+        <div class="dbp-bar" style="width:48%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1343,11 +1319,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>51 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>45 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>7/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>24/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -1362,7 +1338,6 @@
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
 <tr><td>Hour 2</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -1370,8 +1345,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">61.6 mmHg</span>
-        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+        <span class="dbp-label">60.2 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1393,9 +1368,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
-<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>1.00</td><td>Yes</td></tr>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -1403,8 +1377,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">56.2 mmHg</span>
-        <div class="dbp-bar" style="width:47%;background:#78909c;"></div>
+        <span class="dbp-label">55.3 mmHg</span>
+        <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1445,11 +1419,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>49 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>50 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>34/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>4/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -1462,9 +1436,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
 </tbody>
     </table>
     
@@ -1472,8 +1445,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">60.9 mmHg</span>
-        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+        <span class="dbp-label">56.4 mmHg</span>
+        <div class="dbp-bar" style="width:47%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1496,8 +1469,7 @@
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -1505,8 +1477,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">55.3 mmHg</span>
-        <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
+        <span class="dbp-label">60.1 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1547,11 +1519,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>56 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>71 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>13/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>5/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -1564,9 +1536,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -1574,8 +1545,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">58.5 mmHg</span>
-        <div class="dbp-bar" style="width:49%;background:#78909c;"></div>
+        <span class="dbp-label">60.8 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1597,9 +1568,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
 </tbody>
     </table>
     
@@ -1607,8 +1577,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">61.2 mmHg</span>
-        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+        <span class="dbp-label">57.4 mmHg</span>
+        <div class="dbp-bar" style="width:48%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1649,11 +1619,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>63 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>77 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>15/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>7/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -1666,9 +1636,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
 <tr><td>Hour 2</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -1676,8 +1645,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">62.1 mmHg</span>
-        <div class="dbp-bar" style="width:52%;background:#78909c;"></div>
+        <span class="dbp-label">60.8 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1701,7 +1670,6 @@
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
 <tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
 </tbody>
     </table>
     
@@ -1709,8 +1677,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">59.7 mmHg</span>
-        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+        <span class="dbp-label">58.4 mmHg</span>
+        <div class="dbp-bar" style="width:49%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1751,11 +1719,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>66 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>58 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>18/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>5/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -1770,7 +1738,6 @@
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
 <tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -1778,8 +1745,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">61.4 mmHg</span>
-        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+        <span class="dbp-label">57.3 mmHg</span>
+        <div class="dbp-bar" style="width:48%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1801,9 +1768,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -1811,7 +1777,7 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">60.0 mmHg</span>
+        <span class="dbp-label">60.5 mmHg</span>
         <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
     </div>
     
@@ -1856,8 +1822,8 @@
                 <tr><td><strong>Current diastolic BP:</strong></td><td>60 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>5/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>3/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -1872,7 +1838,6 @@
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
 <tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>1.00</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -1880,7 +1845,7 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">56.0 mmHg</span>
+        <span class="dbp-label">55.9 mmHg</span>
         <div class="dbp-bar" style="width:47%;background:#78909c;"></div>
     </div>
     
@@ -1903,9 +1868,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -1913,8 +1877,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">61.6 mmHg</span>
-        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+        <span class="dbp-label">60.5 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -1955,11 +1919,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>44 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>50 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>32/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>6/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -1974,7 +1938,6 @@
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
 <tr><td>Hour 2</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -1982,8 +1945,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">61.4 mmHg</span>
-        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+        <span class="dbp-label">60.3 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -2007,7 +1970,6 @@
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
 <tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>1.00</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -2015,7 +1977,7 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">54.8 mmHg</span>
+        <span class="dbp-label">54.7 mmHg</span>
         <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
     </div>
     
@@ -2057,11 +2019,11 @@
             <h3>Patient Context</h3>
             <table class="context-table">
                 <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>61 mmHg</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>63 mmHg</td></tr>
                 <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
                 <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>8/100 candidates meet safety criteria</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>2/100 candidates meet safety criteria</td></tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -2074,9 +2036,8 @@
                 
     <table class="treatment-table">
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
-        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
-<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
-<tr><td>Hour 3</td><td>1.00</td><td>Yes</td></tr>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -2084,8 +2045,8 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">57.4 mmHg</span>
-        <div class="dbp-bar" style="width:48%;background:#78909c;"></div>
+        <span class="dbp-label">56.4 mmHg</span>
+        <div class="dbp-bar" style="width:47%;background:#78909c;"></div>
     </div>
     
                 </div>
@@ -2109,7 +2070,6 @@
         <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
         <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
 <tr><td>Hour 2</td><td>None</td><td>No</td></tr>
-<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
 </tbody>
     </table>
     
@@ -2117,7 +2077,7 @@
                     <strong>Predicted terminal DBP:</strong>
                     
     <div class="dbp-bar-container">
-        <span class="dbp-label">61.6 mmHg</span>
+        <span class="dbp-label">61.0 mmHg</span>
         <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
     </div>
     
@@ -2149,6 +2109,706 @@
         </div>
     </div>
     
+    <div class="case-card" id="C21">
+        <div class="case-header">
+            <h2>Case C21</h2>
+            <span class="completion-badge" id="badge_C21">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>65 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>6/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">58.2 mmHg</span>
+        <div class="dbp-bar" style="width:48%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C21_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C21_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C21_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C21_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C21_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">60.8 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C21_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C21_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C21_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C21_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C21_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C21_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C21_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C21_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C21_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C22">
+        <div class="case-header">
+            <h2>Case C22</h2>
+            <span class="completion-badge" id="badge_C22">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>45 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>6/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">56.5 mmHg</span>
+        <div class="dbp-bar" style="width:47%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C22_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C22_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C22_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C22_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C22_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">60.1 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C22_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C22_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C22_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C22_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C22_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C22_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C22_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C22_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C22_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C23">
+        <div class="case-header">
+            <h2>Case C23</h2>
+            <span class="completion-badge" id="badge_C23">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>64 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>8/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">60.2 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C23_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C23_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C23_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C23_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C23_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">58.1 mmHg</span>
+        <div class="dbp-bar" style="width:48%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C23_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C23_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C23_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C23_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C23_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C23_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C23_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C23_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C23_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C24">
+        <div class="case-header">
+            <h2>Case C24</h2>
+            <span class="completion-badge" id="badge_C24">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>60 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>5/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">60.1 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C24_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C24_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C24_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C24_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C24_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">58.3 mmHg</span>
+        <div class="dbp-bar" style="width:49%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C24_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C24_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C24_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C24_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C24_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C24_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C24_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C24_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C24_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C25">
+        <div class="case-header">
+            <h2>Case C25</h2>
+            <span class="completion-badge" id="badge_C25">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>46 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>5/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">60.3 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C25_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C25_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C25_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C25_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C25_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">55.9 mmHg</span>
+        <div class="dbp-bar" style="width:47%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C25_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C25_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C25_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C25_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C25_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C25_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C25_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C25_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C25_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C26">
+        <div class="case-header">
+            <h2>Case C26</h2>
+            <span class="completion-badge" id="badge_C26">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>55 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>5/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">56.9 mmHg</span>
+        <div class="dbp-bar" style="width:47%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C26_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C26_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C26_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C26_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C26_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">60.2 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C26_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C26_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C26_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C26_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C26_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C26_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C26_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C26_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C26_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C27">
+        <div class="case-header">
+            <h2>Case C27</h2>
+            <span class="completion-badge" id="badge_C27">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>48 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>2 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>2/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">55.8 mmHg</span>
+        <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C27_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C27_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C27_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C27_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C27_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">60.1 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C27_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C27_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C27_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C27_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C27_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C27_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C27_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C27_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C27_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
 
     <div style="text-align:center; margin:30px; padding:20px; background:#e8f5e9; border-radius:8px;">
         <p style="font-size:1.2em;"><strong>All done?</strong></p>
@@ -2160,7 +2820,7 @@
 
     
 <script>
-const CASE_IDS = ["C01", "C02", "C03", "C04", "C05", "C06", "C07", "C08", "C09", "C10", "C11", "C12", "C13", "C14", "C15", "C16", "C17", "C18", "C19", "C20"];
+const CASE_IDS = ["C01", "C02", "C03", "C04", "C05", "C06", "C07", "C08", "C09", "C10", "C11", "C12", "C13", "C14", "C15", "C16", "C17", "C18", "C19", "C20", "C21", "C22", "C23", "C24", "C25", "C26", "C27"];
 
 function getRadioValue(name) {
     const el = document.querySelector('input[name="' + name + '"]:checked');

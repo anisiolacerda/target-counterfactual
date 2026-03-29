@@ -14,9 +14,10 @@ from pathlib import Path
 
 # --- Configuration ---
 SEED = 10
-TAU = 3
-N_DISCORDANT = 20
+TAU = 2
+N_DISCORDANT = 50  # will be capped to available truly-discordant cases
 N_CONCORDANT = 0
+MIN_L1 = 0.01  # minimum treatment L1 distance to count as truly discordant
 DBP_TARGET = (60, 90)   # mmHg
 DBP_SAFETY = (40, 120)  # mmHg
 
@@ -114,9 +115,13 @@ def main():
 
     print(f"Discordant: {len(discordant)}, Concordant: {len(concordant)}")
 
-    # Select top-N discordant by L1 distance (most different treatment plans)
-    discordant.sort(key=lambda x: -x['l1_distance'])
-    selected_discordant = discordant[:N_DISCORDANT]
+    # Filter to truly discordant (different treatment sequences, not just indices)
+    truly_discordant = [c for c in discordant if c['l1_distance'] >= MIN_L1]
+    print(f"Truly discordant (L1 >= {MIN_L1}): {len(truly_discordant)}")
+
+    # Select top-N by L1 distance
+    truly_discordant.sort(key=lambda x: -x['l1_distance'])
+    selected_discordant = truly_discordant[:N_DISCORDANT]
 
     print(f"\nTop {N_DISCORDANT} discordant cases (by L1 distance):")
     for i, c in enumerate(selected_discordant):

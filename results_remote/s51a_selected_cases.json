@@ -1,8 +1,8 @@
 {
   "config": {
     "seed": 10,
-    "tau": 3,
-    "n_discordant": 20,
+    "tau": 2,
+    "n_discordant": 50,
     "n_concordant": 0,
     "dbp_target": [
       60,
@@ -16,123 +16,113 @@
   "cases": [
     {
       "case_type": "discordant",
-      "individual_id": 50,
-      "observed_dbp": 58.0,
-      "n_feasible": 7,
-      "l1_distance": 0.6666666666666666,
+      "individual_id": 20,
+      "observed_dbp": 95.0,
+      "n_feasible": 6,
+      "l1_distance": 0.5,
       "observed_treatment": [
         [
-          1.0,
-          0.0
+          0.0,
+          1.0
         ],
         [
-          1.0,
-          0.0
+          0.0,
+          1.0
         ],
         [
-          1.0,
-          0.0
+          0.0,
+          1.0
         ],
         [
-          1.0,
-          0.0
+          0.0,
+          1.0
         ],
         [
-          1.0,
-          0.0
+          0.0,
+          1.0
         ],
         [
-          1.0,
-          0.0
+          0.0,
+          1.0
         ]
       ],
       "plan_a": {
-        "candidate_idx": 36,
-        "model_loss": 5.510813236236572,
+        "candidate_idx": 85,
+        "model_loss": 7.1854119300842285,
         "treatment_sequence": [
           [
             0.0,
-            0.0
-          ],
-          [
-            0.0,
-            0.0
+            1.0
           ],
           [
             0.0,
             1.0
           ]
         ],
-        "dbp_terminal": 60.27891159057617,
+        "dbp_terminal": 57.950042724609375,
         "dbp_trajectory": [
-          61.03178787231445,
-          60.66814422607422,
-          60.27891159057617
+          57.18567657470703,
+          57.950042724609375
         ],
-        "dbp_min": 60.27891159057617,
-        "dbp_max": 61.03178787231445,
+        "dbp_min": 57.18567657470703,
+        "dbp_max": 57.950042724609375,
         "vaso_total": 0.0,
-        "vent_total": 1.0
+        "vent_total": 2.0
       },
       "plan_b": {
-        "candidate_idx": 85,
-        "model_loss": 0.3855515122413635,
+        "candidate_idx": 64,
+        "model_loss": 8.922260284423828,
         "treatment_sequence": [
           [
-            1.0,
+            0.0,
             0.0
           ],
           [
-            1.0,
-            0.0
-          ],
-          [
-            1.0,
+            0.0,
             0.0
           ]
         ],
-        "dbp_terminal": 55.63255310058594,
+        "dbp_terminal": 60.71189880371094,
         "dbp_trajectory": [
-          54.94557189941406,
-          55.412811279296875,
-          55.63255310058594
+          60.29934310913086,
+          60.71189880371094
         ],
-        "dbp_min": 54.94557189941406,
-        "dbp_max": 55.63255310058594,
-        "vaso_total": 3.0,
+        "dbp_min": 60.29934310913086,
+        "dbp_max": 60.71189880371094,
+        "vaso_total": 0.0,
         "vent_total": 0.0
       },
       "_answer_key": {
-        "plan_a_is": "ra",
-        "plan_b_is": "elbo"
+        "plan_a_is": "elbo",
+        "plan_b_is": "ra"
       },
       "case_id": "C01"
     },
     {
       "case_type": "discordant",
-      "individual_id": 51,
-      "observed_dbp": 61.0,
-      "n_feasible": 2,
+      "individual_id": 80,
+      "observed_dbp": 52.0,
+      "n_feasible": 5,
       "l1_distance": 0.5,
       "observed_treatment": [
         [
-          1.0,
+          0.0,
           1.0
         ],
         [
-          1.0,
+          0.0,
           1.0
         ],
         [
-          1.0,
+          0.0,
           1.0
         ],
         [
-          1.0,
+          0.0,
           1.0
         ],
         [
-          1.0,
+          0.0,
           1.0
         ],
         [
@@ -141,15 +131,34 @@
         ]
       ],
       "plan_a": {
-        "candidate_idx": 7,
-        "model_loss": 7.879680156707764,
+        "candidate_idx": 98,
+        "model_loss": 0.25454118847846985,
         "treatment_sequence": [
           [
-            1.0,
+            0.0,
             1.0
           ],
           [
             0.0,
+            1.0
+          ]
+        ],
+        "dbp_terminal": 56.615726470947266,
+        "dbp_trajectory": [
+          57.20590591430664,
+          56.615726470947266
+        ],
+        "dbp_min": 56.615726470947266,
+        "dbp_max": 57.20590591430664,
+        "vaso_total": 0.0,
+        "vent_total": 2.0
+      },
+      "plan_b": {
+        "candidate_idx": 73,
+        "model_loss": 3.243687629699707,
+        "treatment_sequence": [
+          [
+            0.0,
             0.0
           ],
           [
@@ -157,57 +166,28 @@
             0.0
           ]
         ],
-        "dbp_terminal": 61.60750198364258,
+        "dbp_terminal": 60.27861785888672,
         "dbp_trajectory": [
-          61.89601135253906,
-          61.34333038330078,
-          61.60750198364258
+          61.07459259033203,
+          60.27861785888672
         ],
-        "dbp_min": 61.34333038330078,
-        "dbp_max": 61.89601135253906,
-        "vaso_total": 1.0,
-        "vent_total": 1.0
-      },
-      "plan_b": {
-        "candidate_idx": 85,
-        "model_loss": 0.6658962965011597,
-        "treatment_sequence": [
-          [
-            1.0,
-            0.0
-          ],
-          [
-            1.0,
-            0.0
-          ],
-          [
-            1.0,
-            0.0
-          ]
-        ],
-        "dbp_terminal": 55.364315032958984,
-        "dbp_trajectory": [
-          56.37846755981445,
-          55.02238082885742,
-          55.364315032958984
-        ],
-        "dbp_min": 55.02238082885742,
-        "dbp_max": 56.37846755981445,
-        "vaso_total": 3.0,
+        "dbp_min": 60.27861785888672,
+        "dbp_max": 61.07459259033203,
+        "vaso_total": 0.0,
         "vent_total": 0.0
       },
       "_answer_key": {
-        "plan_a_is": "ra",
-        "plan_b_is": "elbo"
+        "plan_a_is": "elbo",
+        "plan_b_is": "ra"
       },
       "case_id": "C02"
     },
     {
       "case_type": "discordant",
-      "individual_id": 17,
-      "observed_dbp": 45.0,
-      "n_feasible": 17,
-      "l1_distance": 0.5,
+      "individual_id": 90,
+      "observed_dbp": 46.0,
+      "n_feasible": 8,
+      "l1_distance": 0.25,
       "observed_treatment": [
         [
           0.0,
@@ -235,36 +215,31 @@
         ]
       ],
       "plan_a": {
-        "candidate_idx": 93,
-        "model_loss": 4.264734745025635,
+        "candidate_idx": 41,
+        "model_loss": 0.7821172475814819,
         "treatment_sequence": [
           [
             0.0,
-            0.0
+            1.0
           ],
           [
             0.0,
-            0.0
-          ],
-          [
-            0.0,
-            0.0
+            1.0
           ]
         ],
-        "dbp_terminal": 61.19673156738281,
+        "dbp_terminal": 57.14335250854492,
         "dbp_trajectory": [
-          61.97821044921875,
-          61.32710647583008,
-          61.19673156738281
+          57.595008850097656,
+          57.14335250854492
         ],
-        "dbp_min": 61.19673156738281,
-        "dbp_max": 61.97821044921875,
+        "dbp_min": 57.14335250854492,
+        "dbp_max": 57.595008850097656,
         "vaso_total": 0.0,
-        "vent_total": 0.0
+        "vent_total": 2.0
       },
       "plan_b": {
-        "candidate_idx": 92,
-        "model_loss": 1.3273344039916992,
+        "candidate_idx": 52,
+        "model_loss": 3.904096841812134,
         "treatment_sequence": [
           [
             0.0,
@@ -272,70 +247,61 @@
           ],
           [
             0.0,
-            1.0
-          ],
-          [
-            0.0,
-            1.0
+            0.0
           ]
         ],
-        "dbp_terminal": 58.75404357910156,
+        "dbp_terminal": 60.04610824584961,
         "dbp_trajectory": [
-          59.018428802490234,
-          59.23687744140625,
-          58.75404357910156
+          59.02983856201172,
+          60.04610824584961
         ],
-        "dbp_min": 58.75404357910156,
-        "dbp_max": 59.23687744140625,
+        "dbp_min": 59.02983856201172,
+        "dbp_max": 60.04610824584961,
         "vaso_total": 0.0,
-        "vent_total": 3.0
+        "vent_total": 1.0
       },
       "_answer_key": {
-        "plan_a_is": "ra",
-        "plan_b_is": "elbo"
+        "plan_a_is": "elbo",
+        "plan_b_is": "ra"
       },
       "case_id": "C03"
     },
     {
       "case_type": "discordant",
-      "individual_id": 92,
-      "observed_dbp": 55.0,
-      "n_feasible": 6,
-      "l1_distance": 1.0,
+      "individual_id": 30,
+      "observed_dbp": 60.0,
+      "n_feasible": 27,
+      "l1_distance": 0.5,
       "observed_treatment": [
         [
-          1.0,
+          0.0,
           0.0
         ],
         [
-          1.0,
+          0.0,
           0.0
         ],
         [
-          1.0,
+          0.0,
           0.0
         ],
         [
-          1.0,
+          0.0,
           0.0
         ],
         [
-          1.0,
+          0.0,
           0.0
         ],
         [
-          1.0,
+          0.0,
           0.0
         ]
       ],
       "plan_a": {
-        "candidate_idx": 33,
-        "model_loss": 3.9276413917541504,
+        "candidate_idx": 68,
+        "model_loss": 2.8915343284606934,
         "treatment_sequence": [
-          [
-            0.0,
-            0.0
-          ],
           [
             0.0,
             0.0
@@ -345,44 +311,38 @@
             0.0
           ]
         ],
-        "dbp_terminal": 62.01495361328125,
+        "dbp_terminal": 60.050987243652344,
         "dbp_trajectory": [
-          61.819644927978516,
-          61.680782318115234,
-          62.01495361328125
+          60.27022171020508,
+          60.050987243652344
         ],
-        "dbp_min": 61.680782318115234,
-        "dbp_max": 62.01495361328125,
+        "dbp_min": 60.050987243652344,
+        "dbp_max": 60.27022171020508,
         "vaso_total": 0.0,
         "vent_total": 0.0
       },
       "plan_b": {
-        "candidate_idx": 1,
-        "model_loss": 0.8919909000396729,
+        "candidate_idx": 84,
+        "model_loss": 0.17351068556308746,
         "treatment_sequence": [
           [
-            1.0,
+            0.0,
             1.0
           ],
           [
-            1.0,
-            1.0
-          ],
-          [
-            1.0,
+            0.0,
             1.0
           ]
         ],
-        "dbp_terminal": 57.10035705566406,
+        "dbp_terminal": 57.687137603759766,
         "dbp_trajectory": [
-          57.164981842041016,
-          56.55118942260742,
-          57.10035705566406
+          57.58186340332031,
+          57.687137603759766
         ],
-        "dbp_min": 56.55118942260742,
-        "dbp_max": 57.164981842041016,
-        "vaso_total": 3.0,
-        "vent_total": 3.0
+        "dbp_min": 57.58186340332031,
+        "dbp_max": 57.687137603759766,
+        "vaso_total": 0.0,
+        "vent_total": 2.0
       },
       "_answer_key": {
         "plan_a_is": "ra",
@@ -392,10 +352,10 @@
     },
     {
       "case_type": "discordant",
-      "individual_id": 19,
-      "observed_dbp": 63.0,
-      "n_feasible": 29,
-      "l1_distance": 0.3333333333333333,
+      "individual_id": 69,
+      "observed_dbp": 53.0,
+      "n_feasible": 26,
+      "l1_distance": 0.25,
       "observed_treatment": [
         [
           0.0,
@@ -423,13 +383,9 @@
         ]
       ],
       "plan_a": {
-        "candidate_idx": 9,
-        "model_loss": 0.43484193086624146,
+        "candidate_idx": 30,
+        "model_loss": 0.2366655468940735,
         "treatment_sequence": [
-          [
-            0.0,
-            1.0
-          ],
           [
             0.0,
             1.0
@@ -439,20 +395,19 @@
             1.0
           ]
         ],
-        "dbp_terminal": 59.107601165771484,
+        "dbp_terminal": 57.2242317199707,
         "dbp_trajectory": [
-          58.81587219238281,
-          58.90682601928711,
-          59.107601165771484
+          57.3265495300293,
+          57.2242317199707
         ],
-        "dbp_min": 58.81587219238281,
-        "dbp_max": 59.107601165771484,
+        "dbp_min": 57.2242317199707,
+        "dbp_max": 57.3265495300293,
         "vaso_total": 0.0,
-        "vent_total": 3.0
+        "vent_total": 2.0
       },
       "plan_b": {
-        "candidate_idx": 64,
-        "model_loss": 2.9191603660583496,
+        "candidate_idx": 41,
+        "model_loss": 3.1470649242401123,
         "treatment_sequence": [
           [
             0.0,
@@ -461,20 +416,15 @@
           [
             0.0,
             0.0
-          ],
-          [
-            0.0,
-            0.0
           ]
         ],
-        "dbp_terminal": 63.10749435424805,
+        "dbp_terminal": 60.04724884033203,
         "dbp_trajectory": [
-          62.532379150390625,
-          62.55849075317383,
-          63.10749435424805
+          59.57156753540039,
+          60.04724884033203
         ],
-        "dbp_min": 62.532379150390625,
-        "dbp_max": 63.10749435424805,
+        "dbp_min": 59.57156753540039,
+        "dbp_max": 60.04724884033203,
         "vaso_total": 0.0,
         "vent_total": 1.0
       },
@@ -486,197 +436,9 @@
     },
     {
       "case_type": "discordant",
-      "individual_id": 39,
-      "observed_dbp": 58.0,
-      "n_feasible": 6,
-      "l1_distance": 0.8333333333333334,
-      "observed_treatment": [
-        [
-          1.0,
-          0.0
-        ],
-        [
-          1.0,
-          0.0
-        ],
-        [
-          1.0,
-          0.0
-        ],
-        [
-          1.0,
-          0.0
-        ],
-        [
-          1.0,
-          0.0
-        ],
-        [
-          1.0,
-          0.0
-        ]
-      ],
-      "plan_a": {
-        "candidate_idx": 23,
-        "model_loss": 7.663914680480957,
-        "treatment_sequence": [
-          [
-            0.0,
-            1.0
-          ],
-          [
-            0.0,
-            1.0
-          ],
-          [
-            0.0,
-            0.0
-          ]
-        ],
-        "dbp_terminal": 61.6615104675293,
-        "dbp_trajectory": [
-          61.58005142211914,
-          61.72422790527344,
-          61.6615104675293
-        ],
-        "dbp_min": 61.58005142211914,
-        "dbp_max": 61.72422790527344,
-        "vaso_total": 0.0,
-        "vent_total": 2.0
-      },
-      "plan_b": {
-        "candidate_idx": 90,
-        "model_loss": 0.42886385321617126,
-        "treatment_sequence": [
-          [
-            1.0,
-            0.0
-          ],
-          [
-            1.0,
-            0.0
-          ],
-          [
-            1.0,
-            0.0
-          ]
-        ],
-        "dbp_terminal": 56.03800964355469,
-        "dbp_trajectory": [
-          55.97979736328125,
-          55.579227447509766,
-          56.03800964355469
-        ],
-        "dbp_min": 55.579227447509766,
-        "dbp_max": 56.03800964355469,
-        "vaso_total": 3.0,
-        "vent_total": 0.0
-      },
-      "_answer_key": {
-        "plan_a_is": "ra",
-        "plan_b_is": "elbo"
-      },
-      "case_id": "C06"
-    },
-    {
-      "case_type": "discordant",
-      "individual_id": 62,
-      "observed_dbp": 76.25,
-      "n_feasible": 7,
-      "l1_distance": 1.0,
-      "observed_treatment": [
-        [
-          1.0,
-          1.0
-        ],
-        [
-          1.0,
-          1.0
-        ],
-        [
-          1.0,
-          1.0
-        ],
-        [
-          0.0,
-          1.0
-        ],
-        [
-          0.0,
-          1.0
-        ],
-        [
-          0.0,
-          1.0
-        ]
-      ],
-      "plan_a": {
-        "candidate_idx": 13,
-        "model_loss": 4.51468563079834,
-        "treatment_sequence": [
-          [
-            0.0,
-            0.0
-          ],
-          [
-            0.0,
-            0.0
-          ],
-          [
-            0.0,
-            0.0
-          ]
-        ],
-        "dbp_terminal": 61.495750427246094,
-        "dbp_trajectory": [
-          61.95194625854492,
-          61.68014144897461,
-          61.495750427246094
-        ],
-        "dbp_min": 61.495750427246094,
-        "dbp_max": 61.95194625854492,
-        "vaso_total": 0.0,
-        "vent_total": 0.0
-      },
-      "plan_b": {
-        "candidate_idx": 99,
-        "model_loss": 2.9821889400482178,
-        "treatment_sequence": [
-          [
-            1.0,
-            1.0
-          ],
-          [
-            1.0,
-            1.0
-          ],
-          [
-            1.0,
-            1.0
-          ]
-        ],
-        "dbp_terminal": 57.40574645996094,
-        "dbp_trajectory": [
-          57.186012268066406,
-          56.94854736328125,
-          57.40574645996094
-        ],
-        "dbp_min": 56.94854736328125,
-        "dbp_max": 57.40574645996094,
-        "vaso_total": 3.0,
-        "vent_total": 3.0
-      },
-      "_answer_key": {
-        "plan_a_is": "ra",
-        "plan_b_is": "elbo"
-      },
-      "case_id": "C07"
-    },
-    {
-      "case_type": "discordant",
-      "individual_id": 37,
-      "observed_dbp": 44.0,
-      "n_feasible": 10,
+      "individual_id": 51,
+      "observed_dbp": 64.0,
+      "n_feasible": 3,
       "l1_distance": 0.5,
       "observed_treatment": [
         [
@@ -700,20 +462,16 @@
           1.0
         ],
         [
-          1.0,
+          0.0,
           1.0
         ]
       ],
       "plan_a": {
-        "candidate_idx": 2,
-        "model_loss": 6.895353317260742,
+        "candidate_idx": 9,
+        "model_loss": 2.0700507164001465,
         "treatment_sequence": [
           [
-            1.0,
-            1.0
-          ],
-          [
-            1.0,
+            0.0,
             0.0
           ],
           [
@@ -721,44 +479,206 @@
             0.0
           ]
         ],
-        "dbp_terminal": 60.59300994873047,
+        "dbp_terminal": 61.20814514160156,
         "dbp_trajectory": [
-          61.1107292175293,
-          61.27095031738281,
-          60.59300994873047
+          60.110069274902344,
+          61.20814514160156
         ],
-        "dbp_min": 60.59300994873047,
-        "dbp_max": 61.27095031738281,
-        "vaso_total": 2.0,
-        "vent_total": 1.0
+        "dbp_min": 60.110069274902344,
+        "dbp_max": 61.20814514160156,
+        "vaso_total": 0.0,
+        "vent_total": 0.0
       },
       "plan_b": {
-        "candidate_idx": 75,
-        "model_loss": 1.1063647270202637,
+        "candidate_idx": 4,
+        "model_loss": 0.6247789859771729,
         "treatment_sequence": [
           [
             1.0,
-            1.0
+            0.0
           ],
           [
             1.0,
-            1.0
+            0.0
+          ]
+        ],
+        "dbp_terminal": 56.134986877441406,
+        "dbp_trajectory": [
+          55.0509147644043,
+          56.134986877441406
+        ],
+        "dbp_min": 55.0509147644043,
+        "dbp_max": 56.134986877441406,
+        "vaso_total": 2.0,
+        "vent_total": 0.0
+      },
+      "_answer_key": {
+        "plan_a_is": "ra",
+        "plan_b_is": "elbo"
+      },
+      "case_id": "C06"
+    },
+    {
+      "case_type": "discordant",
+      "individual_id": 56,
+      "observed_dbp": 39.0,
+      "n_feasible": 2,
+      "l1_distance": 0.5,
+      "observed_treatment": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ]
+      ],
+      "plan_a": {
+        "candidate_idx": 43,
+        "model_loss": 5.1878981590271,
+        "treatment_sequence": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "dbp_terminal": 60.15754699707031,
+        "dbp_trajectory": [
+          60.75138473510742,
+          60.15754699707031
+        ],
+        "dbp_min": 60.15754699707031,
+        "dbp_max": 60.75138473510742,
+        "vaso_total": 0.0,
+        "vent_total": 0.0
+      },
+      "plan_b": {
+        "candidate_idx": 63,
+        "model_loss": 1.4541913270950317,
+        "treatment_sequence": [
+          [
+            1.0,
+            0.0
           ],
           [
             1.0,
+            0.0
+          ]
+        ],
+        "dbp_terminal": 54.973670959472656,
+        "dbp_trajectory": [
+          54.79826736450195,
+          54.973670959472656
+        ],
+        "dbp_min": 54.79826736450195,
+        "dbp_max": 54.973670959472656,
+        "vaso_total": 2.0,
+        "vent_total": 0.0
+      },
+      "_answer_key": {
+        "plan_a_is": "ra",
+        "plan_b_is": "elbo"
+      },
+      "case_id": "C07"
+    },
+    {
+      "case_type": "discordant",
+      "individual_id": 98,
+      "observed_dbp": 60.0,
+      "n_feasible": 4,
+      "l1_distance": 0.5,
+      "observed_treatment": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "plan_a": {
+        "candidate_idx": 4,
+        "model_loss": 2.8921799659729004,
+        "treatment_sequence": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "dbp_terminal": 60.1734504699707,
+        "dbp_trajectory": [
+          60.2847785949707,
+          60.1734504699707
+        ],
+        "dbp_min": 60.1734504699707,
+        "dbp_max": 60.2847785949707,
+        "vaso_total": 0.0,
+        "vent_total": 0.0
+      },
+      "plan_b": {
+        "candidate_idx": 95,
+        "model_loss": 0.16038762032985687,
+        "treatment_sequence": [
+          [
+            0.0,
+            1.0
+          ],
+          [
+            0.0,
             1.0
           ]
         ],
-        "dbp_terminal": 56.077449798583984,
+        "dbp_terminal": 58.2918815612793,
         "dbp_trajectory": [
-          56.75652313232422,
-          55.90103530883789,
-          56.077449798583984
+          58.30722427368164,
+          58.2918815612793
         ],
-        "dbp_min": 55.90103530883789,
-        "dbp_max": 56.75652313232422,
-        "vaso_total": 3.0,
-        "vent_total": 3.0
+        "dbp_min": 58.2918815612793,
+        "dbp_max": 58.30722427368164,
+        "vaso_total": 0.0,
+        "vent_total": 2.0
       },
       "_answer_key": {
         "plan_a_is": "ra",
@@ -768,21 +688,21 @@
     },
     {
       "case_type": "discordant",
-      "individual_id": 56,
-      "observed_dbp": 52.0,
-      "n_feasible": 10,
-      "l1_distance": 0.6666666666666666,
+      "individual_id": 19,
+      "observed_dbp": 68.0,
+      "n_feasible": 25,
+      "l1_distance": 0.5,
       "observed_treatment": [
         [
-          1.0,
+          0.0,
           0.0
         ],
         [
-          1.0,
+          0.0,
           0.0
         ],
         [
-          1.0,
+          0.0,
           0.0
         ],
         [
@@ -799,8 +719,8 @@
         ]
       ],
       "plan_a": {
-        "candidate_idx": 6,
-        "model_loss": 5.903607368469238,
+        "candidate_idx": 52,
+        "model_loss": 3.136571168899536,
         "treatment_sequence": [
           [
             0.0,
@@ -809,50 +729,40 @@
           [
             0.0,
             0.0
+          ]
+        ],
+        "dbp_terminal": 61.09020233154297,
+        "dbp_trajectory": [
+          60.18410873413086,
+          61.09020233154297
+        ],
+        "dbp_min": 60.18410873413086,
+        "dbp_max": 61.09020233154297,
+        "vaso_total": 0.0,
+        "vent_total": 0.0
+      },
+      "plan_b": {
+        "candidate_idx": 18,
+        "model_loss": 0.7226452827453613,
+        "treatment_sequence": [
+          [
+            0.0,
+            1.0
           ],
           [
             0.0,
             1.0
           ]
         ],
-        "dbp_terminal": 61.048160552978516,
+        "dbp_terminal": 57.394805908203125,
         "dbp_trajectory": [
-          60.3456916809082,
-          60.625911712646484,
-          61.048160552978516
+          57.082637786865234,
+          57.394805908203125
         ],
-        "dbp_min": 60.3456916809082,
-        "dbp_max": 61.048160552978516,
+        "dbp_min": 57.082637786865234,
+        "dbp_max": 57.394805908203125,
         "vaso_total": 0.0,
-        "vent_total": 1.0
-      },
-      "plan_b": {
-        "candidate_idx": 91,
-        "model_loss": 0.3920164406299591,
-        "treatment_sequence": [
-          [
-            1.0,
-            0.0
-          ],
-          [
-            1.0,
-            0.0
-          ],
-          [
-            1.0,
-            0.0
-          ]
-        ],
-        "dbp_terminal": 54.60057830810547,
-        "dbp_trajectory": [
-          54.831382751464844,
-          55.19740676879883,
-          54.60057830810547
-        ],
-        "dbp_min": 54.60057830810547,
-        "dbp_max": 55.19740676879883,
-        "vaso_total": 3.0,
-        "vent_total": 0.0
+        "vent_total": 2.0
       },
       "_answer_key": {
         "plan_a_is": "ra",
@@ -862,10 +772,10 @@
     },
     {
       "case_type": "discordant",
-      "individual_id": 55,
-      "observed_dbp": 78.0,
-      "n_feasible": 20,
-      "l1_distance": 0.3333333333333333,
+      "individual_id": 81,
+      "observed_dbp": 54.0,
+      "n_feasible": 4,
+      "l1_distance": 0.25,
       "observed_treatment": [
         [
           0.0,
@@ -881,25 +791,21 @@
         ],
         [
           0.0,
-          1.0
+          0.0
         ],
         [
           0.0,
-          1.0
+          0.0
         ],
         [
           0.0,
-          1.0
+          0.0
         ]
       ],
       "plan_a": {
-        "candidate_idx": 80,
-        "model_loss": 2.0918729305267334,
+        "candidate_idx": 89,
+        "model_loss": 0.18294896185398102,
         "treatment_sequence": [
-          [
-            0.0,
-            1.0
-          ],
           [
             0.0,
             1.0
@@ -909,20 +815,19 @@
             1.0
           ]
         ],
-        "dbp_terminal": 59.60792922973633,
+        "dbp_terminal": 56.69133377075195,
         "dbp_trajectory": [
-          59.093360900878906,
-          59.4513053894043,
-          59.60792922973633
+          57.59348678588867,
+          56.69133377075195
         ],
-        "dbp_min": 59.093360900878906,
-        "dbp_max": 59.60792922973633,
+        "dbp_min": 56.69133377075195,
+        "dbp_max": 57.59348678588867,
         "vaso_total": 0.0,
-        "vent_total": 3.0
+        "vent_total": 2.0
       },
       "plan_b": {
-        "candidate_idx": 40,
-        "model_loss": 4.146183967590332,
+        "candidate_idx": 41,
+        "model_loss": 3.0774996280670166,
         "treatment_sequence": [
           [
             0.0,
@@ -931,20 +836,15 @@
           [
             0.0,
             0.0
-          ],
-          [
-            0.0,
-            0.0
           ]
         ],
-        "dbp_terminal": 62.53349304199219,
+        "dbp_terminal": 60.01908874511719,
         "dbp_trajectory": [
-          62.62016677856445,
-          62.36322784423828,
-          62.53349304199219
+          59.54703903198242,
+          60.01908874511719
         ],
-        "dbp_min": 62.36322784423828,
-        "dbp_max": 62.62016677856445,
+        "dbp_min": 59.54703903198242,
+        "dbp_max": 60.01908874511719,
         "vaso_total": 0.0,
         "vent_total": 1.0
       },
@@ -956,10 +856,10 @@
     },
     {
       "case_type": "discordant",
-      "individual_id": 65,
-      "observed_dbp": 51.0,
-      "n_feasible": 7,
-      "l1_distance": 0.6666666666666666,
+      "individual_id": 39,
+      "observed_dbp": 46.0,
+      "n_feasible": 2,
+      "l1_distance": 0.5,
       "observed_treatment": [
         [
           1.0,
@@ -987,72 +887,146 @@
         ]
       ],
       "plan_a": {
-        "candidate_idx": 63,
-        "model_loss": 0.4341663718223572,
+        "candidate_idx": 47,
+        "model_loss": 3.4406843185424805,
         "treatment_sequence": [
           [
-            1.0,
+            0.0,
             0.0
           ],
           [
-            1.0,
-            0.0
-          ],
-          [
-            1.0,
+            0.0,
             0.0
           ]
         ],
-        "dbp_terminal": 54.88019943237305,
+        "dbp_terminal": 60.43454360961914,
         "dbp_trajectory": [
-          55.088897705078125,
-          56.33815383911133,
-          54.88019943237305
+          60.59685134887695,
+          60.43454360961914
         ],
-        "dbp_min": 54.88019943237305,
-        "dbp_max": 56.33815383911133,
-        "vaso_total": 3.0,
+        "dbp_min": 60.43454360961914,
+        "dbp_max": 60.59685134887695,
+        "vaso_total": 0.0,
         "vent_total": 0.0
       },
       "plan_b": {
-        "candidate_idx": 28,
-        "model_loss": 5.939918518066406,
+        "candidate_idx": 63,
+        "model_loss": 0.6125004291534424,
         "treatment_sequence": [
           [
-            0.0,
+            1.0,
             0.0
           ],
           [
-            0.0,
+            1.0,
             0.0
-          ],
-          [
-            0.0,
-            1.0
           ]
         ],
-        "dbp_terminal": 60.42458724975586,
+        "dbp_terminal": 54.95012283325195,
         "dbp_trajectory": [
-          60.75914764404297,
-          61.11676025390625,
-          60.42458724975586
+          55.955257415771484,
+          54.95012283325195
         ],
-        "dbp_min": 60.42458724975586,
-        "dbp_max": 61.11676025390625,
-        "vaso_total": 0.0,
-        "vent_total": 1.0
+        "dbp_min": 54.95012283325195,
+        "dbp_max": 55.955257415771484,
+        "vaso_total": 2.0,
+        "vent_total": 0.0
       },
       "_answer_key": {
-        "plan_a_is": "elbo",
-        "plan_b_is": "ra"
+        "plan_a_is": "ra",
+        "plan_b_is": "elbo"
       },
       "case_id": "C11"
     },
     {
       "case_type": "discordant",
-      "individual_id": 69,
-      "observed_dbp": 50.0,
-      "n_feasible": 35,
+      "individual_id": 5,
+      "observed_dbp": 60.0,
+      "n_feasible": 6,
+      "l1_distance": 0.75,
+      "observed_treatment": [
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ]
+      ],
+      "plan_a": {
+        "candidate_idx": 38,
+        "model_loss": 5.640374183654785,
+        "treatment_sequence": [
+          [
+            0.0,
+            1.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "dbp_terminal": 60.14657211303711,
+        "dbp_trajectory": [
+          59.7541618347168,
+          60.14657211303711
+        ],
+        "dbp_min": 59.7541618347168,
+        "dbp_max": 60.14657211303711,
+        "vaso_total": 0.0,
+        "vent_total": 1.0
+      },
+      "plan_b": {
+        "candidate_idx": 67,
+        "model_loss": 0.17830896377563477,
+        "treatment_sequence": [
+          [
+            1.0,
+            1.0
+          ],
+          [
+            1.0,
+            1.0
+          ]
+        ],
+        "dbp_terminal": 57.4762077331543,
+        "dbp_trajectory": [
+          56.35419845581055,
+          57.4762077331543
+        ],
+        "dbp_min": 56.35419845581055,
+        "dbp_max": 57.4762077331543,
+        "vaso_total": 2.0,
+        "vent_total": 2.0
+      },
+      "_answer_key": {
+        "plan_a_is": "ra",
+        "plan_b_is": "elbo"
+      },
+      "case_id": "C12"
+    },
+    {
+      "case_type": "discordant",
+      "individual_id": 28,
+      "observed_dbp": 45.0,
+      "n_feasible": 24,
       "l1_distance": 0.5,
       "observed_treatment": [
         [
@@ -1081,41 +1055,9 @@
         ]
       ],
       "plan_a": {
-        "candidate_idx": 46,
-        "model_loss": 0.7465900182723999,
+        "candidate_idx": 65,
+        "model_loss": 4.078361988067627,
         "treatment_sequence": [
-          [
-            0.0,
-            1.0
-          ],
-          [
-            0.0,
-            1.0
-          ],
-          [
-            0.0,
-            1.0
-          ]
-        ],
-        "dbp_terminal": 58.71479034423828,
-        "dbp_trajectory": [
-          59.51750183105469,
-          59.52991485595703,
-          58.71479034423828
-        ],
-        "dbp_min": 58.71479034423828,
-        "dbp_max": 59.52991485595703,
-        "vaso_total": 0.0,
-        "vent_total": 3.0
-      },
-      "plan_b": {
-        "candidate_idx": 62,
-        "model_loss": 3.543728828430176,
-        "treatment_sequence": [
-          [
-            0.0,
-            0.0
-          ],
           [
             0.0,
             0.0
@@ -1125,110 +1067,38 @@
             0.0
           ]
         ],
-        "dbp_terminal": 61.032310485839844,
+        "dbp_terminal": 60.20368576049805,
         "dbp_trajectory": [
-          61.44474792480469,
-          61.983436584472656,
-          61.032310485839844
+          59.6751708984375,
+          60.20368576049805
         ],
-        "dbp_min": 61.032310485839844,
-        "dbp_max": 61.983436584472656,
-        "vaso_total": 0.0,
-        "vent_total": 0.0
-      },
-      "_answer_key": {
-        "plan_a_is": "elbo",
-        "plan_b_is": "ra"
-      },
-      "case_id": "C12"
-    },
-    {
-      "case_type": "discordant",
-      "individual_id": 0,
-      "observed_dbp": 51.0,
-      "n_feasible": 7,
-      "l1_distance": 1.0,
-      "observed_treatment": [
-        [
-          1.0,
-          1.0
-        ],
-        [
-          1.0,
-          1.0
-        ],
-        [
-          1.0,
-          1.0
-        ],
-        [
-          1.0,
-          1.0
-        ],
-        [
-          1.0,
-          1.0
-        ],
-        [
-          1.0,
-          1.0
-        ]
-      ],
-      "plan_a": {
-        "candidate_idx": 1,
-        "model_loss": 5.270217418670654,
-        "treatment_sequence": [
-          [
-            0.0,
-            0.0
-          ],
-          [
-            0.0,
-            0.0
-          ],
-          [
-            0.0,
-            0.0
-          ]
-        ],
-        "dbp_terminal": 61.577022552490234,
-        "dbp_trajectory": [
-          61.79738235473633,
-          60.980369567871094,
-          61.577022552490234
-        ],
-        "dbp_min": 60.980369567871094,
-        "dbp_max": 61.79738235473633,
+        "dbp_min": 59.6751708984375,
+        "dbp_max": 60.20368576049805,
         "vaso_total": 0.0,
         "vent_total": 0.0
       },
       "plan_b": {
-        "candidate_idx": 85,
-        "model_loss": 0.5988646149635315,
+        "candidate_idx": 16,
+        "model_loss": 0.6910096406936646,
         "treatment_sequence": [
           [
             1.0,
-            1.0
+            0.0
           ],
           [
             1.0,
-            1.0
-          ],
-          [
-            1.0,
-            1.0
+            0.0
           ]
         ],
-        "dbp_terminal": 56.23640441894531,
+        "dbp_terminal": 55.31687927246094,
         "dbp_trajectory": [
-          56.926734924316406,
-          56.77003860473633,
-          56.23640441894531
+          55.014339447021484,
+          55.31687927246094
         ],
-        "dbp_min": 56.23640441894531,
-        "dbp_max": 56.926734924316406,
-        "vaso_total": 3.0,
-        "vent_total": 3.0
+        "dbp_min": 55.014339447021484,
+        "dbp_max": 55.31687927246094,
+        "vaso_total": 2.0,
+        "vent_total": 0.0
       },
       "_answer_key": {
         "plan_a_is": "ra",
@@ -1238,104 +1108,598 @@
     },
     {
       "case_type": "discordant",
-      "individual_id": 30,
-      "observed_dbp": 49.0,
-      "n_feasible": 34,
-      "l1_distance": 0.8333333333333334,
+      "individual_id": 17,
+      "observed_dbp": 50.0,
+      "n_feasible": 4,
+      "l1_distance": 0.25,
       "observed_treatment": [
         [
           0.0,
-          0.0
+          1.0
         ],
         [
           0.0,
-          0.0
+          1.0
         ],
         [
           0.0,
-          0.0
+          1.0
         ],
         [
           0.0,
-          0.0
+          1.0
         ],
         [
           0.0,
-          0.0
+          1.0
         ],
         [
           0.0,
-          0.0
+          1.0
         ]
       ],
       "plan_a": {
-        "candidate_idx": 86,
-        "model_loss": 3.646862030029297,
+        "candidate_idx": 33,
+        "model_loss": 0.3575398623943329,
         "treatment_sequence": [
           [
             0.0,
-            0.0
+            1.0
           ],
           [
             0.0,
-            0.0
-          ],
-          [
-            0.0,
-            0.0
+            1.0
           ]
         ],
-        "dbp_terminal": 60.909358978271484,
+        "dbp_terminal": 56.42512893676758,
         "dbp_trajectory": [
-          61.91019821166992,
-          61.85758590698242,
-          60.909358978271484
+          56.78660202026367,
+          56.42512893676758
         ],
-        "dbp_min": 60.909358978271484,
-        "dbp_max": 61.91019821166992,
+        "dbp_min": 56.42512893676758,
+        "dbp_max": 56.78660202026367,
         "vaso_total": 0.0,
-        "vent_total": 0.0
+        "vent_total": 2.0
       },
       "plan_b": {
-        "candidate_idx": 2,
-        "model_loss": 3.1253199577331543,
+        "candidate_idx": 59,
+        "model_loss": 3.4183409214019775,
         "treatment_sequence": [
           [
             0.0,
             1.0
           ],
           [
-            1.0,
-            1.0
-          ],
-          [
-            1.0,
-            1.0
+            0.0,
+            0.0
           ]
         ],
-        "dbp_terminal": 55.27158737182617,
+        "dbp_terminal": 60.13345718383789,
         "dbp_trajectory": [
-          56.355751037597656,
-          56.42426681518555,
-          55.27158737182617
+          59.26693344116211,
+          60.13345718383789
         ],
-        "dbp_min": 55.27158737182617,
-        "dbp_max": 56.42426681518555,
-        "vaso_total": 2.0,
-        "vent_total": 3.0
+        "dbp_min": 59.26693344116211,
+        "dbp_max": 60.13345718383789,
+        "vaso_total": 0.0,
+        "vent_total": 1.0
       },
       "_answer_key": {
-        "plan_a_is": "ra",
-        "plan_b_is": "elbo"
+        "plan_a_is": "elbo",
+        "plan_b_is": "ra"
       },
       "case_id": "C14"
     },
     {
       "case_type": "discordant",
-      "individual_id": 4,
-      "observed_dbp": 56.0,
-      "n_feasible": 13,
-      "l1_distance": 0.16666666666666666,
+      "individual_id": 92,
+      "observed_dbp": 71.0,
+      "n_feasible": 5,
+      "l1_distance": 1.0,
+      "observed_treatment": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ]
+      ],
+      "plan_a": {
+        "candidate_idx": 22,
+        "model_loss": 4.203787326812744,
+        "treatment_sequence": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "dbp_terminal": 60.77618408203125,
+        "dbp_trajectory": [
+          60.32212448120117,
+          60.77618408203125
+        ],
+        "dbp_min": 60.32212448120117,
+        "dbp_max": 60.77618408203125,
+        "vaso_total": 0.0,
+        "vent_total": 0.0
+      },
+      "plan_b": {
+        "candidate_idx": 93,
+        "model_loss": 1.6292896270751953,
+        "treatment_sequence": [
+          [
+            1.0,
+            1.0
+          ],
+          [
+            1.0,
+            1.0
+          ]
+        ],
+        "dbp_terminal": 57.365135192871094,
+        "dbp_trajectory": [
+          56.01388168334961,
+          57.365135192871094
+        ],
+        "dbp_min": 56.01388168334961,
+        "dbp_max": 57.365135192871094,
+        "vaso_total": 2.0,
+        "vent_total": 2.0
+      },
+      "_answer_key": {
+        "plan_a_is": "ra",
+        "plan_b_is": "elbo"
+      },
+      "case_id": "C15"
+    },
+    {
+      "case_type": "discordant",
+      "individual_id": 58,
+      "observed_dbp": 77.0,
+      "n_feasible": 7,
+      "l1_distance": 0.5,
+      "observed_treatment": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "plan_a": {
+        "candidate_idx": 33,
+        "model_loss": 4.229623317718506,
+        "treatment_sequence": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "dbp_terminal": 60.849369049072266,
+        "dbp_trajectory": [
+          60.48091506958008,
+          60.849369049072266
+        ],
+        "dbp_min": 60.48091506958008,
+        "dbp_max": 60.849369049072266,
+        "vaso_total": 0.0,
+        "vent_total": 0.0
+      },
+      "plan_b": {
+        "candidate_idx": 56,
+        "model_loss": 1.9149665832519531,
+        "treatment_sequence": [
+          [
+            0.0,
+            1.0
+          ],
+          [
+            0.0,
+            1.0
+          ]
+        ],
+        "dbp_terminal": 58.426387786865234,
+        "dbp_trajectory": [
+          57.98710632324219,
+          58.426387786865234
+        ],
+        "dbp_min": 57.98710632324219,
+        "dbp_max": 58.426387786865234,
+        "vaso_total": 0.0,
+        "vent_total": 2.0
+      },
+      "_answer_key": {
+        "plan_a_is": "ra",
+        "plan_b_is": "elbo"
+      },
+      "case_id": "C16"
+    },
+    {
+      "case_type": "discordant",
+      "individual_id": 78,
+      "observed_dbp": 58.0,
+      "n_feasible": 5,
+      "l1_distance": 0.5,
+      "observed_treatment": [
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ]
+      ],
+      "plan_a": {
+        "candidate_idx": 29,
+        "model_loss": 0.2552346885204315,
+        "treatment_sequence": [
+          [
+            0.0,
+            1.0
+          ],
+          [
+            0.0,
+            1.0
+          ]
+        ],
+        "dbp_terminal": 57.27835464477539,
+        "dbp_trajectory": [
+          57.599998474121094,
+          57.27835464477539
+        ],
+        "dbp_min": 57.27835464477539,
+        "dbp_max": 57.599998474121094,
+        "vaso_total": 0.0,
+        "vent_total": 2.0
+      },
+      "plan_b": {
+        "candidate_idx": 41,
+        "model_loss": 2.071753740310669,
+        "treatment_sequence": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "dbp_terminal": 60.52730941772461,
+        "dbp_trajectory": [
+          60.54242706298828,
+          60.52730941772461
+        ],
+        "dbp_min": 60.52730941772461,
+        "dbp_max": 60.54242706298828,
+        "vaso_total": 0.0,
+        "vent_total": 0.0
+      },
+      "_answer_key": {
+        "plan_a_is": "elbo",
+        "plan_b_is": "ra"
+      },
+      "case_id": "C17"
+    },
+    {
+      "case_type": "discordant",
+      "individual_id": 62,
+      "observed_dbp": 60.0,
+      "n_feasible": 3,
+      "l1_distance": 0.5,
+      "observed_treatment": [
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "plan_a": {
+        "candidate_idx": 3,
+        "model_loss": 0.730221152305603,
+        "treatment_sequence": [
+          [
+            1.0,
+            0.0
+          ],
+          [
+            1.0,
+            0.0
+          ]
+        ],
+        "dbp_terminal": 55.890933990478516,
+        "dbp_trajectory": [
+          55.65562438964844,
+          55.890933990478516
+        ],
+        "dbp_min": 55.65562438964844,
+        "dbp_max": 55.890933990478516,
+        "vaso_total": 2.0,
+        "vent_total": 0.0
+      },
+      "plan_b": {
+        "candidate_idx": 20,
+        "model_loss": 3.3939273357391357,
+        "treatment_sequence": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "dbp_terminal": 60.53276824951172,
+        "dbp_trajectory": [
+          60.71691131591797,
+          60.53276824951172
+        ],
+        "dbp_min": 60.53276824951172,
+        "dbp_max": 60.71691131591797,
+        "vaso_total": 0.0,
+        "vent_total": 0.0
+      },
+      "_answer_key": {
+        "plan_a_is": "elbo",
+        "plan_b_is": "ra"
+      },
+      "case_id": "C18"
+    },
+    {
+      "case_type": "discordant",
+      "individual_id": 65,
+      "observed_dbp": 50.0,
+      "n_feasible": 6,
+      "l1_distance": 0.5,
+      "observed_treatment": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ]
+      ],
+      "plan_a": {
+        "candidate_idx": 15,
+        "model_loss": 3.4368884563446045,
+        "treatment_sequence": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "dbp_terminal": 60.29792404174805,
+        "dbp_trajectory": [
+          60.488224029541016,
+          60.29792404174805
+        ],
+        "dbp_min": 60.29792404174805,
+        "dbp_max": 60.488224029541016,
+        "vaso_total": 0.0,
+        "vent_total": 0.0
+      },
+      "plan_b": {
+        "candidate_idx": 88,
+        "model_loss": 0.25870224833488464,
+        "treatment_sequence": [
+          [
+            1.0,
+            0.0
+          ],
+          [
+            1.0,
+            0.0
+          ]
+        ],
+        "dbp_terminal": 54.7103385925293,
+        "dbp_trajectory": [
+          55.8109016418457,
+          54.7103385925293
+        ],
+        "dbp_min": 54.7103385925293,
+        "dbp_max": 55.8109016418457,
+        "vaso_total": 2.0,
+        "vent_total": 0.0
+      },
+      "_answer_key": {
+        "plan_a_is": "ra",
+        "plan_b_is": "elbo"
+      },
+      "case_id": "C19"
+    },
+    {
+      "case_type": "discordant",
+      "individual_id": 50,
+      "observed_dbp": 63.0,
+      "n_feasible": 2,
+      "l1_distance": 0.5,
+      "observed_treatment": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ]
+      ],
+      "plan_a": {
+        "candidate_idx": 58,
+        "model_loss": 0.36830002069473267,
+        "treatment_sequence": [
+          [
+            1.0,
+            0.0
+          ],
+          [
+            1.0,
+            0.0
+          ]
+        ],
+        "dbp_terminal": 56.40037536621094,
+        "dbp_trajectory": [
+          55.5515251159668,
+          56.40037536621094
+        ],
+        "dbp_min": 55.5515251159668,
+        "dbp_max": 56.40037536621094,
+        "vaso_total": 2.0,
+        "vent_total": 0.0
+      },
+      "plan_b": {
+        "candidate_idx": 22,
+        "model_loss": 2.914024829864502,
+        "treatment_sequence": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "dbp_terminal": 60.97801971435547,
+        "dbp_trajectory": [
+          60.36680221557617,
+          60.97801971435547
+        ],
+        "dbp_min": 60.36680221557617,
+        "dbp_max": 60.97801971435547,
+        "vaso_total": 0.0,
+        "vent_total": 0.0
+      },
+      "_answer_key": {
+        "plan_a_is": "elbo",
+        "plan_b_is": "ra"
+      },
+      "case_id": "C20"
+    },
+    {
+      "case_type": "discordant",
+      "individual_id": 72,
+      "observed_dbp": 65.0,
+      "n_feasible": 6,
+      "l1_distance": 0.5,
       "observed_treatment": [
         [
           0.0,
@@ -1364,12 +1728,8 @@
       ],
       "plan_a": {
         "candidate_idx": 50,
-        "model_loss": 0.3886151909828186,
+        "model_loss": 0.38323482871055603,
         "treatment_sequence": [
-          [
-            0.0,
-            1.0
-          ],
           [
             0.0,
             1.0
@@ -1379,57 +1739,51 @@
             1.0
           ]
         ],
-        "dbp_terminal": 58.513404846191406,
+        "dbp_terminal": 58.19817352294922,
         "dbp_trajectory": [
-          59.74226379394531,
-          59.33877182006836,
-          58.513404846191406
+          57.42220687866211,
+          58.19817352294922
         ],
-        "dbp_min": 58.513404846191406,
-        "dbp_max": 59.74226379394531,
+        "dbp_min": 57.42220687866211,
+        "dbp_max": 58.19817352294922,
         "vaso_total": 0.0,
-        "vent_total": 3.0
+        "vent_total": 2.0
       },
       "plan_b": {
-        "candidate_idx": 6,
-        "model_loss": 3.0580031871795654,
+        "candidate_idx": 58,
+        "model_loss": 2.9828696250915527,
         "treatment_sequence": [
           [
             0.0,
-            1.0
-          ],
-          [
-            0.0,
-            1.0
+            0.0
           ],
           [
             0.0,
             0.0
           ]
         ],
-        "dbp_terminal": 61.203609466552734,
+        "dbp_terminal": 60.78142547607422,
         "dbp_trajectory": [
-          61.166805267333984,
-          61.51679611206055,
-          61.203609466552734
+          60.36035919189453,
+          60.78142547607422
         ],
-        "dbp_min": 61.166805267333984,
-        "dbp_max": 61.51679611206055,
+        "dbp_min": 60.36035919189453,
+        "dbp_max": 60.78142547607422,
         "vaso_total": 0.0,
-        "vent_total": 2.0
+        "vent_total": 0.0
       },
       "_answer_key": {
         "plan_a_is": "elbo",
         "plan_b_is": "ra"
       },
-      "case_id": "C15"
+      "case_id": "C21"
     },
     {
       "case_type": "discordant",
-      "individual_id": 10,
-      "observed_dbp": 63.0,
-      "n_feasible": 15,
-      "l1_distance": 0.3333333333333333,
+      "individual_id": 26,
+      "observed_dbp": 45.0,
+      "n_feasible": 6,
+      "l1_distance": 0.25,
       "observed_treatment": [
         [
           0.0,
@@ -1457,8 +1811,31 @@
         ]
       ],
       "plan_a": {
-        "candidate_idx": 46,
-        "model_loss": 5.486135482788086,
+        "candidate_idx": 34,
+        "model_loss": 0.8286633491516113,
+        "treatment_sequence": [
+          [
+            0.0,
+            1.0
+          ],
+          [
+            0.0,
+            1.0
+          ]
+        ],
+        "dbp_terminal": 56.54373550415039,
+        "dbp_trajectory": [
+          57.59132385253906,
+          56.54373550415039
+        ],
+        "dbp_min": 56.54373550415039,
+        "dbp_max": 57.59132385253906,
+        "vaso_total": 0.0,
+        "vent_total": 2.0
+      },
+      "plan_b": {
+        "candidate_idx": 54,
+        "model_loss": 4.058917045593262,
         "treatment_sequence": [
           [
             0.0,
@@ -1467,63 +1844,30 @@
           [
             0.0,
             0.0
-          ],
-          [
-            0.0,
-            0.0
           ]
         ],
-        "dbp_terminal": 62.125335693359375,
+        "dbp_terminal": 60.08222579956055,
         "dbp_trajectory": [
-          62.20284652709961,
-          62.597530364990234,
-          62.125335693359375
+          59.0912971496582,
+          60.08222579956055
         ],
-        "dbp_min": 62.125335693359375,
-        "dbp_max": 62.597530364990234,
+        "dbp_min": 59.0912971496582,
+        "dbp_max": 60.08222579956055,
         "vaso_total": 0.0,
         "vent_total": 1.0
       },
-      "plan_b": {
-        "candidate_idx": 93,
-        "model_loss": 2.9782910346984863,
-        "treatment_sequence": [
-          [
-            0.0,
-            1.0
-          ],
-          [
-            0.0,
-            1.0
-          ],
-          [
-            0.0,
-            1.0
-          ]
-        ],
-        "dbp_terminal": 59.665958404541016,
-        "dbp_trajectory": [
-          59.576873779296875,
-          59.59410858154297,
-          59.665958404541016
-        ],
-        "dbp_min": 59.576873779296875,
-        "dbp_max": 59.665958404541016,
-        "vaso_total": 0.0,
-        "vent_total": 3.0
-      },
       "_answer_key": {
-        "plan_a_is": "ra",
-        "plan_b_is": "elbo"
+        "plan_a_is": "elbo",
+        "plan_b_is": "ra"
       },
-      "case_id": "C16"
+      "case_id": "C22"
     },
     {
       "case_type": "discordant",
       "individual_id": 15,
-      "observed_dbp": 66.0,
-      "n_feasible": 18,
-      "l1_distance": 0.16666666666666666,
+      "observed_dbp": 64.0,
+      "n_feasible": 8,
+      "l1_distance": 0.25,
       "observed_treatment": [
         [
           0.0,
@@ -1551,13 +1895,9 @@
         ]
       ],
       "plan_a": {
-        "candidate_idx": 54,
-        "model_loss": 3.029794692993164,
+        "candidate_idx": 0,
+        "model_loss": 2.9686357975006104,
         "treatment_sequence": [
-          [
-            0.0,
-            1.0
-          ],
           [
             0.0,
             1.0
@@ -1567,25 +1907,20 @@
             0.0
           ]
         ],
-        "dbp_terminal": 61.35158920288086,
+        "dbp_terminal": 60.15910720825195,
         "dbp_trajectory": [
-          61.24885559082031,
-          61.55797576904297,
-          61.35158920288086
+          60.055477142333984,
+          60.15910720825195
         ],
-        "dbp_min": 61.24885559082031,
-        "dbp_max": 61.55797576904297,
+        "dbp_min": 60.055477142333984,
+        "dbp_max": 60.15910720825195,
         "vaso_total": 0.0,
-        "vent_total": 2.0
+        "vent_total": 1.0
       },
       "plan_b": {
-        "candidate_idx": 77,
-        "model_loss": 0.5437045097351074,
+        "candidate_idx": 61,
+        "model_loss": 0.326076865196228,
         "treatment_sequence": [
-          [
-            0.0,
-            1.0
-          ],
           [
             0.0,
             1.0
@@ -1595,157 +1930,58 @@
             1.0
           ]
         ],
-        "dbp_terminal": 59.96001052856445,
+        "dbp_terminal": 58.05535888671875,
         "dbp_trajectory": [
-          59.63504409790039,
-          58.806514739990234,
-          59.96001052856445
+          57.56568145751953,
+          58.05535888671875
         ],
-        "dbp_min": 58.806514739990234,
-        "dbp_max": 59.96001052856445,
+        "dbp_min": 57.56568145751953,
+        "dbp_max": 58.05535888671875,
         "vaso_total": 0.0,
-        "vent_total": 3.0
+        "vent_total": 2.0
       },
       "_answer_key": {
         "plan_a_is": "ra",
         "plan_b_is": "elbo"
       },
-      "case_id": "C17"
+      "case_id": "C23"
     },
     {
       "case_type": "discordant",
-      "individual_id": 33,
+      "individual_id": 55,
       "observed_dbp": 60.0,
       "n_feasible": 5,
-      "l1_distance": 0.8333333333333334,
-      "observed_treatment": [
-        [
-          1.0,
-          0.0
-        ],
-        [
-          1.0,
-          0.0
-        ],
-        [
-          1.0,
-          0.0
-        ],
-        [
-          1.0,
-          0.0
-        ],
-        [
-          1.0,
-          0.0
-        ],
-        [
-          1.0,
-          0.0
-        ]
-      ],
-      "plan_a": {
-        "candidate_idx": 70,
-        "model_loss": 3.0043857097625732,
-        "treatment_sequence": [
-          [
-            1.0,
-            0.0
-          ],
-          [
-            1.0,
-            0.0
-          ],
-          [
-            1.0,
-            0.0
-          ]
-        ],
-        "dbp_terminal": 55.97808837890625,
-        "dbp_trajectory": [
-          55.64345169067383,
-          55.22285842895508,
-          55.97808837890625
-        ],
-        "dbp_min": 55.22285842895508,
-        "dbp_max": 55.97808837890625,
-        "vaso_total": 3.0,
-        "vent_total": 0.0
-      },
-      "plan_b": {
-        "candidate_idx": 14,
-        "model_loss": 4.95530891418457,
-        "treatment_sequence": [
-          [
-            0.0,
-            1.0
-          ],
-          [
-            0.0,
-            1.0
-          ],
-          [
-            0.0,
-            0.0
-          ]
-        ],
-        "dbp_terminal": 61.572052001953125,
-        "dbp_trajectory": [
-          61.04672622680664,
-          61.19853591918945,
-          61.572052001953125
-        ],
-        "dbp_min": 61.04672622680664,
-        "dbp_max": 61.572052001953125,
-        "vaso_total": 0.0,
-        "vent_total": 2.0
-      },
-      "_answer_key": {
-        "plan_a_is": "elbo",
-        "plan_b_is": "ra"
-      },
-      "case_id": "C18"
-    },
-    {
-      "case_type": "discordant",
-      "individual_id": 28,
-      "observed_dbp": 44.0,
-      "n_feasible": 32,
       "l1_distance": 0.5,
       "observed_treatment": [
         [
           0.0,
-          0.0
+          1.0
         ],
         [
           0.0,
-          0.0
+          1.0
         ],
         [
           0.0,
-          0.0
+          1.0
         ],
         [
           0.0,
-          0.0
+          1.0
         ],
         [
           0.0,
-          0.0
+          1.0
         ],
         [
           0.0,
-          0.0
+          1.0
         ]
       ],
       "plan_a": {
-        "candidate_idx": 55,
-        "model_loss": 4.47265625,
+        "candidate_idx": 72,
+        "model_loss": 2.892233371734619,
         "treatment_sequence": [
-          [
-            0.0,
-            0.0
-          ],
           [
             0.0,
             0.0
@@ -1755,56 +1991,50 @@
             0.0
           ]
         ],
-        "dbp_terminal": 61.40100860595703,
+        "dbp_terminal": 60.129940032958984,
         "dbp_trajectory": [
-          61.938629150390625,
-          61.492435455322266,
-          61.40100860595703
+          60.31459426879883,
+          60.129940032958984
         ],
-        "dbp_min": 61.40100860595703,
-        "dbp_max": 61.938629150390625,
+        "dbp_min": 60.129940032958984,
+        "dbp_max": 60.31459426879883,
         "vaso_total": 0.0,
         "vent_total": 0.0
       },
       "plan_b": {
-        "candidate_idx": 52,
-        "model_loss": 0.9595351219177246,
+        "candidate_idx": 53,
+        "model_loss": 0.16042712330818176,
         "treatment_sequence": [
           [
-            1.0,
-            0.0
+            0.0,
+            1.0
           ],
           [
-            1.0,
-            0.0
-          ],
-          [
-            1.0,
-            0.0
+            0.0,
+            1.0
           ]
         ],
-        "dbp_terminal": 54.83893585205078,
+        "dbp_terminal": 58.28226852416992,
         "dbp_trajectory": [
-          55.610652923583984,
-          55.08634948730469,
-          54.83893585205078
+          57.97785186767578,
+          58.28226852416992
         ],
-        "dbp_min": 54.83893585205078,
-        "dbp_max": 55.610652923583984,
-        "vaso_total": 3.0,
-        "vent_total": 0.0
+        "dbp_min": 57.97785186767578,
+        "dbp_max": 58.28226852416992,
+        "vaso_total": 0.0,
+        "vent_total": 2.0
       },
       "_answer_key": {
         "plan_a_is": "ra",
         "plan_b_is": "elbo"
       },
-      "case_id": "C19"
+      "case_id": "C24"
     },
     {
       "case_type": "discordant",
-      "individual_id": 5,
-      "observed_dbp": 61.0,
-      "n_feasible": 8,
+      "individual_id": 0,
+      "observed_dbp": 46.0,
+      "n_feasible": 5,
       "l1_distance": 1.0,
       "observed_treatment": [
         [
@@ -1833,41 +2063,200 @@
         ]
       ],
       "plan_a": {
-        "candidate_idx": 92,
-        "model_loss": 0.4234411418437958,
+        "candidate_idx": 2,
+        "model_loss": 5.82218074798584,
         "treatment_sequence": [
           [
-            1.0,
-            1.0
+            0.0,
+            0.0
           ],
           [
-            1.0,
-            1.0
-          ],
-          [
-            1.0,
-            1.0
+            0.0,
+            0.0
           ]
         ],
-        "dbp_terminal": 57.43939208984375,
+        "dbp_terminal": 60.289703369140625,
         "dbp_trajectory": [
-          57.196224212646484,
-          57.12033462524414,
-          57.43939208984375
+          59.38222885131836,
+          60.289703369140625
         ],
-        "dbp_min": 57.12033462524414,
-        "dbp_max": 57.43939208984375,
-        "vaso_total": 3.0,
-        "vent_total": 3.0
+        "dbp_min": 59.38222885131836,
+        "dbp_max": 60.289703369140625,
+        "vaso_total": 0.0,
+        "vent_total": 0.0
       },
       "plan_b": {
-        "candidate_idx": 36,
-        "model_loss": 5.485590934753418,
+        "candidate_idx": 97,
+        "model_loss": 0.7472265958786011,
+        "treatment_sequence": [
+          [
+            1.0,
+            1.0
+          ],
+          [
+            1.0,
+            1.0
+          ]
+        ],
+        "dbp_terminal": 55.90324783325195,
+        "dbp_trajectory": [
+          56.5574836730957,
+          55.90324783325195
+        ],
+        "dbp_min": 55.90324783325195,
+        "dbp_max": 56.5574836730957,
+        "vaso_total": 2.0,
+        "vent_total": 2.0
+      },
+      "_answer_key": {
+        "plan_a_is": "ra",
+        "plan_b_is": "elbo"
+      },
+      "case_id": "C25"
+    },
+    {
+      "case_type": "discordant",
+      "individual_id": 4,
+      "observed_dbp": 55.0,
+      "n_feasible": 5,
+      "l1_distance": 0.25,
+      "observed_treatment": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "plan_a": {
+        "candidate_idx": 93,
+        "model_loss": 0.16339901089668274,
         "treatment_sequence": [
           [
             0.0,
-            0.0
+            1.0
           ],
+          [
+            0.0,
+            1.0
+          ]
+        ],
+        "dbp_terminal": 56.88266372680664,
+        "dbp_trajectory": [
+          57.26239776611328,
+          56.88266372680664
+        ],
+        "dbp_min": 56.88266372680664,
+        "dbp_max": 57.26239776611328,
+        "vaso_total": 0.0,
+        "vent_total": 2.0
+      },
+      "plan_b": {
+        "candidate_idx": 47,
+        "model_loss": 3.029184579849243,
+        "treatment_sequence": [
+          [
+            0.0,
+            1.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "dbp_terminal": 60.16706466674805,
+        "dbp_trajectory": [
+          59.44734191894531,
+          60.16706466674805
+        ],
+        "dbp_min": 59.44734191894531,
+        "dbp_max": 60.16706466674805,
+        "vaso_total": 0.0,
+        "vent_total": 1.0
+      },
+      "_answer_key": {
+        "plan_a_is": "elbo",
+        "plan_b_is": "ra"
+      },
+      "case_id": "C26"
+    },
+    {
+      "case_type": "discordant",
+      "individual_id": 37,
+      "observed_dbp": 48.0,
+      "n_feasible": 2,
+      "l1_distance": 1.0,
+      "observed_treatment": [
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ]
+      ],
+      "plan_a": {
+        "candidate_idx": 73,
+        "model_loss": 0.45499733090400696,
+        "treatment_sequence": [
+          [
+            1.0,
+            1.0
+          ],
+          [
+            1.0,
+            1.0
+          ]
+        ],
+        "dbp_terminal": 55.76828384399414,
+        "dbp_trajectory": [
+          56.57086181640625,
+          55.76828384399414
+        ],
+        "dbp_min": 55.76828384399414,
+        "dbp_max": 56.57086181640625,
+        "vaso_total": 2.0,
+        "vent_total": 2.0
+      },
+      "plan_b": {
+        "candidate_idx": 15,
+        "model_loss": 6.386868953704834,
+        "treatment_sequence": [
           [
             0.0,
             0.0
@@ -1877,14 +2266,13 @@
             0.0
           ]
         ],
-        "dbp_terminal": 61.62958526611328,
+        "dbp_terminal": 60.06375503540039,
         "dbp_trajectory": [
-          61.706443786621094,
-          61.702571868896484,
-          61.62958526611328
+          60.75565719604492,
+          60.06375503540039
         ],
-        "dbp_min": 61.62958526611328,
-        "dbp_max": 61.706443786621094,
+        "dbp_min": 60.06375503540039,
+        "dbp_max": 60.75565719604492,
         "vaso_total": 0.0,
         "vent_total": 0.0
       },
@@ -1892,7 +2280,7 @@
         "plan_a_is": "elbo",
         "plan_b_is": "ra"
       },
-      "case_id": "C20"
+      "case_id": "C27"
     }
   ]
 }

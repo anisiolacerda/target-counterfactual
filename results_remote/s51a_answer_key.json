@@ -1,15 +1,15 @@
 {
   "C01": {
-    "plan_a_is": "ra",
-    "plan_b_is": "elbo"
+    "plan_a_is": "elbo",
+    "plan_b_is": "ra"
   },
   "C02": {
-    "plan_a_is": "ra",
-    "plan_b_is": "elbo"
+    "plan_a_is": "elbo",
+    "plan_b_is": "ra"
   },
   "C03": {
-    "plan_a_is": "ra",
-    "plan_b_is": "elbo"
+    "plan_a_is": "elbo",
+    "plan_b_is": "ra"
   },
   "C04": {
     "plan_a_is": "ra",
@@ -40,32 +40,32 @@
     "plan_b_is": "ra"
   },
   "C11": {
-    "plan_a_is": "elbo",
-    "plan_b_is": "ra"
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
   },
   "C12": {
-    "plan_a_is": "elbo",
-    "plan_b_is": "ra"
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
   },
   "C13": {
     "plan_a_is": "ra",
     "plan_b_is": "elbo"
   },
   "C14": {
-    "plan_a_is": "ra",
-    "plan_b_is": "elbo"
-  },
-  "C15": {
     "plan_a_is": "elbo",
     "plan_b_is": "ra"
+  },
+  "C15": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
   },
   "C16": {
     "plan_a_is": "ra",
     "plan_b_is": "elbo"
   },
   "C17": {
-    "plan_a_is": "ra",
-    "plan_b_is": "elbo"
+    "plan_a_is": "elbo",
+    "plan_b_is": "ra"
   },
   "C18": {
     "plan_a_is": "elbo",
@@ -76,6 +76,34 @@
     "plan_b_is": "elbo"
   },
   "C20": {
+    "plan_a_is": "elbo",
+    "plan_b_is": "ra"
+  },
+  "C21": {
+    "plan_a_is": "elbo",
+    "plan_b_is": "ra"
+  },
+  "C22": {
+    "plan_a_is": "elbo",
+    "plan_b_is": "ra"
+  },
+  "C23": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C24": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C25": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C26": {
+    "plan_a_is": "elbo",
+    "plan_b_is": "ra"
+  },
+  "C27": {
     "plan_a_is": "elbo",
     "plan_b_is": "ra"
   },
@@ -100,29 +128,43 @@
       "C17": "discordant",
       "C18": "discordant",
       "C19": "discordant",
-      "C20": "discordant"
+      "C20": "discordant",
+      "C21": "discordant",
+      "C22": "discordant",
+      "C23": "discordant",
+      "C24": "discordant",
+      "C25": "discordant",
+      "C26": "discordant",
+      "C27": "discordant"
     },
     "patient_ids": {
-      "C01": 50,
-      "C02": 51,
-      "C03": 17,
-      "C04": 92,
-      "C05": 19,
-      "C06": 39,
-      "C07": 62,
-      "C08": 37,
-      "C09": 56,
-      "C10": 55,
-      "C11": 65,
-      "C12": 69,
-      "C13": 0,
-      "C14": 30,
-      "C15": 4,
-      "C16": 10,
-      "C17": 15,
-      "C18": 33,
-      "C19": 28,
-      "C20": 5
+      "C01": 20,
+      "C02": 80,
+      "C03": 90,
+      "C04": 30,
+      "C05": 69,
+      "C06": 51,
+      "C07": 56,
+      "C08": 98,
+      "C09": 19,
+      "C10": 81,
+      "C11": 39,
+      "C12": 5,
+      "C13": 28,
+      "C14": 17,
+      "C15": 92,
+      "C16": 58,
+      "C17": 78,
+      "C18": 62,
+      "C19": 65,
+      "C20": 50,
+      "C21": 72,
+      "C22": 26,
+      "C23": 15,
+      "C24": 55,
+      "C25": 0,
+      "C26": 4,
+      "C27": 37
     }
   }
 }
