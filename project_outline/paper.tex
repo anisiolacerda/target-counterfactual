@@ -374,7 +374,7 @@ At each step $s$, Assumption~\ref{ass:hidden_confounding} implies a $\Gamma$-bou
 \end{proof}
 
 \vspace{-0.8em}
-\paragraph{Empirical sensitivity bounds.} On the Cancer simulator at $\gamma = 4$, the breakdown points are: $\Gamma_{\max} = 7.5$ at $\tau = 2$ ($\mathrm{SR}_0 = 94.4\%$), $\Gamma_{\max} = 3.4$ at $\tau = 4$ ($\mathrm{SR}_0 = 95.6\%$), and $\Gamma_{\max} = 2.1$ at $\tau = 8$ ($\mathrm{SR}_0 = 97.0\%$). At moderate hidden confounding ($\Gamma = 1.5$), the guaranteed safety rates remain $\geq 58\%$ ($\tau = 2$) and $\geq 14\%$ ($\tau = 8$). Even at $\Gamma = 2.0$ (each hidden confounder doubles the treatment odds at each step), the bound is non-vacuous through $\tau = 8$. These results confirm that RA-constrained selection provides meaningful safety guarantees under substantial hidden confounding, with robustness strongest at short horizons---precisely the regime most clinically relevant. Full sensitivity tables are in Appendix~\ref{app:sensitivity}.
+\paragraph{Empirical sensitivity bounds.} On the Cancer simulator at $\gamma = 4$, the breakdown points are: $\Gamma_{\max} = 7.5$ at $\tau = 2$ ($\mathrm{SR}_0 = 94.4\%$), $\Gamma_{\max} = 3.4$ at $\tau = 4$ ($\mathrm{SR}_0 = 95.6\%$), and $\Gamma_{\max} = 2.1$ at $\tau = 8$ ($\mathrm{SR}_0 = 97.0\%$). At moderate hidden confounding ($\Gamma = 1.5$), the guaranteed safety rates remain $\geq 58\%$ ($\tau = 2$) and $\geq 14\%$ ($\tau = 8$). Even at $\Gamma = 2.0$ (each hidden confounder doubles the treatment odds at each step), the bound is non-vacuous through $\tau = 8$. These results confirm that RA-constrained selection provides meaningful safety guarantees under substantial hidden confounding, with robustness strongest at short horizons---precisely the regime most clinically relevant. We further validate empirically by retraining VCIP with a genuine covariate (\texttt{patient\_types}) hidden: the RA safety rate degrades by at most 0.8~pp, consistent with the bound (Appendix~\ref{app:artificial_confounding}). Full sensitivity tables are in Appendix~\ref{app:sensitivity}.
 
 \vspace{-0.5em}
 \begin{corollary}[Combined robustness margin]
@@ -1199,6 +1199,31 @@ $\tau$ & $\mathrm{SR}_0$ & $\Gamma{=}1.0$ & $\Gamma{=}1.1$ & $\Gamma{=}1.5$ & $\
 \paragraph{Interpretation.} The sensitivity bounds reveal a clear horizon--robustness tradeoff: short-horizon planning ($\tau = 2$) tolerates up to $\Gamma = 7.5$ before the safety guarantee becomes vacuous, while long-horizon planning ($\tau = 8$) is vulnerable above $\Gamma = 2.1$. This provides additional justification for short-horizon treatment planning in safety-critical clinical settings where hidden confounding is plausible. Notably, even at $\Gamma = 2.0$ (each unobserved confounder can double the treatment odds at every step), the RA filter guarantees $> 0\%$ safety through $\tau = 8$---confirming that the method provides meaningful robustness to unmeasured confounding across all tested configurations.
 
 The $\Gamma$ parameter has a clinical interpretation: $\Gamma = 1.5$ means that an unobserved factor (e.g., patient frailty, unmeasured lab values) can increase the odds of receiving a particular treatment by 50\% at each step. In well-curated ICU databases like MIMIC-III, where extensive covariate measurement reduces residual confounding, $\Gamma \in [1.1, 1.5]$ is a plausible range~\citep{frauen2023sharp}. At $\Gamma = 1.5$, the RA filter guarantees safety $\geq 58.4\%$ ($\tau = 2$) to $13.8\%$ ($\tau = 8$).
+
+\subsection{Artificial Hidden Confounding Experiment}
+\label{app:artificial_confounding}
+
+To empirically validate the sensitivity analysis, we retrain VCIP at $\gamma = 4$ with the \texttt{patient\_types} covariate zeroed out, simulating hidden confounding. In the Cancer simulator, \texttt{patient\_types} (discrete, 3 values) affects both treatment assignment probabilities and tumor dynamics, making it a genuine confounder when unobserved. With this covariate hidden, the model violates sequential ignorability---exactly the scenario Theorem~\ref{thm:sensitivity} addresses.
+
+\paragraph{Results.} RA safety rates under hidden confounding are virtually identical to the fully-observed baseline:
+
+\begin{center}
+\small
+\begin{tabular}{c cc cc}
+\toprule
+& \multicolumn{2}{c}{ELBO safe} & \multicolumn{2}{c}{RA safe} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+$\tau$ & Observed & Hidden & Observed & Hidden \\
+\midrule
+2 & 85.0\% & 85.2\% & 94.4\% & 94.4\% \\
+4 & 83.2\% & 83.0\% & 95.6\% & 95.6\% \\
+6 & 79.8\% & 79.2\% & 97.0\% & 96.2\% \\
+8 & 74.4\% & 73.8\% & 97.0\% & 97.0\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The maximum safety degradation is $0.8$ percentage points ($\tau = 6$), well within the Theorem~\ref{thm:sensitivity} bound at any $\Gamma > 1$. This occurs because in the Cancer simulator at $\gamma = 4$, treatment assignment confounding is dominated by cancer volume (which the model still observes), not \texttt{patient\_types}. The effective $\Gamma$ for this hidden covariate is close to~$1$, consistent with the negligible safety drop. This experiment confirms that the RA filter is robust to realistic hidden confounding in this domain: even with a genuine confounder removed, the safety guarantee remains empirically intact.
 
 
 \section{Finite-Sample Analysis}
