@@ -1,0 +1,2272 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>S5.1a Clinician Plausibility Assessment</title>
+    
+<style>
+    @media print { .case-card { page-break-after: always; } .no-print { display: none; } }
+    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; color: #333; }
+    h1 { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; }
+    .case-card {
+        border: 2px solid #666; border-radius: 8px; padding: 20px; margin: 20px 0;
+        background: #fafafa;
+    }
+    .case-header { display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 1px solid #aaa; margin-bottom: 10px; padding-bottom: 5px; }
+    .case-header h2 { margin: 0; color: #1a5276; }
+    .completion-badge {
+        padding: 4px 12px; border-radius: 12px; font-size: 0.85em; font-weight: bold;
+    }
+    .completion-badge.incomplete { background: #ffcdd2; color: #c62828; }
+    .completion-badge.complete { background: #c8e6c9; color: #2e7d32; }
+    .patient-context { background: #eaf2f8; padding: 12px; border-radius: 6px; margin-bottom: 15px; }
+    .patient-context h3 { margin-top: 0; }
+    .context-table td { padding: 3px 10px; }
+    .context-note { font-style: italic; color: #555; font-size: 0.9em; }
+    .plans-container { display: flex; gap: 20px; }
+    .plan-column { flex: 1; background: white; border: 1px solid #ccc; border-radius: 6px; padding: 12px; }
+    .plan-column h3 { text-align: center; margin-top: 0; color: #2c3e50; }
+    .treatment-table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+    .treatment-table th, .treatment-table td { border: 1px solid #ddd; padding: 6px; text-align: center; }
+    .treatment-table th { background: #ecf0f1; }
+    .predicted-outcome { margin: 10px 0; padding: 8px; background: #f9f9f9; border-radius: 4px; }
+    .dbp-bar-container { margin: 5px 0; }
+    .dbp-bar { height: 18px; border-radius: 3px; margin-top: 3px; }
+    .dbp-label { font-size: 0.95em; }
+    .rating-box { margin: 10px 0; padding: 10px; background: #fff8e1; border: 1px solid #f0e68c; border-radius: 4px; }
+    .likert-scale label { display: block; margin: 4px 0; cursor: pointer; }
+    .preference-box { margin: 15px 0; padding: 10px; background: #e8f5e9; border-radius: 4px; }
+    .preference-box label { margin-right: 20px; cursor: pointer; }
+    .comments-box { margin: 10px 0; }
+    .comments-box textarea { width: 100%; box-sizing: border-box; }
+    .instructions { background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 15px; margin: 20px 0; }
+    .instructions h3 { margin-top: 0; }
+    .summary-stats { background: #e3f2fd; padding: 12px; border-radius: 6px; margin: 20px 0; }
+
+    /* Progress bar + download section */
+    .toolbar {
+        position: sticky; top: 0; z-index: 100; background: white;
+        border-bottom: 2px solid #333; padding: 10px 20px; margin: -20px -20px 20px -20px;
+        display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    }
+    .progress-container { flex: 1; min-width: 200px; }
+    .progress-bar-bg { background: #e0e0e0; border-radius: 8px; height: 20px; overflow: hidden; }
+    .progress-bar-fill { background: #4CAF50; height: 100%; border-radius: 8px; transition: width 0.3s; }
+    .progress-text { font-size: 0.9em; margin-top: 3px; }
+    .download-btn {
+        padding: 10px 24px; font-size: 1em; font-weight: bold; cursor: pointer;
+        border: none; border-radius: 6px; color: white;
+    }
+    .download-btn.ready { background: #2196F3; }
+    .download-btn.ready:hover { background: #1976D2; }
+    .download-btn.disabled { background: #bdbdbd; cursor: not-allowed; }
+    .save-btn { background: #ff9800; }
+    .save-btn:hover { background: #f57c00; }
+</style>
+
+</head>
+<body>
+    <h1>Clinician Plausibility Assessment: AI Treatment Plans for ICU Patients</h1>
+
+    <div class="toolbar no-print">
+        <div class="progress-container">
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+            </div>
+            <div class="progress-text" id="progress-text">0/20 cases completed (0%)</div>
+        </div>
+        <button class="download-btn disabled" id="download-btn" onclick="downloadCSV()" disabled>
+            Download CSV (0/20)
+        </button>
+        <button class="download-btn save-btn" onclick="saveToLocalStorage()">Save Progress</button>
+        <span id="save-status" style="font-size:0.8em;color:#666;"></span>
+    </div>
+
+    
+    <div class="instructions">
+        <h3>Instructions for Clinician Reviewers</h3>
+        <p>Thank you for participating in this evaluation of AI-recommended treatment plans for ICU patients.</p>
+        <ul>
+            <li><strong>Context:</strong> Each case presents an ICU patient from the MIMIC-III database with their current diastolic blood pressure and two AI-recommended treatment plans for the next 3 hours.</li>
+            <li><strong>Treatments:</strong> Vasopressor dose (normalized 0–1) and ventilation (Yes/No) at each hourly step.</li>
+            <li><strong>Your task:</strong> For each case, rate both plans independently on a 1–5 scale, then indicate your overall preference.</li>
+            <li><strong>Scale:</strong>
+                <ol>
+                    <li><strong>Dangerous</strong> – would likely cause harm</li>
+                    <li><strong>Questionable</strong> – significant clinical concerns</li>
+                    <li><strong>Acceptable</strong> – reasonable but not preferred</li>
+                    <li><strong>Good</strong> – clinically sound</li>
+                    <li><strong>Excellent</strong> – matches best practice</li>
+                </ol>
+            </li>
+            <li><strong>Blinding:</strong> Plans A and B are randomly assigned. You do not know which method generated each plan.</li>
+            <li><strong>Saving:</strong> Your progress is auto-saved in the browser. You can close the page and return later — your ratings will be restored.</li>
+            <li><strong>When done:</strong> Click the <strong>"Download CSV"</strong> button at the top to export your ratings, then email the CSV file back.</li>
+            <li><strong>Time:</strong> ~1–2 minutes per case, 20 cases total (~30 minutes).</li>
+        </ul>
+    </div>
+    
+
+    
+    <div class="case-card" id="C01">
+        <div class="case-header">
+            <h2>Case C01</h2>
+            <span class="completion-badge" id="badge_C01">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>58 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>7/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">60.3 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C01_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C01_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C01_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C01_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C01_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>1.00</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">55.6 mmHg</span>
+        <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C01_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C01_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C01_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C01_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C01_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C01_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C01_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C01_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C01_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C02">
+        <div class="case-header">
+            <h2>Case C02</h2>
+            <span class="completion-badge" id="badge_C02">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>61 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>2/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">61.6 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C02_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C02_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C02_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C02_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C02_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>1.00</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">55.4 mmHg</span>
+        <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C02_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C02_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C02_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C02_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C02_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C02_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C02_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C02_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C02_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C03">
+        <div class="case-header">
+            <h2>Case C03</h2>
+            <span class="completion-badge" id="badge_C03">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>45 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>17/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">61.2 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C03_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C03_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C03_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C03_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C03_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">58.8 mmHg</span>
+        <div class="dbp-bar" style="width:49%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C03_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C03_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C03_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C03_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C03_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C03_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C03_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C03_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C03_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C04">
+        <div class="case-header">
+            <h2>Case C04</h2>
+            <span class="completion-badge" id="badge_C04">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>55 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>6/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">62.0 mmHg</span>
+        <div class="dbp-bar" style="width:52%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C04_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C04_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C04_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C04_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C04_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>1.00</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">57.1 mmHg</span>
+        <div class="dbp-bar" style="width:48%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C04_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C04_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C04_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C04_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C04_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C04_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C04_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C04_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C04_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C05">
+        <div class="case-header">
+            <h2>Case C05</h2>
+            <span class="completion-badge" id="badge_C05">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>63 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>29/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">59.1 mmHg</span>
+        <div class="dbp-bar" style="width:49%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C05_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C05_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C05_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C05_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C05_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">63.1 mmHg</span>
+        <div class="dbp-bar" style="width:53%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C05_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C05_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C05_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C05_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C05_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C05_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C05_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C05_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C05_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C06">
+        <div class="case-header">
+            <h2>Case C06</h2>
+            <span class="completion-badge" id="badge_C06">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>58 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>6/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">61.7 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C06_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C06_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C06_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C06_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C06_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>1.00</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">56.0 mmHg</span>
+        <div class="dbp-bar" style="width:47%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C06_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C06_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C06_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C06_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C06_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C06_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C06_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C06_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C06_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C07">
+        <div class="case-header">
+            <h2>Case C07</h2>
+            <span class="completion-badge" id="badge_C07">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>76 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>7/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">61.5 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C07_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C07_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C07_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C07_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C07_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>1.00</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">57.4 mmHg</span>
+        <div class="dbp-bar" style="width:48%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C07_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C07_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C07_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C07_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C07_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C07_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C07_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C07_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C07_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C08">
+        <div class="case-header">
+            <h2>Case C08</h2>
+            <span class="completion-badge" id="badge_C08">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>44 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>10/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">60.6 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C08_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C08_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C08_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C08_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C08_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>1.00</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">56.1 mmHg</span>
+        <div class="dbp-bar" style="width:47%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C08_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C08_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C08_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C08_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C08_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C08_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C08_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C08_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C08_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C09">
+        <div class="case-header">
+            <h2>Case C09</h2>
+            <span class="completion-badge" id="badge_C09">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>52 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>10/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">61.0 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C09_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C09_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C09_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C09_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C09_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>1.00</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">54.6 mmHg</span>
+        <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C09_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C09_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C09_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C09_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C09_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C09_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C09_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C09_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C09_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C10">
+        <div class="case-header">
+            <h2>Case C10</h2>
+            <span class="completion-badge" id="badge_C10">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>78 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>20/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">59.6 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C10_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C10_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C10_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C10_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C10_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">62.5 mmHg</span>
+        <div class="dbp-bar" style="width:52%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C10_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C10_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C10_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C10_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C10_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C10_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C10_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C10_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C10_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C11">
+        <div class="case-header">
+            <h2>Case C11</h2>
+            <span class="completion-badge" id="badge_C11">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>51 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>7/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>1.00</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">54.9 mmHg</span>
+        <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C11_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C11_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C11_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C11_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C11_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">60.4 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C11_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C11_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C11_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C11_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C11_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C11_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C11_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C11_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C11_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C12">
+        <div class="case-header">
+            <h2>Case C12</h2>
+            <span class="completion-badge" id="badge_C12">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>50 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>35/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">58.7 mmHg</span>
+        <div class="dbp-bar" style="width:49%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C12_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C12_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C12_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C12_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C12_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">61.0 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C12_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C12_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C12_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C12_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C12_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C12_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C12_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C12_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C12_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C13">
+        <div class="case-header">
+            <h2>Case C13</h2>
+            <span class="completion-badge" id="badge_C13">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>51 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>7/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">61.6 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C13_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C13_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C13_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C13_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C13_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>1.00</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">56.2 mmHg</span>
+        <div class="dbp-bar" style="width:47%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C13_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C13_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C13_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C13_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C13_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C13_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C13_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C13_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C13_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C14">
+        <div class="case-header">
+            <h2>Case C14</h2>
+            <span class="completion-badge" id="badge_C14">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>49 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>34/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">60.9 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C14_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C14_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C14_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C14_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C14_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>1.00</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">55.3 mmHg</span>
+        <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C14_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C14_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C14_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C14_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C14_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C14_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C14_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C14_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C14_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C15">
+        <div class="case-header">
+            <h2>Case C15</h2>
+            <span class="completion-badge" id="badge_C15">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>56 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>13/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">58.5 mmHg</span>
+        <div class="dbp-bar" style="width:49%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C15_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C15_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C15_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C15_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C15_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">61.2 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C15_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C15_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C15_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C15_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C15_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C15_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C15_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C15_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C15_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C16">
+        <div class="case-header">
+            <h2>Case C16</h2>
+            <span class="completion-badge" id="badge_C16">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>63 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>15/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">62.1 mmHg</span>
+        <div class="dbp-bar" style="width:52%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C16_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C16_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C16_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C16_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C16_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">59.7 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C16_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C16_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C16_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C16_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C16_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C16_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C16_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C16_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C16_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C17">
+        <div class="case-header">
+            <h2>Case C17</h2>
+            <span class="completion-badge" id="badge_C17">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>66 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>18/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">61.4 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C17_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C17_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C17_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C17_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C17_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">60.0 mmHg</span>
+        <div class="dbp-bar" style="width:50%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C17_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C17_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C17_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C17_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C17_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C17_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C17_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C17_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C17_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C18">
+        <div class="case-header">
+            <h2>Case C18</h2>
+            <span class="completion-badge" id="badge_C18">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>60 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>5/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>1.00</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">56.0 mmHg</span>
+        <div class="dbp-bar" style="width:47%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C18_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C18_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C18_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C18_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C18_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">61.6 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C18_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C18_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C18_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C18_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C18_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C18_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C18_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C18_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C18_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C19">
+        <div class="case-header">
+            <h2>Case C19</h2>
+            <span class="completion-badge" id="badge_C19">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>44 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>32/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">61.4 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C19_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C19_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C19_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C19_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C19_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>1.00</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">54.8 mmHg</span>
+        <div class="dbp-bar" style="width:46%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C19_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C19_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C19_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C19_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C19_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C19_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C19_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C19_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C19_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+    <div class="case-card" id="C20">
+        <div class="case-header">
+            <h2>Case C20</h2>
+            <span class="completion-badge" id="badge_C20">Incomplete</span>
+        </div>
+
+        <div class="patient-context">
+            <h3>Patient Context</h3>
+            <table class="context-table">
+                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
+                <tr><td><strong>Current diastolic BP:</strong></td><td>61 mmHg</td></tr>
+                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
+                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
+                <tr><td><strong>Planning horizon:</strong></td><td>3 hours ahead</td></tr>
+                <tr><td><strong>Feasible plans available:</strong></td><td>8/100 candidates meet safety criteria</td></tr>
+            </table>
+            <p class="context-note">Two AI-recommended treatment plans are shown below.
+            Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
+            Please rate each plan independently.</p>
+        </div>
+
+        <div class="plans-container">
+            <div class="plan-column">
+                <h3>Plan A</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 2</td><td>1.00</td><td>Yes</td></tr>
+<tr><td>Hour 3</td><td>1.00</td><td>Yes</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">57.4 mmHg</span>
+        <div class="dbp-bar" style="width:48%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan A:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C20_a" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C20_a" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C20_a" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C20_a" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C20_a" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plan-column">
+                <h3>Plan B</h3>
+                
+    <table class="treatment-table">
+        <thead><tr><th>Step</th><th>Vasopressor</th><th>Ventilation</th></tr></thead>
+        <tbody><tr><td>Hour 1</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 2</td><td>None</td><td>No</td></tr>
+<tr><td>Hour 3</td><td>None</td><td>No</td></tr>
+</tbody>
+    </table>
+    
+                <div class="predicted-outcome">
+                    <strong>Predicted terminal DBP:</strong>
+                    
+    <div class="dbp-bar-container">
+        <span class="dbp-label">61.6 mmHg</span>
+        <div class="dbp-bar" style="width:51%;background:#78909c;"></div>
+    </div>
+    
+                </div>
+
+                <div class="rating-box">
+                    <p><strong>Rate Plan B:</strong></p>
+                    <div class="likert-scale">
+                        <label><input type="radio" name="C20_b" value="1" onchange="updateProgress()"> 1 – Dangerous</label>
+                        <label><input type="radio" name="C20_b" value="2" onchange="updateProgress()"> 2 – Questionable</label>
+                        <label><input type="radio" name="C20_b" value="3" onchange="updateProgress()"> 3 – Acceptable</label>
+                        <label><input type="radio" name="C20_b" value="4" onchange="updateProgress()"> 4 – Good</label>
+                        <label><input type="radio" name="C20_b" value="5" onchange="updateProgress()"> 5 – Excellent</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preference-box">
+            <p><strong>Overall preference:</strong></p>
+            <label><input type="radio" name="C20_pref" value="A" onchange="updateProgress()"> Prefer Plan A</label>
+            <label><input type="radio" name="C20_pref" value="B" onchange="updateProgress()"> Prefer Plan B</label>
+            <label><input type="radio" name="C20_pref" value="N" onchange="updateProgress()"> No preference</label>
+        </div>
+
+        <div class="comments-box">
+            <p><strong>Comments (optional):</strong></p>
+            <textarea id="C20_comment" rows="2"></textarea>
+        </div>
+    </div>
+    
+
+    <div style="text-align:center; margin:30px; padding:20px; background:#e8f5e9; border-radius:8px;">
+        <p style="font-size:1.2em;"><strong>All done?</strong></p>
+        <button class="download-btn ready" onclick="downloadCSV()" style="font-size:1.1em; padding:12px 32px;">
+            Download Ratings CSV
+        </button>
+        <p style="margin-top:10px; color:#555;">Please email the downloaded <code>s51a_rating_form.csv</code> file back to the researcher.</p>
+    </div>
+
+    
+<script>
+const CASE_IDS = ["C01", "C02", "C03", "C04", "C05", "C06", "C07", "C08", "C09", "C10", "C11", "C12", "C13", "C14", "C15", "C16", "C17", "C18", "C19", "C20"];
+
+function getRadioValue(name) {
+    const el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+}
+
+function updateProgress() {
+    let completed = 0;
+    CASE_IDS.forEach(function(cid) {
+        const a = getRadioValue(cid + '_a');
+        const b = getRadioValue(cid + '_b');
+        const p = getRadioValue(cid + '_pref');
+        const badge = document.getElementById('badge_' + cid);
+        if (a && b && p) {
+            completed++;
+            badge.textContent = 'Complete';
+            badge.className = 'completion-badge complete';
+        } else {
+            badge.textContent = 'Incomplete';
+            badge.className = 'completion-badge incomplete';
+        }
+    });
+
+    const pct = Math.round(100 * completed / CASE_IDS.length);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = completed + '/' + CASE_IDS.length + ' cases completed (' + pct + '%)';
+
+    const btn = document.getElementById('download-btn');
+    if (completed === CASE_IDS.length) {
+        btn.className = 'download-btn ready';
+        btn.disabled = false;
+        btn.textContent = 'Download Ratings CSV';
+    } else {
+        btn.className = 'download-btn ready';
+        btn.disabled = false;
+        btn.textContent = 'Download CSV (' + completed + '/' + CASE_IDS.length + ')';
+    }
+}
+
+function downloadCSV() {
+    let rows = ['case_id,plan_a_likert,plan_b_likert,preference,comments'];
+    CASE_IDS.forEach(function(cid) {
+        const a = getRadioValue(cid + '_a');
+        const b = getRadioValue(cid + '_b');
+        const p = getRadioValue(cid + '_pref');
+        const commentEl = document.getElementById(cid + '_comment');
+        const comment = commentEl ? commentEl.value.replace(/"/g, '""').replace(/\n/g, ' ') : '';
+        rows.push(cid + ',' + a + ',' + b + ',' + p + ',"' + comment + '"');
+    });
+
+    const csv = rows.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 's51a_rating_form.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// Auto-save to localStorage
+function saveToLocalStorage() {
+    const state = {};
+    CASE_IDS.forEach(function(cid) {
+        state[cid + '_a'] = getRadioValue(cid + '_a');
+        state[cid + '_b'] = getRadioValue(cid + '_b');
+        state[cid + '_pref'] = getRadioValue(cid + '_pref');
+        const commentEl = document.getElementById(cid + '_comment');
+        state[cid + '_comment'] = commentEl ? commentEl.value : '';
+    });
+    localStorage.setItem('s51a_ratings', JSON.stringify(state));
+    document.getElementById('save-status').textContent = 'Saved at ' + new Date().toLocaleTimeString();
+}
+
+function loadFromLocalStorage() {
+    const saved = localStorage.getItem('s51a_ratings');
+    if (!saved) return;
+    const state = JSON.parse(saved);
+    Object.keys(state).forEach(function(key) {
+        if (key.endsWith('_comment')) {
+            const el = document.getElementById(key);
+            if (el) el.value = state[key];
+        } else if (state[key]) {
+            const el = document.querySelector('input[name="' + key + '"][value="' + state[key] + '"]');
+            if (el) el.checked = true;
+        }
+    });
+    updateProgress();
+}
+
+// Auto-save every 30 seconds
+setInterval(saveToLocalStorage, 30000);
+
+// Also save on every rating change
+document.addEventListener('change', function(e) {
+    if (e.target.type === 'radio' || e.target.tagName === 'TEXTAREA') {
+        saveToLocalStorage();
+    }
+});
+
+// Load saved state on page load
+window.addEventListener('load', function() {
+    loadFromLocalStorage();
+    updateProgress();
+});
+</script>
+
+</body>
+</html>

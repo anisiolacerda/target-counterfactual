@@ -1,0 +1,128 @@
+{
+  "C01": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C02": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C03": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C04": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C05": {
+    "plan_a_is": "elbo",
+    "plan_b_is": "ra"
+  },
+  "C06": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C07": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C08": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C09": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C10": {
+    "plan_a_is": "elbo",
+    "plan_b_is": "ra"
+  },
+  "C11": {
+    "plan_a_is": "elbo",
+    "plan_b_is": "ra"
+  },
+  "C12": {
+    "plan_a_is": "elbo",
+    "plan_b_is": "ra"
+  },
+  "C13": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C14": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C15": {
+    "plan_a_is": "elbo",
+    "plan_b_is": "ra"
+  },
+  "C16": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C17": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C18": {
+    "plan_a_is": "elbo",
+    "plan_b_is": "ra"
+  },
+  "C19": {
+    "plan_a_is": "ra",
+    "plan_b_is": "elbo"
+  },
+  "C20": {
+    "plan_a_is": "elbo",
+    "plan_b_is": "ra"
+  },
+  "_metadata": {
+    "case_types": {
+      "C01": "discordant",
+      "C02": "discordant",
+      "C03": "discordant",
+      "C04": "discordant",
+      "C05": "discordant",
+      "C06": "discordant",
+      "C07": "discordant",
+      "C08": "discordant",
+      "C09": "discordant",
+      "C10": "discordant",
+      "C11": "discordant",
+      "C12": "discordant",
+      "C13": "discordant",
+      "C14": "discordant",
+      "C15": "discordant",
+      "C16": "discordant",
+      "C17": "discordant",
+      "C18": "discordant",
+      "C19": "discordant",
+      "C20": "discordant"
+    },
+    "patient_ids": {
+      "C01": 50,
+      "C02": 51,
+      "C03": 17,
+      "C04": 92,
+      "C05": 19,
+      "C06": 39,
+      "C07": 62,
+      "C08": 37,
+      "C09": 56,
+      "C10": 55,
+      "C11": 65,
+      "C12": 69,
+      "C13": 0,
+      "C14": 30,
+      "C15": 4,
+      "C16": 10,
+      "C17": 15,
+      "C18": 33,
+      "C19": 28,
+      "C20": 5
+    }
+  }
+}
