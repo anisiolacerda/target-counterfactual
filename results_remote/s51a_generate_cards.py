@@ -313,6 +313,21 @@ function loadFromLocalStorage() {{
     updateProgress();
 }}
 
+function clearAll() {{
+    if (!confirm('This will erase ALL your ratings, comments, and saved progress. Are you sure?')) return;
+    localStorage.removeItem('s51a_ratings');
+    document.getElementById('reviewer_name').value = '';
+    CASE_IDS.forEach(function(cid) {{
+        document.querySelectorAll('input[name="' + cid + '_a"]').forEach(function(r) {{ r.checked = false; }});
+        document.querySelectorAll('input[name="' + cid + '_b"]').forEach(function(r) {{ r.checked = false; }});
+        document.querySelectorAll('input[name="' + cid + '_pref"]').forEach(function(r) {{ r.checked = false; }});
+        var c = document.getElementById(cid + '_comment');
+        if (c) c.value = '';
+    }});
+    updateProgress();
+    document.getElementById('save-status').textContent = 'Cleared at ' + new Date().toLocaleTimeString();
+}}
+
 // Auto-save every 30 seconds
 setInterval(saveToLocalStorage, 30000);
 
@@ -394,6 +409,7 @@ def main():
             Download CSV (0/{len(cases)})
         </button>
         <button class="download-btn save-btn" onclick="saveToLocalStorage()">Save Progress</button>
+        <button class="download-btn" style="background:#e53935;" onclick="clearAll()">Clear All</button>
         <span id="save-status" style="font-size:0.8em;color:#666;"></span>
     </div>
 
