@@ -241,15 +241,31 @@ function updateProgress() {{
     }}
 }}
 
+function getReviewerName() {{
+    const el = document.getElementById('reviewer_name');
+    return el ? el.value.trim() : '';
+}}
+
+function sanitizeName(name) {{
+    return name.replace(/\\s+/g, '_').replace(/[^a-zA-Z0-9_\\-]/g, '');
+}}
+
 function downloadCSV() {{
-    let rows = ['case_id,plan_a_likert,plan_b_likert,preference,comments'];
+    const name = getReviewerName();
+    if (!name) {{
+        alert('Please enter your name at the top of the page before downloading.');
+        document.getElementById('reviewer_name').focus();
+        return;
+    }}
+
+    let rows = ['case_id,reviewer,plan_a_likert,plan_b_likert,preference,comments'];
     CASE_IDS.forEach(function(cid) {{
         const a = getRadioValue(cid + '_a');
         const b = getRadioValue(cid + '_b');
         const p = getRadioValue(cid + '_pref');
         const commentEl = document.getElementById(cid + '_comment');
         const comment = commentEl ? commentEl.value.replace(/"/g, '""').replace(/\\n/g, ' ') : '';
-        rows.push(cid + ',' + a + ',' + b + ',' + p + ',"' + comment + '"');
+        rows.push(cid + ',"' + name + '",' + a + ',' + b + ',' + p + ',"' + comment + '"');
     }});
 
     const csv = rows.join('\\n');
@@ -257,7 +273,7 @@ function downloadCSV() {{
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 's51a_rating_form.csv';
+    a.download = 's51a_ratings_' + sanitizeName(name) + '.csv';
     a.click();
     URL.revokeObjectURL(url);
 }}
@@ -265,6 +281,7 @@ function downloadCSV() {{
 // Auto-save to localStorage
 function saveToLocalStorage() {{
     const state = {{}};
+    state['_reviewer_name'] = getReviewerName();
     CASE_IDS.forEach(function(cid) {{
         state[cid + '_a'] = getRadioValue(cid + '_a');
         state[cid + '_b'] = getRadioValue(cid + '_b');
@@ -280,7 +297,11 @@ function loadFromLocalStorage() {{
     const saved = localStorage.getItem('s51a_ratings');
     if (!saved) return;
     const state = JSON.parse(saved);
+    if (state['_reviewer_name']) {{
+        document.getElementById('reviewer_name').value = state['_reviewer_name'];
+    }}
     Object.keys(state).forEach(function(key) {{
+        if (key.startsWith('_')) return;
         if (key.endsWith('_comment')) {{
             const el = document.getElementById(key);
             if (el) el.value = state[key];
@@ -374,6 +395,14 @@ def main():
         </button>
         <button class="download-btn save-btn" onclick="saveToLocalStorage()">Save Progress</button>
         <span id="save-status" style="font-size:0.8em;color:#666;"></span>
+    </div>
+
+    <div class="name-box" style="background:#e8eaf6; border:2px solid #5c6bc0; border-radius:8px; padding:15px; margin:20px 0;">
+        <label for="reviewer_name" style="font-size:1.1em; font-weight:bold;">Reviewer name (required):</label>
+        <input type="text" id="reviewer_name" placeholder="e.g. Maria Silva"
+            style="margin-left:10px; padding:6px 12px; font-size:1em; border:1px solid #999; border-radius:4px; width:300px;"
+            oninput="updateProgress()">
+        <p style="margin:5px 0 0 0; font-size:0.85em; color:#555;">Your name will be included in the downloaded CSV filename.</p>
     </div>
 
     {generate_instructions(len(cases))}

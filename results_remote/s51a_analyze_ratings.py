@@ -25,6 +25,7 @@ def load_ratings(csv_path):
             if row['plan_a_likert'] and row['plan_b_likert']:
                 ratings.append({
                     'case_id': row['case_id'],
+                    'reviewer': row.get('reviewer', ''),
                     'plan_a_likert': int(row['plan_a_likert']),
                     'plan_b_likert': int(row['plan_b_likert']),
                     'preference': row['preference'].strip() if row['preference'] else 'N',
