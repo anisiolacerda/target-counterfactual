@@ -2819,12 +2819,33 @@
     </div>
     
 
+    <div class="case-card" style="background:#f3e5f5; border-color:#9c27b0;">
+        <h2 style="color:#6a1b9a; border-bottom-color:#ce93d8;">Overall Feedback</h2>
+        <p>Please share your overall impressions after reviewing all cases. Your qualitative feedback is very valuable for interpreting the quantitative results.</p>
+
+        <p><strong>1. How realistic were the patient scenarios and treatment options presented?</strong></p>
+        <textarea id="feedback_realism" rows="3" style="width:100%; box-sizing:border-box;"
+            placeholder="e.g., Were the treatment options clinically plausible? Was the information sufficient to make a judgment?"></textarea>
+
+        <p><strong>2. In general, did one type of plan tend to feel more clinically appropriate than the other? Any patterns you noticed?</strong></p>
+        <textarea id="feedback_patterns" rows="3" style="width:100%; box-sizing:border-box;"
+            placeholder="e.g., Plans with/without vasopressors seemed more appropriate for..."></textarea>
+
+        <p><strong>3. What additional patient information would have helped you make better assessments?</strong></p>
+        <textarea id="feedback_info" rows="3" style="width:100%; box-sizing:border-box;"
+            placeholder="e.g., Lab values, fluid balance, MAP, comorbidities, reason for ICU admission..."></textarea>
+
+        <p><strong>4. Any other comments on the evaluation process, the AI-recommended plans, or suggestions for improvement?</strong></p>
+        <textarea id="feedback_other" rows="3" style="width:100%; box-sizing:border-box;"
+            placeholder="Free-form comments..."></textarea>
+    </div>
+
     <div style="text-align:center; margin:30px; padding:20px; background:#e8f5e9; border-radius:8px;">
         <p style="font-size:1.2em;"><strong>All done?</strong></p>
         <button class="download-btn ready" onclick="downloadCSV()" style="font-size:1.1em; padding:12px 32px;">
             Download Ratings CSV
         </button>
-        <p style="margin-top:10px; color:#555;">Please email the downloaded <code>s51a_rating_form.csv</code> file back to the researcher.</p>
+        <p style="margin-top:10px; color:#555;">Please email the downloaded CSV file back to the researcher. Thank you!</p>
     </div>
 
     
@@ -2896,6 +2917,16 @@ function downloadCSV() {
         rows.push(cid + ',"' + name + '",' + a + ',' + b + ',' + p + ',"' + comment + '"');
     });
 
+    // Append overall feedback as special rows
+    const feedbackFields = ['feedback_realism', 'feedback_patterns', 'feedback_info', 'feedback_other'];
+    feedbackFields.forEach(function(fid) {
+        const el = document.getElementById(fid);
+        const val = el ? el.value.replace(/"/g, '""').replace(/\n/g, ' ') : '';
+        if (val) {
+            rows.push(fid + ',"' + name + '",,,,"' + val + '"');
+        }
+    });
+
     const csv = rows.join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -2917,6 +2948,10 @@ function saveToLocalStorage() {
         const commentEl = document.getElementById(cid + '_comment');
         state[cid + '_comment'] = commentEl ? commentEl.value : '';
     });
+    ['feedback_realism', 'feedback_patterns', 'feedback_info', 'feedback_other'].forEach(function(fid) {
+        const el = document.getElementById(fid);
+        if (el) state[fid] = el.value;
+    });
     localStorage.setItem('s51a_ratings', JSON.stringify(state));
     document.getElementById('save-status').textContent = 'Saved at ' + new Date().toLocaleTimeString();
 }
@@ -2928,8 +2963,14 @@ function loadFromLocalStorage() {
     if (state['_reviewer_name']) {
         document.getElementById('reviewer_name').value = state['_reviewer_name'];
     }
+    ['feedback_realism', 'feedback_patterns', 'feedback_info', 'feedback_other'].forEach(function(fid) {
+        if (state[fid]) {
+            const el = document.getElementById(fid);
+            if (el) el.value = state[fid];
+        }
+    });
     Object.keys(state).forEach(function(key) {
-        if (key.startsWith('_')) return;
+        if (key.startsWith('_') || key.startsWith('feedback_')) return;
         if (key.endsWith('_comment')) {
             const el = document.getElementById(key);
             if (el) el.value = state[key];
@@ -2942,7 +2983,7 @@ function loadFromLocalStorage() {
 }
 
 function clearAll() {
-    if (!confirm('This will erase ALL your ratings, comments, and saved progress. Are you sure?')) return;
+    if (!confirm('This will erase ALL your ratings, comments, feedback, and saved progress. Are you sure?')) return;
     localStorage.removeItem('s51a_ratings');
     document.getElementById('reviewer_name').value = '';
     CASE_IDS.forEach(function(cid) {
@@ -2951,6 +2992,10 @@ function clearAll() {
         document.querySelectorAll('input[name="' + cid + '_pref"]').forEach(function(r) { r.checked = false; });
         var c = document.getElementById(cid + '_comment');
         if (c) c.value = '';
+    });
+    ['feedback_realism', 'feedback_patterns', 'feedback_info', 'feedback_other'].forEach(function(fid) {
+        var el = document.getElementById(fid);
+        if (el) el.value = '';
     });
     updateProgress();
     document.getElementById('save-status').textContent = 'Cleared at ' + new Date().toLocaleTimeString();
