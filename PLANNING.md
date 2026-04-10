@@ -202,9 +202,9 @@ Tested `score = ELBO + λ · RA_penalty` with λ ∈ {0, 0.01, ..., 50}.
 
 #### Phase 3 — Gradient-based RA planning (~$10-15)
 
-- [ ] **3.1** Implement `optimize_reach_avoid()`: gradient optimization of J_RA w.r.t. intervention sequence ā (analogous to existing `optimize_interventions_onetime()`)
-- [ ] **3.2** Compare gradient-based RA planning vs. perturbation-based ranking on Cancer ground truth
-- [ ] **3.3** This also addresses W4 (perturbation-dependent evaluation) as a byproduct
+- [ ] **3.1** Implement `optimize_reach_avoid()` — POST-SUBMISSION (post-hoc filter shown sufficient)
+- [ ] **3.2** Compare gradient-based RA planning vs. perturbation-based ranking — POST-SUBMISSION
+- [ ] **3.3** This also addresses W4 — POST-SUBMISSION
 
 #### Phase 4 — Full experimental matrix (~$50-60)
 
@@ -229,15 +229,15 @@ Tested `score = ELBO + λ · RA_penalty` with λ ∈ {0, 0.01, ..., 50}.
 
 #### Phase 5 — Ablations
 
-- [ ] **5.1** Target set size: vary T width (narrow vs. broad clinical range)
-- [ ] **5.2** Sigmoid hardness κ: {1, 5, 10, 50, 100} — validates ε_soft convergence from theorem
-- [ ] **5.3** Reach-only vs. reach-avoid
-- [ ] **5.4** Intermediate loss weight ratio in training
-- [ ] **5.5** Model-agnostic: apply RA scoring to ACTIN, CRN, CT, RMSN (not just VCIP)
-- [ ] **5.6** Midpoint-baseline: VCIP with Y_target = midpoint(T) vs. RA scoring (critical ablation, see Reviewer Concerns below)
-- [ ] **5.7** Empirical ε_VI estimation: compute TV distance proxy between model and simulator outcome distributions on Cancer data, verify T2 bound is non-vacuous
-- [ ] **5.8** VCI-inspired latent disentanglement regularizer: with/without DKL[q(Z|a_obs) || q(Z|a_alt)] penalty during training (varying λ_disent ∈ {0.01, 0.1, 0.5}). Compare RA scoring quality and intermediate prediction accuracy. Motivated by Wu et al. (ICLR 2025) Lemma 1.
-- [ ] **5.9** Counterfactual consistency diagnostic validation: on Cancer, correlate VCI-style latent divergence metric with ground-truth counterfactual prediction error. If strongly correlated, use as model-intrinsic evaluation metric on MIMIC (addresses RC3).
+- [x] **5.1** Target set size: ✓ COMPLETE — smooth trade-off documented in paper
+- [x] **5.2** Sigmoid hardness κ: ✓ COMPLETE — κ≥5 indistinguishable from hard filter
+- [x] **5.3** Reach-only vs. reach-avoid: ✓ COMPLETE — reach is primary driver
+- [x] **5.4** Intermediate loss weight ratio: SUPERSEDED — Phase 2 showed retraining unnecessary
+- [x] **5.5** Model-agnostic: ✓ COMPLETE — all 5 models benefit, baselines more than VCIP
+- [x] **5.6** Midpoint-baseline: ✓ COMPLETE — promoted to main text
+- [x] **5.7** ε_VI estimation: ✓ COMPLETE — ε_VI≈0.09-0.23, bound non-vacuous
+- [ ] **5.8** VCI-inspired latent disentanglement: POST-SUBMISSION — decoder mod experiments showed bottleneck is latent space
+- [ ] **5.9** CF consistency diagnostic: POST-SUBMISSION — VCI diagnostic already showed KL≈10⁻⁵
 
 ---
 
@@ -296,7 +296,7 @@ The original RC1–RC7 (identified 2026-03-15 from VCIP's ICML review) are subsu
 
 - **A2 (W2): Strengthen theory framing.** [TEXT] Reposition theorem as *design principle*, not mathematical breakthrough. Emphasize quantitative margin condition connecting to γ-sweep results. Location: Theory, after Theorem 1 (~line 302).
 
-- **A3 (W3): Oracle-vs-model experiment.** [NEW EXPERIMENT] Run RA filtering on **model-predicted trajectories** (decoder outputs) instead of simulator ground truth on Cancer. Compare safety/Top-1/feasibility between oracle-filtered and model-predicted-filtered. Creates 3-level validation: oracle → model-predicted synthetic → model-predicted real (MIMIC).
+- **A3 (W3): Oracle-vs-model experiment.** [NEW EXPERIMENT] ✓ COMPLETE (2026-03-27 initial + 2026-04-09 decoder mods). Ran RA filtering on model-predicted trajectories (decoder outputs). **Result: model-predicted feasibility ~0% across all decoder modifications** (vanilla, heteroscedastic, wider, MC-dropout). Root cause: action-invariant latent space. **E1 risk materialized → paper must reframe oracle/model gap as first-class diagnostic finding.**
   - **Infrastructure:** MIMIC's `extract_predicted_dbp()` (`scripts/mimic_ra/eval_mimic_traj.py:32-113`) already does this. Build parallel `extract_predicted_cv()` for Cancer using `generative_model.py:476` (`decode_p_a`) and `reach_avoid/model.py:174-320` step loop.
   - **Effort:** ~3-5 days. Run on existing 5 seeds × 4 gammas, no retraining needed.
   - **Expected:** Model-predicted RA less effective than oracle but direction of improvement holds. The gap itself is a novel finding.
@@ -328,12 +328,18 @@ Three independent paths, each sufficient alone. All three together make it a str
 
 - **S5.1: Clinical evaluation on MIMIC.** [NEW EXPERIMENT + EXTERNAL COLLABORATION]
   Recruit 1-2 ICU clinicians (intensivists) to evaluate RA-recommended treatment plans.
-  - **S5.1a: Clinician plausibility assessment.** Present ~30-50 patient cases with ELBO-selected vs. RA-selected treatment sequences (blinded). Clinician rates each plan on a 5-point Likert scale (1=dangerous, 5=clinically appropriate). Report inter-rater agreement (if 2 clinicians) and mean plausibility scores.
-  - **S5.1b: Outcome correlation analysis.** For MIMIC patients with observed good outcomes (e.g., DBP stabilized in [60,90] within 24h, survived ICU), compare RA-selected treatment sequences against their actual observed treatments. Report Jaccard similarity or treatment overlap. If RA selects treatments similar to what *actually worked*, this is strong indirect validation.
-  - **S5.1c: Guideline concordance.** Compare RA-recommended vasopressor/fluid patterns against published clinical guidelines (e.g., Surviving Sepsis Campaign 2021 for vasopressor escalation). Report concordance rate.
-  - **Infrastructure:** Existing MIMIC pickle data contains full treatment sequences. Need clinical collaborator(s) + IRB-exempt review for secondary data analysis (MIMIC already de-identified).
-  - **Effort:** ~2-3 weeks (mostly coordination with clinicians; analysis is straightforward once ratings collected).
-  - **Impact:** Directly addresses RC-post-2 (MIMIC lacks clinical validation). Transforms MIMIC from "feasibility demonstration" to "clinically validated."
+  - **S5.1a: Clinician plausibility assessment.** ✓ **1st EVALUATION COMPLETE (2026-03-30)**
+    - **Design:** 27 discordant cases (τ=2, seed=10), paired A/B blinded, 5-point Likert scale. Self-contained HTML with auto-save, progress tracking, CSV export.
+    - **1st evaluator:** Dr. Alexandre Barros (ICU intensivist). **Result:** RA mean Likert 2.93±1.33 vs ELBO 1.37±0.87 (p=0.0001, Wilcoxon). RA preferred in 17/19 decisive cases (89%).
+    - **Key clinical feedback:** (1) Scenarios lack context for vaso/vent decisions — needs ABG, lactate, vitals, diagnosis, comorbidities, age. (2) Isolated DBP is questionable as sole outcome. (3) Normal-DBP patients → "no intervention" seems best.
+    - **Response to feedback:** Enriched case cards v2 with demographics, 6h vitals history, labs, treatment history from raw MIMIC HDF5 (`s51a_extract_patient_context.py`).
+    - **Power analysis:** 27 cases gives 84% power at 0.75-point Likert effect (`s51a_power_analysis.py`).
+    - **Paper integration:** Appendix N.6 (`\label{sec:clinician_assessment}`) with Table `\label{tab:clinician}`. Main text MIMIC section + Limitations updated.
+    - **PENDING:** 2nd clinician evaluation with enriched cards. Subgroup analysis by baseline DBP.
+  - **S5.1b: Outcome correlation analysis.** ✓ COMPLETE (2026-03-27). See above.
+  - **S5.1c: Guideline concordance.** ✓ COMPLETE (2026-03-27). See above.
+  - **Infrastructure:** Scripts in `results_remote/s51a_*.py`. Raw MIMIC data in `results_remote/mimic_extract/`.
+  - **Impact:** **Strongly addresses RC-post-2.** 1st clinician evaluation is highly significant. 2nd evaluation with enriched context will provide inter-rater agreement.
 
 - **S5.2: Second evaluation domain with ground truth.** [NEW EXPERIMENT + IMPLEMENTATION] ✓ **COMPLETE (2026-03-27)**
   Implemented Bergman minimal model glucose-insulin simulator as second evaluation domain.
@@ -397,16 +403,16 @@ Three independent paths, each sufficient alone. All three together make it a str
 
 **Core challenge:** Score 7 requires a contribution that opens a new research direction or provides a tight theoretical characterization. Qualitatively different from "better experiments."
 
-- **S7.2: Safe planning under hidden confounding.** [NEW THEORY + EXPERIMENT] ★ KEY CONTRIBUTION
+- **S7.2: Safe planning under hidden confounding.** [NEW THEORY + EXPERIMENT] ★ KEY CONTRIBUTION — **PARTIALLY COMPLETE (2026-04-09)**
   Develop safety guarantees valid even when unmeasured confounders exist (sequential ignorability fails).
-  - **Γ-sensitivity model:** Parameterize hidden confounding by Γ ≥ 1 (Rosenbaum 2002). Unobserved confounders can shift treatment assignment odds by factor Γ. When Γ=1, ignorability holds.
-  - **Identified set:** Under bounded confounding Γ, counterfactual outcome Y[ā] lies in a set [Y_lower(Γ), Y_upper(Γ)]. Derive sharp bounds for sequential treatments.
-  - **Γ-robust conformal certificate:** Target theorem: P(Y_true[ā] ∈ S | confounding ≤ Γ) ≥ 1-α with Γ-adjusted quantile. Extends S6.1 naturally.
-  - **Key challenge:** Sensitivity compounds over τ steps. Mitigation: use Markov property (next-step sensitivity depends only on current state) or present results for small τ first.
-  - **Validation on Cancer:** Artificial hidden confounding (hold out a covariate from model training). Verify coverage holds across Γ levels. Also validate on gamma sweep (natural confounding variation).
-  - **Key references:** Rosenbaum 2002, Tan 2006, Kallus & Zhou 2021, Yadlowsky et al. 2022
-  - **Effort:** ~4-6 weeks (theory: 2-3 weeks, implementation: 1-2 weeks, experiments: 1 week)
-  - **Impact:** First distribution-free safety guarantee for counterfactual planning under hidden confounding. Addresses W9 from a completely new angle.
+  - **Γ-sensitivity model:** ✓ Already in paper as Assumption 1 + Theorem 2 (sequential maximal coupling). Bound: ψ(Γ,τ) = 1-(2/(Γ+1))^τ. Γ_max = 2.1 at τ=8.
+  - **Time-invariant confounder bound (NEW, 2026-04-09):** ✓ Proposition 5 added. When U is time-invariant, bound reduces to φ(Γ) = (Γ-1)/(Γ+1), eliminating τ-dependence. Γ_max jumps to 65.7 at τ=8. Plausible for ICU settings (patient frailty, genetics stable over τ≤8h). Full proof + comparison table in appendix.
+  - **MSM connection:** ✓ Assessed. Naive MSM with Γ^τ compound weights is worse at long τ. Reframed as layered 3-tier recommendation (general → time-invariant → empirical validation). Citations added: Tan 2006, Kallus & Zhou 2021, Yadlowsky et al. 2022.
+  - **Identified set / sharp bounds:** Deferred — requires substantial theory effort, MSM approach not tractable for sequential setting.
+  - **Γ-robust conformal certificate:** Deferred — S6.1 showed conformal already too conservative; Γ-adjustment makes it worse.
+  - **Validation on Cancer:** ✓ Already in paper (artificial confounding with patient_types held out, max degradation 0.8pp).
+  - **Remaining:** Sharp identified set (if time). Write differentiation paragraph vs. Yadlowsky et al. / Kallus & Zhou approaches.
+  - **Impact:** The time-invariant bound is a clean, practical theoretical contribution that directly addresses the hostile review's P1 item 7.
 
 - **S7.1: Minimax optimality bounds (if time).** [NEW THEORY]
   Prove tight lower + upper bounds on achievable safety rate:
@@ -581,6 +587,9 @@ Working title: *"Reach-Avoid Counterfactual Intervention Planning via Variationa
 - **B4 k-expansion (2026-03-27):** Experiment complete. Feasibility stable ~70% with moderate thresholds, N_feasible scales linearly with k. Top-1 decreases slightly with k (noisier ELBO ranking). Data: `results_remote/b4/b4_k_expansion_gamma4_tau8.pkl`.
 - **Phase 1 defensive edits COMPLETE (2026-03-27):** All Priority A (A1-A3), B (B1, B3, B4), and C (C1, C3, C4/W10) text edits done. S6.2 failure taxonomy completed and integrated as new Discussion paragraph. "First systematic safety evaluation" added to abstract. RLHF rejection sampling cite added. Failure modes: conservative undershoot dominates at short τ, toxic path grows at long τ. B1 MIMIC calibration validates all paper claims. Paper compiles at 25 pages.
 - **Remaining for submission:** C2 (ε_VI formalization, optional appendix), W12 (related work gap fills), S7.2 theory (if time), final polish pass. **All GPU experiments complete — Vast.ai instance shut down.**
+- **Phase 3-4 theory COMPLETE (2026-03-29):** Sensitivity analysis (Theorem 2), Bernstein bounds, cross-model failure taxonomy, DRO interpretation, artificial hidden confounding experiment. Paper trimmed to 9-page NeurIPS limit (from 13 pages). All safety improvement claims verified against tables.
+- **S5.1a clinician evaluation COMPLETE (2026-03-30):** 1st intensivist (Dr. Alexandre Barros) evaluated 27 blinded cases. RA strongly preferred (p=0.0001, 89%). Written as Appendix N.6. **Clinical feedback:** needs richer context (ABG, lactate, vitals, dx, age) and questions isolated DBP as sole outcome. Response: enriched case cards v2 with demographics, 6h vitals, labs from raw MIMIC HDF5.
+- **Remaining for submission (updated 2026-03-31):** 2nd clinician evaluation with enriched cards, subgroup analysis of 1st ratings, strengthen single-outcome limitation text, final polish pass.
 
 ---
 

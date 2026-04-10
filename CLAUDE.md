@@ -24,7 +24,8 @@ With this goal in mind, the overall steps, currently, are:
 
 ## Remote Execution (Vast.ai)
 
-- **Current instance:** `ssh -p 11299 root@70.69.192.6` (2x RTX 3090, venv at `/root/vcip_env`)
+- **Current instance:** `ssh -p 35230 root@142.115.221.60` (1x RTX 3090, venv at `/root/vcip_env`) — decoder mod experiments (2026-04-09). Can be shut down.
+- **Previous instance:** `ssh -p 11299 root@70.69.192.6` (2x RTX 3090, venv at `/root/vcip_env`) — expired
 - **Previous instances (expired):** port 20525 on same host; `ssh -p 63498 root@142.112.39.215`
 - **MIMIC data:** `all_hourly_data.h5` (7.3GB) + 10 other processed files on Seagate Expansion Drive (local copy). Also at `/root/mimic_extract_output/` on current instance.
 - **Remote code path:** `/root/VCIP/` (code + checkpoints, no `my_outputs` or `results` from local)

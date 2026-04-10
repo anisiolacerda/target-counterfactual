@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 
 INPUT_PATH = Path("s51a_selected_cases.json")
+CONTEXT_PATH = Path("s51a_patient_context.json")
 OUTPUT_PATH = Path("s51a_case_cards.html")
 
 
@@ -45,12 +46,119 @@ def fmt_dbp_bar(value):
     """
 
 
-def generate_case_card(case, tau):
+def fmt_val(v, unit=""):
+    """Format a value, handling None."""
+    if v is None:
+        return "—"
+    return f"{v}{unit}"
+
+
+def fmt_age(age):
+    """Format MIMIC age (300 = >89 years, anonymized)."""
+    if age is None or age < 0:
+        return "Unknown"
+    if age >= 300:
+        return ">89"
+    return str(int(round(age)))
+
+
+def render_clinical_context(ctx):
+    """Render the clinical context panel HTML."""
+    if ctx is None:
+        return '<p style="color:#999;"><em>Clinical context not available for this patient.</em></p>'
+
+    # Demographics
+    demo = ctx.get('demographics') or {}
+    demo_html = f"""
+    <table class="context-table" style="margin-bottom:8px;">
+        <tr>
+            <td><strong>Age:</strong> {fmt_age(demo.get('age'))}</td>
+            <td><strong>Gender:</strong> {demo.get('gender', '—')}</td>
+            <td><strong>Ethnicity:</strong> {demo.get('ethnicity', '—')}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Admission Dx:</strong> {demo.get('diagnosis', '—')}</td>
+            <td><strong>ICU:</strong> {demo.get('icu_type', '—')} ({fmt_val(demo.get('los_icu_days'))} days)</td>
+        </tr>
+    </table>"""
+
+    # Labs
+    labs = ctx.get('labs') or {}
+    lab_items = []
+    lab_defs = [
+        ('creatinine', 'mg/dL'), ('bicarbonate', 'mEq/L'), ('anion gap', 'mEq/L'),
+        ('hemoglobin', 'g/dL'), ('glucose', 'mg/dL'), ('platelets', 'K/uL'),
+    ]
+    for name, unit in lab_defs:
+        v = labs.get(name)
+        lab_items.append(f"<td><strong>{name.title()}:</strong> {fmt_val(v, f' {unit}')}</td>")
+
+    labs_html = f"""
+    <table class="context-table" style="margin-bottom:8px;">
+        <tr><td colspan="6" style="background:#f5f5f5;"><strong>Most Recent Labs</strong></td></tr>
+        <tr>{''.join(lab_items[:3])}</tr>
+        <tr>{''.join(lab_items[3:])}</tr>
+    </table>"""
+
+    # Vitals history
+    vitals = ctx.get('vitals_history') or {}
+    vitals_defs = [
+        ('heart rate', 'bpm'), ('mean blood pressure', 'mmHg'),
+        ('respiratory rate', '/min'), ('glascow coma scale total', ''),
+        ('diastolic blood pressure', 'mmHg'),
+    ]
+    vitals_rows = ""
+    for name, unit in vitals_defs:
+        vals = vitals.get(name, [])
+        cells = "".join(f"<td>{fmt_val(v)}</td>" for v in vals[-6:])
+        # Pad if fewer than 6 values
+        cells += "<td>—</td>" * max(0, 6 - len(vals))
+        vitals_rows += f"<tr><td><strong>{name.title()}</strong> ({unit})</td>{cells}</tr>\n"
+
+    n_hours = min(6, len(vitals.get('heart rate', [])))
+    hour_headers = "".join(f"<th>-{6-i}h</th>" for i in range(6))
+    vitals_html = f"""
+    <table class="vitals-table" style="margin-bottom:8px;">
+        <thead><tr><th>Vital Sign</th>{hour_headers}</tr></thead>
+        <tbody>{vitals_rows}</tbody>
+    </table>"""
+
+    # Treatment history
+    tx = ctx.get('treatment_history') or {}
+    tx_html = ""
+    if tx:
+        vaso_vals = tx.get('vaso', [])
+        vent_vals = tx.get('vent', [])
+        vaso_cells = "".join(f"<td>{fmt_val(v)}</td>" for v in vaso_vals[-6:])
+        vent_cells = "".join(
+            f"<td>{'Yes' if v and v > 0.5 else 'No' if v is not None else '—'}</td>"
+            for v in vent_vals[-6:]
+        )
+        vaso_cells += "<td>—</td>" * max(0, 6 - len(vaso_vals))
+        vent_cells += "<td>—</td>" * max(0, 6 - len(vent_vals))
+        tx_html = f"""
+        <table class="vitals-table">
+            <thead><tr><th>Treatment</th>{hour_headers}</tr></thead>
+            <tbody>
+                <tr><td><strong>Vasopressor</strong></td>{vaso_cells}</tr>
+                <tr><td><strong>Ventilation</strong></td>{vent_cells}</tr>
+            </tbody>
+        </table>"""
+
+    return demo_html + labs_html + vitals_html + tx_html
+
+
+def generate_case_card(case, tau, patient_contexts=None):
     case_id = case['case_id']
     obs_dbp = case['observed_dbp']
     n_feas = case['n_feasible']
     plan_a = case['plan_a']
     plan_b = case['plan_b']
+
+    # Get clinical context if available
+    ind_id = str(case['individual_id'])
+    ctx = patient_contexts.get(ind_id) if patient_contexts else None
+    clinical_panel = render_clinical_context(ctx)
 
     return f"""
     <div class="case-card" id="{case_id}">
@@ -61,13 +169,15 @@ def generate_case_card(case, tau):
 
         <div class="patient-context">
             <h3>Patient Context</h3>
-            <table class="context-table">
-                <tr><td><strong>Setting:</strong></td><td>ICU patient, MIMIC-III database</td></tr>
-                <tr><td><strong>Current diastolic BP:</strong></td><td>{obs_dbp:.0f} mmHg</td></tr>
-                <tr><td><strong>Target DBP range:</strong></td><td>60–90 mmHg (hemodynamic stability)</td></tr>
-                <tr><td><strong>Safety bounds:</strong></td><td>40–120 mmHg (avoid shock / hypertensive crisis)</td></tr>
-                <tr><td><strong>Planning horizon:</strong></td><td>{tau} hours ahead</td></tr>
-                <tr><td><strong>Feasible plans available:</strong></td><td>{n_feas}/100 candidates meet safety criteria</td></tr>
+            {clinical_panel}
+            <table class="context-table" style="margin-top:8px; background:#eaf2f8; padding:6px;">
+                <tr>
+                    <td><strong>Current DBP:</strong> {obs_dbp:.0f} mmHg</td>
+                    <td><strong>Target:</strong> 60–90 mmHg</td>
+                    <td><strong>Safety:</strong> 40–120 mmHg</td>
+                    <td><strong>Horizon:</strong> {tau}h</td>
+                    <td><strong>Feasible:</strong> {n_feas}/100</td>
+                </tr>
             </table>
             <p class="context-note">Two AI-recommended treatment plans are shown below.
             Vasopressor values are normalized (0 = none, 1 = maximum observed dose).
@@ -169,6 +279,10 @@ def generate_css():
     .preference-box label { margin-right: 20px; cursor: pointer; }
     .comments-box { margin: 10px 0; }
     .comments-box textarea { width: 100%; box-sizing: border-box; }
+    .vitals-table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+    .vitals-table th, .vitals-table td { border: 1px solid #ddd; padding: 4px 6px; text-align: center; }
+    .vitals-table th { background: #ecf0f1; font-size: 0.9em; }
+    .vitals-table td:first-child { text-align: left; white-space: nowrap; }
     .instructions { background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 15px; margin: 20px 0; }
     .instructions h3 { margin-top: 0; }
     .summary-stats { background: #e3f2fd; padding: 12px; border-radius: 6px; margin: 20px 0; }
@@ -406,11 +520,20 @@ def main():
     cases = data['cases']
     case_ids = [c['case_id'] for c in cases]
 
+    # Load patient clinical context if available
+    patient_contexts = None
+    if CONTEXT_PATH.exists():
+        with open(CONTEXT_PATH) as f:
+            patient_contexts = json.load(f)
+        print(f"Loaded clinical context for {len(patient_contexts)} patients")
+    else:
+        print(f"No clinical context file ({CONTEXT_PATH}), generating cards without it")
+
     print(f"Generating cards for {len(cases)} cases at τ={tau}")
 
     cards_html = ""
     for case in cases:
-        cards_html += generate_case_card(case, tau)
+        cards_html += generate_case_card(case, tau, patient_contexts)
 
     html = f"""<!DOCTYPE html>
 <html>

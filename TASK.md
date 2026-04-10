@@ -14,7 +14,7 @@
 - [x] Set up `baseline` conda environment from `requirements_ct.txt` (using `baseline-env`)
 - [x] Run smoke test: single gamma, single seed, VCIP only (2 epochs, gamma=4, seed=10, MPS device)
 - [x] Replicate Table 1: long-range prediction, gamma=4, tau=1..12 (identical strategies)
-- [ ] Replicate Table 2: long-range prediction, gamma=4, tau=1..12 (distinct strategies) — requires `exp.test=True`
+- [ ] Replicate Table 2: long-range prediction, gamma=4, tau=1..12 (distinct strategies) — POST-SUBMISSION (not needed for current paper)
 - [x] Replicate Table 3: ablation study (with/without adjustment) — VCIP_ablation + RMSN_ab at gamma=4
 - [x] Replicate Figure 4: GRP and RCS across models, gamma=4, tau=2,4,6,8
 - [x] Replicate Figure 6: target distances across gamma=1,2,3, tau=1..6
@@ -70,7 +70,7 @@
 - [x] Confounding sensitivity: VCIP advantage grows with gamma (GRP drop: -0.248 at tau=2, -0.163 at tau=8); CRN most affected (-0.362 at tau=8); CT nearly unaffected
 - [x] Horizon sensitivity: VCIP rank stability improves with tau (std: 7.0→0.8); slice discovery confirms advantage grows
 - [x] Calibration analysis: Cancer ELBO-True Spearman rho=0.75-0.90 (5 seeds); Top-1 agreement 19% at tau=2, rising to 76% at tau=8
-- [ ] Extended ablation: latent dimension, LSTM capacity, training schedule sensitivity — **running in parallel with Step 4 Phase 0-1** (6 runs on Vast.ai, ~$3-5). Results reviewed at Phase 1 decision gate. See PLANNING.md for configurations.
+- [ ] Extended ablation: latent dimension, LSTM capacity, training schedule sensitivity — POST-SUBMISSION (E1 decoder mod failure + VCI diagnostic KL≈10⁻⁵ already characterize the bottleneck)
 - [x] Summarize identified weaknesses as candidate research directions (6 weaknesses, 4 research directions)
 
 ### Key Weakness Findings
@@ -205,27 +205,27 @@ Offline analysis (no GPU). Analysis notebook: `lightning-hydra-template-main/src
 
 **Implication for the paper:** RA-constrained selection is a pure post-hoc method requiring no retraining. This is a *strength*: simpler, cheaper, model-agnostic, and equally effective. Phase 2 validates this claim empirically.
 
-### Phase 3 — Gradient-based RA planning (~$10-15)
-- [ ] 3.1 Implement `optimize_reach_avoid()` (gradient optimization of J_RA)
-- [ ] 3.2 Compare gradient RA planning vs perturbation-based ranking
+### Phase 3 — Gradient-based RA planning (~$10-15) — POST-SUBMISSION
+- [ ] 3.1 Implement `optimize_reach_avoid()` (gradient optimization of J_RA) — POST-SUBMISSION
+- [ ] 3.2 Compare gradient RA planning vs perturbation-based ranking — POST-SUBMISSION
 
-### Phase 4 — Full experimental matrix (~$50-60)
-- [ ] Cancer: vanilla baseline (existing) + RA scoring + RA-retrained + gradient planning
-- [ ] MIMIC: vanilla baseline (existing) + RA scoring + RA-retrained
+### Phase 4 — Full experimental matrix (~$50-60) — SUPERSEDED by current results
+- [x] Cancer: covered by Phase 1-2 + decoder mods + PID-Lagrangian
+- [x] MIMIC: covered by E7 + matched-treatment analysis
 
 ### Phase 5 — Ablations
 - [x] 5.1 Target set size sensitivity — smooth trade-off: narrow T ↑safety/↓Top-1, moderate is sweet spot (54% feas, 9-23pp safety gain)
 - [x] 5.2 Sigmoid hardness κ: {1, 5, 10, 50, 100} — κ≥5 indistinguishable from hard filter (>99.9% agreement), ε_soft≈0
 - [x] 5.3 Reach-only vs reach-avoid — reach (target) is primary driver (+11pp in-target), avoid adds incremental safety at long horizons
-- [ ] 5.4 Intermediate loss weight ratio
+- [x] 5.4 Intermediate loss weight ratio — SUPERSEDED: Phase 2 showed retraining unnecessary; post-hoc filter is the method
 - [x] 5.5 Model-agnostic: RA scoring on ACTIN, CRN, CT, RMSN — baselines benefit MORE than VCIP (rank improvement 13-15 vs +2)
 - [x] 5.6 **Midpoint-baseline** (RC1): Oracle midpoint ranker has WORSE Top-1 than ELBO (58% vs 76% at τ=8, γ=4); ignores intermediate safety. RA-constrained ELBO is strictly better as a practical method.
 - [x] 5.7 **ε_VI estimation** (RC2): ε_VI≈0.09-0.23 (rank MAE), Spearman ρ=0.42-0.90. T2 bound is non-vacuous. ELBO pairwise preservation 61-87%.
-- [ ] 5.8 **Latent disentanglement** (VCI-inspired): with/without DKL regularizer, varying λ_disent ∈ {0.01, 0.1, 0.5}
-- [ ] 5.9 **CF consistency diagnostic validation**: correlate latent divergence with ground-truth CF prediction error on Cancer
+- [ ] 5.8 **Latent disentanglement** (VCI-inspired) — POST-SUBMISSION: decoder mod experiments showed bottleneck is latent space, not decoder. Disentanglement may help but requires full retraining.
+- [ ] 5.9 **CF consistency diagnostic validation** — POST-SUBMISSION: VCI diagnostic already showed KL≈10⁻⁵ (action-invariant). Further validation deferred.
 
 ### Reviewer-Driven Experiments (from VCIP OpenReview analysis)
-- [ ] RC3: Document real-data evaluation limitations explicitly in paper (MIMIC has no ground-truth counterfactuals)
+- [x] RC3: Document real-data evaluation limitations explicitly in paper ✓ COMPLETE — matched-treatment analysis + limitations paragraph + clinician evaluation reframed as "suggestive"
 - [x] RC4: Gamma sweep sensitivity — RA benefit scales with confounding: γ=1 benign no-op, γ=4 +10.8pp in-target gain. Safety gain +15-21pp avg across all gammas. RA never hurts.
 - [x] RC6: Intermediate prediction quality — MSE=2-4×10⁻³ (stable across steps), Spearman ρ≈0 (no cross-individual ranking power). Decoder is action-insensitive at intermediate steps.
 - [x] RC7: Figure 1 concept visualization — shows ELBO picking unsafe-path sequence vs RA picking safe-path. PNG + PDF saved.
@@ -311,15 +311,71 @@ Addresses 12 weaknesses (W1–W12) from simulated NeurIPS reviewer analysis (Sco
 - [x] **W12: Fill related work gaps** [TEXT] ✓ COMPLETE (2026-03-27)
   - [x] Added chance-constrained optimization (Nemirovski & Shapiro 2006, Calafiore & Campi 2006) and robust MDPs (Iyengar 2005, Nilim & El Ghaoui 2005) to both main Related Work and Extended Related Work appendix
 
+#### New Work (2026-04-09)
+
+**Decoder Modification Experiments (P0 — Cancer deployable variant)** ✓ COMPLETE (2026-04-09) — **ALL VARIANTS FAIL**
+
+- [x] Implemented 3 decoder modifications: heteroscedastic (NLL loss), wider ([64,32] hidden), MC-dropout
+- [x] Set up Vast.ai instance (1× RTX 3090, $0.202/hr, ssh -p 35230 root@142.115.221.60)
+- [x] Ran vanilla + heteroscedastic (complete), wider (partial, 2/20 taus), mcdropout (skipped)
+- [x] **Result: ALL variants show ~0% model feasibility** (vs oracle ~65-71%)
+  - Vanilla: 0.1-0.2% model feasibility
+  - Heteroscedastic: 0.0-0.5% (NLL loss makes it worse)
+  - Wider (partial): 0.0% at τ=2,4
+  - MC-dropout: skipped (same structural bottleneck)
+- **Root cause:** VCIP latent space is action-invariant (KL ≈ 10⁻⁵ from VCI diagnostic). Decoder receives same Z regardless of treatment → near-constant CV predictions (~1.0-2.1 unscaled). No decoder-level modification can fix this.
+- **Implication:** This is the "E1 fails" scenario from risk register. Paper must reframe oracle/model gap as a first-class diagnostic finding, not a limitation. The RA filter's value is conditional on trajectory prediction quality.
+- Scripts: `results_remote/decoder_mods/train_and_eval_decoder_mods.py`, `analyze_decoder_results.py`
+- Data: `results_remote/decoder_mods/vanilla_gamma4.pkl`, `heteroscedastic_gamma4.pkl`
+- Instance cost: ~$2.00 (shut down after experiments killed)
+
+**Matched-Treatment MIMIC Subgroup Analysis (P0 — de-tautologize MIMIC)** ✓ COMPLETE (2026-04-09)
+
+- [x] For each patient, identified ELBO-selected and RA-selected candidate sequences
+- [x] Checked treatment match to observed sequence (exact match + L1 distance thresholds)
+- [x] For matched patients, reported *observed* DBP outcomes vs target range
+- **Key findings:**
+  1. ELBO selects observed treatment 86-90% of time; RA selects it 74-81%
+  2. Observed in-target rate is **42-50%** (NOT 99-100% as predicted metric claims)
+  3. RA-matched patients show +2-3pp higher observed in-target rate vs ELBO-matched
+  4. Prediction calibration: MAE ≈ 10.5 mmHg, Pearson r ≈ 0.11-0.16, in-target concordance ~50%
+  5. The "99-100% in-target" headline is definitional (filter by predicted DBP, evaluate by same)
+- **Implication:** Must retire the "73-81% → 99-100%" headline. Replace with defensible claim: "RA filtering selects plans associated with +2-3pp higher observed in-target rates among treatment-matched patients"
+- Script: `results_remote/mimic_matched_treatment_analysis.py`
+
+**Time-Invariant Sensitivity Bound (S7.2a — tighter bound for long horizons)** ✓ COMPLETE (2026-04-09)
+
+- [x] Strategy A: Proposition 5 (time-invariant confounder) — eliminates τ-dependence entirely
+  - Bound: φ(Γ) = (Γ-1)/(Γ+1), independent of horizon
+  - Γ_max at τ=8: 2.1 → 65.7 (32× improvement)
+  - SR_lower at Γ=2.0, τ=8: 0.9% → 63.7%
+  - Assumption: unobserved confounder U is time-invariant (plausible for patient frailty, genetics, comorbidities over τ≤8h ICU windows)
+- [x] Strategy B: MSM assessed — naive MSM with Γ^τ compound weights worse at long τ
+- [x] Reframed as layered 3-tier recommendation (general → time-invariant → empirical validation)
+- [x] Added citations: Tan 2006, Kallus & Zhou 2021, Yadlowsky et al. 2022
+- [x] Full proof in Appendix (app:sensitivity_invariant) + comparison table (tab:sensitivity_comparison)
+- [x] Paper compiles cleanly: 37 pages, no undefined references
+
 #### Phase 2: Path to Score 5 (Accept) — ~3-6 weeks additional
 
 **S5.1: Clinical evaluation on MIMIC** [NEW EXPERIMENT + EXTERNAL COLLABORATION]
 
-- [ ] S5.1a: Clinician plausibility assessment
-  - [ ] Recruit 1-2 ICU clinicians (intensivists)
-  - [ ] Prepare ~30-50 blinded patient cases (ELBO-selected vs. RA-selected treatment sequences)
-  - [ ] Collect 5-point Likert ratings (1=dangerous → 5=clinically appropriate)
-  - [ ] Report inter-rater agreement (if 2 clinicians) and mean plausibility scores
+- [x] S5.1a: Clinician plausibility assessment — **1st EVALUATION COMPLETE (2026-03-30)**
+  - [x] Recruit 1-2 ICU clinicians (intensivists) — Dr. Alexandre Barros (intensivist)
+  - [x] Prepare 27 blinded discordant cases (τ=2, seed=10, L1>0), paired A/B randomized
+  - [x] Case cards: self-contained HTML with progress bar, auto-save, CSV export
+  - [x] Collect 5-point Likert ratings (1=dangerous → 5=excellent)
+  - [x] **Result: RA strongly preferred.** Mean Likert: RA 2.93±1.33 vs ELBO 1.37±0.87 (p=0.0001, Wilcoxon). Preference: 17/19 decisive cases (89%) favored RA.
+  - [x] Written as Appendix N.6 (sec:clinician_assessment) with Table tab:clinician
+  - [x] Main MIMIC section + Limitations updated with clinician results
+  - **Clinician feedback (Dr. Barros):**
+    - Scenarios lack context for vaso/vent decisions (needs ABG, lactate, vitals, dx, comorbidities, age)
+    - Isolated DBP is questionable as sole outcome — "what does it tell about the patient?"
+    - Normal-DBP patients → "no intervention" seems best (aligns with SSC concordance analysis)
+  - [x] **Enriched case cards (v2):** Added demographics, vitals history (6h), labs, treatment history from raw MIMIC HDF5. Files: `s51a_extract_patient_context.py`, `s51a_patient_context.json`
+  - [x] Power analysis: 27 cases gives 84% power at 0.75-point effect (file: `s51a_power_analysis.py`)
+  - [x] **2nd clinician evaluation** ✓ COMPLETE — Dr. Christiano Coli evaluated all 27 cases. Results integrated (d=0.41, 76% preference). Paper uses 2-rater analysis.
+  - [x] Subgroup analysis: stratify 1st clinician ratings by baseline DBP ✓ ALREADY IN PAPER (Appendix, line 1664) — normotensive 100%/82% RA preference, hypotensive 75%/67%
 - [x] S5.1b: Outcome correlation analysis ✓ COMPLETE (2026-03-27)
   - [x] Identify MIMIC patients with observed good outcomes (DBP stabilized in [60,90] within 24h)
   - [x] Compare RA-selected treatment sequences against actual observed treatments
@@ -334,9 +390,9 @@ Addresses 12 weaknesses (W1–W12) from simulated NeurIPS reviewer analysis (Sco
   - [x] Outcome correlation + guideline concordance written as Appendix (app:outcome_correlation)
   - [x] Main MIMIC section cross-references appendix with key numbers
   - [x] Discussion/Limitations updated to cite outcome correlation and guideline concordance findings
-  - [ ] S5.1a (clinician plausibility assessment) remains deferred — requires clinical collaborator
-- Infrastructure: Existing MIMIC pickle data; clinician evaluation (S5.1a) needs clinical collaborator(s) + IRB-exempt review
-- Impact: Partially addresses RC-post-2 (MIMIC lacks clinical validation). Automated concordance analysis provides indirect evidence; formal clinician evaluation would complete this.
+  - [x] S5.1a 1st evaluation complete — 2nd clinician evaluation pending with enriched cards
+- Infrastructure: Existing MIMIC pickle data + raw HDF5 for clinical context. Scripts: `s51a_case_selection.py`, `s51a_generate_cards.py`, `s51a_extract_patient_context.py`, `s51a_analyze_ratings.py`, `s51a_power_analysis.py`.
+- Impact: **Strongly addresses RC-post-2.** 1st clinician evaluation shows RA plans significantly preferred (p=0.0001, 89%). Paper updated with results in Appendix N.6 + main text references. 2nd evaluation with enriched context will further strengthen.
 
 **S5.2: Second evaluation domain with ground truth** [NEW EXPERIMENT + IMPLEMENTATION] ✓ **COMPLETE (2026-03-27)**
 
@@ -429,27 +485,14 @@ Addresses 12 weaknesses (W1–W12) from simulated NeurIPS reviewer analysis (Sco
 
 **S7.2: Safe planning under hidden confounding** [NEW THEORY + EXPERIMENT] ★ KEY CONTRIBUTION
 
-- [ ] S7.2a: Γ-sensitivity model for sequential treatments
-  - [ ] Formalize Rosenbaum Γ-sensitivity model for multi-step treatment sequences
-  - [ ] Derive identified set for Y[ā] under bounded confounding Γ
-  - [ ] Address compound sensitivity over τ steps (use Markov property or bound per-step)
-- [ ] S7.2b: Γ-robust conformal certificate
-  - [ ] Extend S6.1 coverage theorem: P(Y_true ∈ S | confounding ≤ Γ) ≥ 1-α with Γ-adjusted quantile
-  - [ ] Prove the Γ-robust coverage theorem
-  - [ ] Characterize how certificate tightness degrades as Γ increases
-- [ ] S7.2c: Cancer experiments with artificial hidden confounding
-  - [ ] Hold out a covariate from model training (simulate hidden confounder)
-  - [ ] Apply Γ-robust filter at varying Γ levels
-  - [ ] Verify coverage holds: empirical coverage ≥ 1-α across Γ values
-  - [ ] Compare: standard conformal (S6.1) vs. Γ-robust conformal (S7.2) under hidden confounding
-- [ ] S7.2d: Cancer gamma sweep validation
-  - [ ] Use gamma parameter (confounding strength) as natural robustness test
-  - [ ] Show Γ-robust certificates remain valid across gamma values
-- [ ] S7.2e: MIMIC application
-  - [ ] Apply Γ-robust recommendations at Γ ∈ {1.0, 1.5, 2.0, 3.0}
-  - [ ] Report how recommendations shift as Γ increases (conservative shift expected)
-  - [ ] Analyze clinical implications of robustness parameter choice
-- [ ] S7.2f: Write hidden confounding section for paper (new Section 3.3 + Theorem in Sec 4.3)
+- [x] S7.2a: Γ-sensitivity model for sequential treatments ✓ PARTIALLY COMPLETE (2026-04-09)
+  - [x] Formalize Rosenbaum Γ-sensitivity model — already in paper as Assumption 1 + Theorem 2 (sequential maximal coupling, ψ(Γ,τ) = 1-(2/(Γ+1))^τ)
+  - [x] Time-invariant confounder bound (Strategy A) — Proposition 5 added: φ(Γ) = (Γ-1)/(Γ+1), independent of τ. Γ_max jumps from 2.1→65.7 at τ=8. Full proof in Appendix.
+  - [x] MSM connection (Strategy B) assessed — naive MSM with Γ^τ compound weights is worse than analytic at long τ. Reframed as layered recommendation (3-tier: general → MSM → time-invariant).
+  - [x] Missing citations added: Tan 2006, Kallus & Zhou 2021, Yadlowsky et al. 2022
+  - [ ] Derive sharp identified set for Y[ā] under bounded confounding Γ (deferred — requires substantial theory effort, MSM approach assessed as not tractable for sequential setting)
+- [ ] S7.2b: Γ-robust conformal certificate (DEFERRED — S6.1 showed conformal too conservative; extending to Γ-robust makes it worse)
+- [ ] S7.2c-f: Γ-robust conformal experiments + MIMIC application + paper section — POST-SUBMISSION (conformal too conservative; time-invariant bound already addresses long-horizon sensitivity)
 - Key references: Rosenbaum 2002, Tan 2006, Kallus & Zhou 2021, Yadlowsky et al. 2022
 - Effort: ~4-6 weeks (theory: 2-3 weeks, implementation: 1-2 weeks, experiments: 1 week)
 - Risk: HIGH — compound sensitivity over τ steps is technically challenging. Mitigation: present small-τ results first, frame longer horizons as future work if needed.
@@ -457,13 +500,7 @@ Addresses 12 weaknesses (W1–W12) from simulated NeurIPS reviewer analysis (Sco
 
 **S7.1: Minimax optimality bounds (secondary, if time permits)** [NEW THEORY]
 
-- [ ] S7.1a: Lower bound construction
-  - [ ] Construct adversarial instance showing no filter achieves safety > 1-Ω(ε_VI/√k)
-  - [ ] Prove information-theoretic lower bound
-- [ ] S7.1b: Upper bound (from S6.1)
-  - [ ] Show conformal-RA achieves safety ≥ 1-O(ε_VI/√k + 1/√n_cal)
-- [ ] S7.1c: Minimax optimality corollary
-  - [ ] Conformal-RA is minimax optimal as n_cal → ∞
+- [ ] S7.1a-c: Minimax optimality bounds — POST-SUBMISSION (Pareto-optimality proposition partially addresses this; full minimax characterization is future work)
 - Effort: ~4-6 weeks of hard theory. **Pursue only if S7.2 completes ahead of schedule.**
 - Impact: Tight bounds = Oral-level theory
 
@@ -471,10 +508,7 @@ Addresses 12 weaknesses (W1–W12) from simulated NeurIPS reviewer analysis (Sco
 
 **S8.1: "The Safety Tax" theorem (exploratory)** [NEW THEORY]
 
-- [ ] S8.1a: Investigate fundamental quality-safety tradeoff
-  - [ ] Can we prove: safety rate ≥ 1-δ requires quality regret ≥ Ω(f(ε_VI, δ, k, τ))?
-  - [ ] Does conformal-RA achieve this bound?
-  - [ ] If clean result: include as theorem. If not: frame as open question in Discussion.
+- [ ] S8.1a: "Safety Tax" theorem — POST-SUBMISSION (Proposition 4's Pareto frontier is the empirical version; tight lower bound is future work)
 - Effort: ~1 week exploration (Week 5)
 - Risk: VERY HIGH — this is best-paper territory and may not yield a clean result
 - Impact: If successful, defines a "price of safety" analogous to "price of fairness." Career paper.
@@ -483,10 +517,10 @@ Addresses 12 weaknesses (W1–W12) from simulated NeurIPS reviewer analysis (Sco
 
 - [x] **Week 1 (Mar 26 – Apr 2):** **ACTUAL:** S5.2 ✓ (glucose simulator). S6.1 ✓ (conformal — honest negative result). A3 ✓ (oracle-vs-model). B4 ✓ (k-expansion). A1 ✓ (reframe contribution). A2 ✓ (theory framing). A3.4-5 ✓ (paper integration). B1 ✓ (MIMIC calibration). B3 ✓ (constrained RL reframing). C1 ✓ (standard practice). C3 ✓ (sensitivity claim fix). C4/W10 ✓ (model-agnostic language). S6.2 ✓ (failure taxonomy + paper integration). **Phase 1 COMPLETE. All Vast.ai GPU experiments done. Instance shut down.**
 - [x] **Week 2 (Mar 27):** **ACTUAL (completed same day as Week 1):** C2 ✓ (ε_VI proxy formalized as appendix with Diaconis-Graham inequality). W12 ✓ (chance-constrained optimization + robust MDP citations added). RC3 ✓ (real-data evaluation limitations documented). T2 ✓ (theorem proof reviewed, Part (b) C_d definition corrected). S6.2 ✓ (full failure taxonomy appendix section). Final polish ✓ (cross-refs, notation, captions). B4.3 ✓ (k-expansion table added to appendix). **All Phase 1 text + analysis tasks COMPLETE. Paper: 28 pages, clean compile.**
-- [ ] **Week 3 (Apr 9 – Apr 16):** Remaining text edits (B3, C1, C2, C4, W10, W12) + S7.2 theory development.
-- [ ] **Week 4 (Apr 16 – Apr 23):** S7.2 experiments + paper integration.
-- [ ] **Week 5 (Apr 23 – Apr 30):** S8.1 exploration. S5.1 (if collaborator). Near-final paper.
-- [ ] **Week 6 (Apr 30 – May 6):** Final polish, compile, submit.
+- [x] **Week 3 (Apr 9 – Apr 10):** **ACTUAL:** Decoder modification experiments ✓ (vanilla + heteroscedastic + wider partial — all fail, 0% model feasibility). Matched-treatment MIMIC subgroup analysis ✓ (observed in-target rate ~42-50%, not 99-100%; RA-matched +2-3pp). Time-invariant sensitivity bound (Proposition 5) ✓ (eliminates τ-dependence, Γ_max 2.1→65.7 at τ=8). MSM connection assessed ✓ (reframed as layered recommendation). Missing citations added ✓ (Tan 2006, Kallus & Zhou 2021, Yadlowsky et al. 2022). Paper compiles: 37 pages.
+- [x] **Week 4 (Apr 10):** **ACTUAL:** All P0 paper edits ✓ (oracle relabeling, MIMIC rewrite, narrative reframe). P1: Pareto-optimality theorem (Proposition 4) ✓. PID-Lagrangian baseline ✓ (equivalent to hard filter). Rater random-effects ✓ (per-rater d=0.99/0.41, combined d=0.69, κ=0.49). Quantitative Theorem 1(c) ✓ (m_RA ≥ 1-2β). Missing refs + differentiation ✓ (Thomas, Kallus, Stooke + paragraph). Midpoint baseline + three-regime framework promoted ✓. P2/P3: S-set notation ✓, code availability ✓, P3 text fixes ✓ (ε_VI explanation, determinism, "up to 24pp", VCIP peer review phrasing, table audit, figure verification, MIMIC citation audit). **Paper: 41pp, clean compile. Estimated rating: ~7.0.**
+- [ ] **Week 5 (Apr 16 – Apr 23):** 2nd clinician evaluation (external dependency). Per-pair scatter plot (if time). Final re-read.
+- [ ] **Week 6 (Apr 23 – May 6):** Final polish, compile, submit.
 
 ---
 

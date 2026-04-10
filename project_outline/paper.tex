@@ -66,7 +66,7 @@
 \maketitle
 
 \begin{abstract}
-Variational counterfactual intervention planning selects treatment sequences by optimizing an evidence lower bound (ELBO) toward a point target outcome. In clinical practice, however, the goal is typically to bring a patient's state into an \emph{acceptable range} while maintaining \emph{safety constraints} at every intermediate step---requirements that point-target optimization does not address. We introduce \emph{reach-avoid constrained selection}, a post-hoc method that filters ELBO-ranked candidate sequences through a reach-avoid feasibility criterion: the terminal outcome must lie within a target set~$\cT$ and all intermediate outcomes must remain within a safety set~$\cS$. We prove that reach-avoid ranking is more robust to variational approximation error than point-target ELBO ranking, with an explicit bound on ranking preservation in terms of the variational gap~$\varepsilon_{\mathrm{VI}}$. We further provide a sensitivity analysis under hidden confounding, extending the Rosenbaum sensitivity model to sequential treatments and showing that the safety guarantee degrades gracefully as the sensitivity parameter~$\Gamma$ increases, with non-vacuous bounds through $\Gamma = 2.0$ at all tested horizons. Empirically, on a cancer tumor growth simulator with known counterfactuals, reach-avoid constrained selection improves safety by 9--11 percentage points for VCIP and up to 24 percentage points across all five baseline models under strong confounding, Pareto-dominates soft-constraint alternatives, and transfers without retraining. On MIMIC-III intensive care data, it lifts in-target diastolic blood pressure rates from 73--81\% to 99--100\%. To our knowledge, this is the first systematic safety evaluation of counterfactual treatment planners. The approach requires no model modification, no retraining, and is compatible with any variational counterfactual planner.
+Variational counterfactual intervention planning selects treatment sequences by optimizing an evidence lower bound (ELBO) toward a point target outcome. In clinical practice, however, the goal is typically to bring a patient's state into an \emph{acceptable range} while maintaining \emph{safety constraints} at every intermediate step---requirements that point-target optimization does not address. We introduce \emph{reach-avoid constrained selection}, a post-hoc method that filters ELBO-ranked candidate sequences through a reach-avoid feasibility criterion: the terminal outcome must lie within a target set~$\cT$ and all intermediate outcomes must remain within a safety set~$\cS$. We prove that reach-avoid ranking is more robust to variational approximation error than point-target ELBO ranking, with an explicit bound on ranking preservation in terms of the variational gap~$\varepsilon_{\mathrm{VI}}$. We further provide a sensitivity analysis under hidden confounding, extending the Rosenbaum sensitivity model to sequential treatments; under a time-invariant confounder assumption, the safety guarantee is independent of the planning horizon, with breakdown points $\Gamma_{\max}$ exceeding $30$ at all tested horizons. Empirically, on a cancer tumor growth simulator with known counterfactuals, reach-avoid constrained selection using \emph{oracle trajectories} improves safety by 9--11 percentage points for VCIP and 12--24 percentage points across five baseline models (best: CRN at $\tau = 2$) under strong confounding, Pareto-dominates soft-constraint alternatives, and transfers without retraining. A systematic investigation of model-predicted trajectories reveals that current variational planners produce action-invariant latent representations, yielding near-zero model-predicted feasibility---we formalize this gap as a deployment diagnostic. On MIMIC-III intensive care data, RA filtering corrects selection to predicted-in-target plans in $>$95\% of cases where ELBO selects out-of-target; a matched-treatment subgroup analysis shows $+$2--3~pp higher observed in-target rates. The approach requires no model modification, no retraining, and is compatible with any variational counterfactual planner.
 \end{abstract}
 
 
@@ -79,7 +79,7 @@ Individualized treatment planning from observational data is a central challenge
 However, clinical treatment planning has two features that point-target ELBO optimization does not capture:
 
 \vspace{-0.8em}
-\paragraph{Range targets, not point targets.} Clinicians aim for \emph{acceptable ranges}---diastolic BP in $[60, 90]$~mmHg, tumor volume below a threshold---not single numbers. Plans equidistant from a point target receive the same ELBO penalty regardless of clinical implications. This limitation was explicitly noted in the VCIP peer review process.
+\paragraph{Range targets, not point targets.} Clinicians aim for \emph{acceptable ranges}---diastolic BP in $[60, 90]$~mmHg, tumor volume below a threshold---not single numbers. Plans equidistant from a point target receive the same ELBO penalty regardless of clinical implications. This limitation was identified in the VCIP review~\citep{melnychuk2025vcip} and acknowledged by the authors as future work.
 
 \vspace{-0.8em}
 \paragraph{Path safety, not just terminal achievement.} ELBO-based planning evaluates only the terminal outcome~$Y_{t+\tau}$, ignoring intermediate states. A regimen that produces dangerous toxicity at step~$t{+}3$ before recovering may rank identically to a safe one. In clinical practice, intermediate safety violations are unacceptable.
@@ -106,10 +106,10 @@ The simplicity is deliberate. RA scores are near-binary, providing no discrimina
 \vspace{-0.8em}
 \paragraph{Contributions.}
 \begin{enumerate}[leftmargin=*,itemsep=1pt,topsep=2pt]
-\item \textbf{First systematic safety evaluation of counterfactual planners.} We formalize reach-avoid constrained selection, separating safety from quality in a way that reveals a previously unquantified safety gap: existing planners violate clinically meaningful constraints on 15--45\% of patients under moderate confounding (Section~\ref{sec:experiments}).
-\item \textbf{Ranking robustness theory.} We prove that reach-avoid ranking is more robust to variational approximation error than point-target ELBO ranking (Theorem~\ref{thm:ranking_robustness}), with an explicit, empirically non-vacuous bound ($\varepsilon_{\mathrm{VI}} \approx 0.09$--$0.23$) on ranking preservation (Section~\ref{sec:theory}).
-\item \textbf{Sensitivity analysis under hidden confounding.} We extend the Rosenbaum sensitivity model to sequential treatments and prove that the safety guarantee degrades gracefully as confounding increases (Theorem~\ref{thm:sensitivity}), with breakdown points $\Gamma_{\max} = 2.1$--$7.5$ (Section~\ref{sec:sensitivity}).
-\item \textbf{Comprehensive experiments.} On Cancer, RA-constrained selection yields $+$9--11~pp safety for VCIP and up to $+$24~pp across all five baseline models; on MIMIC-III, it lifts in-target rates from 73--81\% to 99--100\%. Hard filtering Pareto-dominates soft constraints (Section~\ref{sec:experiments}).
+\item \textbf{First reach-avoid safety evaluation of variational counterfactual planners.} We formalize reach-avoid constrained selection, separating safety from ranking quality and revealing a previously unquantified safety gap: existing planners violate clinically meaningful constraints on 15--45\% of patients under moderate confounding ($\gamma \in [2,4]$; Section~\ref{sec:experiments}).
+\item \textbf{Ranking robustness and Pareto-optimality theory.} We prove that reach-avoid ranking is more robust to variational approximation error than point-target ELBO ranking (Theorem~\ref{thm:ranking_robustness}), and that hard RA filtering is Pareto-optimal: it achieves the minimum quality loss among all post-hoc filters at maximum safety, with a complete characterization of the safety--quality frontier (Proposition~\ref{prop:pareto}, Section~\ref{sec:theory}).
+\item \textbf{Sensitivity analysis under hidden confounding.} We extend the Rosenbaum sensitivity model to sequential treatments (Theorem~\ref{thm:sensitivity}) and prove a tighter bound under time-invariant confounders (Proposition~\ref{prop:sensitivity_invariant}) that eliminates horizon dependence, with breakdown points $\Gamma_{\max} > 30$ at all horizons (Section~\ref{sec:sensitivity}).
+\item \textbf{Comprehensive experiments with oracle/model diagnostic.} On Cancer with \emph{oracle trajectories}, RA-constrained selection yields $+$9--11~pp safety for VCIP and $+$12--24~pp across five baseline models. A systematic decoder modification study reveals that model-predicted trajectories yield near-zero feasibility due to action-invariant latent representations---we formalize model feasibility as a deployment readiness diagnostic. On MIMIC-III, matched-treatment subgroup analysis shows $+$2--3~pp higher observed in-target rates; a blinded evaluation by two ICU intensivists confirms RA plans are preferred (combined $d = 0.69$, 83\% preference; Appendix~\ref{sec:clinician_assessment}). Hard filtering Pareto-dominates soft constraints (Section~\ref{sec:experiments}).
 \item \textbf{Model-agnostic post-hoc method.} The approach requires no retraining---RA-aware retraining produces identical results---and is compatible with any variational counterfactual planner (Section~\ref{sec:retraining_result}).
 \end{enumerate}
 
@@ -121,7 +121,10 @@ The simplicity is deliberate. RA scores are near-binary, providing no discrimina
 We briefly position our work here; Appendix~\ref{app:extended_related_work} contains a comprehensive survey.
 
 \vspace{-0.5em}
-A growing literature estimates counterfactual outcomes from longitudinal data~\citep{bica2020crn, melnychuk2022causal, lim2018forecasting, seedat2022actin}, but these methods evaluate \emph{given} treatments rather than optimizing over sequences. VCIP~\citep{melnychuk2025vcip} bridges this gap via ELBO-based planning; we add a safety-aware selection layer. Dynamic treatment regimes~\citep{murphy2003optimal, chakraborty2014dynamic} learn state$\to$action policies, whereas we rank complete intervention sequences---a \emph{counterfactual planning} mode where post-hoc filtering is natural. Safe RL~\citep{garcia2015comprehensive, achiam2017constrained} constrains policies during training or execution; our setting differs fundamentally since we select among pre-computed candidate plans with no opportunity for policy correction, motivating a filter rather than constrained optimization. The \emph{reach-avoid} concept from control theory~\citep{mitchell2005reach, fisac2015reach} formalizes reaching a target while avoiding unsafe regions; we import this into variational counterfactual planning as a discrete feasibility check. Finally, variational causal inference~\citep{louizos2017cevae, wu2025vci} informs our latent diagnostic (Appendix~\ref{sec:e4_diagnostic}), which reveals that VCIP's latent space is nearly action-invariant ($D_{\KL} \approx 10^{-5}$).
+A growing literature estimates counterfactual outcomes from longitudinal data~\citep{bica2020crn, melnychuk2022causal, lim2018forecasting, seedat2022actin}, but these methods evaluate \emph{given} treatments rather than optimizing over sequences. VCIP~\citep{melnychuk2025vcip} bridges this gap via ELBO-based planning; we add a safety-aware selection layer. Dynamic treatment regimes~\citep{murphy2003optimal, chakraborty2014dynamic} learn state$\to$action policies, whereas we rank complete intervention sequences---a \emph{counterfactual planning} mode where post-hoc filtering is natural. Safe RL~\citep{garcia2015comprehensive, achiam2017constrained, stooke2020responsive} constrains policies during training or execution; our setting differs fundamentally since we select among pre-computed candidate plans with no opportunity for policy correction, motivating a filter rather than constrained optimization. The \emph{reach-avoid} concept from control theory~\citep{mitchell2005reach, fisac2015reach} formalizes reaching a target while avoiding unsafe regions; we import this into variational counterfactual planning as a discrete feasibility check. Finally, variational causal inference~\citep{louizos2017cevae, wu2025vci} informs our latent diagnostic (Appendix~\ref{sec:e4_diagnostic}), which reveals that VCIP's latent space is nearly action-invariant ($D_{\KL} \approx 10^{-5}$).
+
+\vspace{-0.5em}
+\paragraph{Distinction from safe off-policy evaluation.} High-confidence off-policy evaluation~\citep{thomas2015high, thomas2016data} and safe policy learning~\citep{kallus2018policy} provide statistical guarantees on policy \emph{value} (expected reward) under distributional shift. Our setting is structurally different: we filter individual treatment \emph{sequences} by trajectory-level safety constraints, not policies by expected returns. The safety criterion is a reach-avoid event (all intermediate states safe, terminal state in target), not a scalar reward threshold. Our sensitivity analysis (Section~\ref{sec:sensitivity}) uses Rosenbaum-style bounds~\citep{rosenbaum2002observational} adapted to sequential treatments, connecting to distributional robustness for causal inference~\citep{kallus2021minimax, yadlowsky2022bounds} rather than importance-weighted policy evaluation. Conformal prediction for counterfactual outcomes~\citep{lei2021conformal} provides distribution-free coverage guarantees but requires well-calibrated trajectory predictions; we show this is currently too conservative (Appendix~\ref{app:conformal}) and propose model feasibility as a practical alternative diagnostic.
 
 
 %% ============================================================
@@ -170,10 +173,10 @@ E(\ba) := \{Y_{t+\tau}[\ba] \in \cT\} \cap \bigcap_{s=t}^{t+\tau} \{Y_s[\ba] \in
 \end{equation}
 \end{definition}
 
-The event $E(\ba)$ requires the terminal outcome to land in the target set (\emph{reach}) while all intermediate outcomes remain in the safety set (\emph{avoid} unsafe regions). The sets $\cT$ and $\cS$ encode domain knowledge:
+The event $E(\ba)$ requires the terminal outcome to land in the target set (\emph{reach}) while all intermediate outcomes remain in the safety set (\emph{avoid} unsafe regions). In general, safety may constrain both outcomes and treatments; we write $\cS = \cS_Y \times \cS_A$ when the constraint decomposes into outcome-space and treatment-space components. The sets encode domain knowledge:
 \begin{itemize}
-    \item \textbf{Cancer:} $\cT = \{y : \text{tumor volume} \leq 3.0\}$ (clinically manageable stage), $\cS = \{y : \text{volume} \leq 12.0\} \cap \{y : \text{chemo dosage} \leq 5.0\}$ (no tumor explosion, no toxic chemotherapy).
-    \item \textbf{ICU (MIMIC-III):} $\cT = \{y : \text{DBP} \in [60, 90] \text{ mmHg}\}$ (normotensive range), $\cS = \{y : \text{DBP} \in [40, 120] \text{ mmHg}\}$ (avoids dangerous hypo-/hypertension).
+    \item \textbf{Cancer:} $\cT = \{y : \text{volume} \leq 3.0\}$, $\cS_Y = \{y : \text{volume} \leq 12.0\}$ (no tumor explosion), $\cS_A = \{a : \text{chemo dosage} \leq 5.0\}$ (no toxic chemotherapy).
+    \item \textbf{ICU (MIMIC-III):} $\cT = \{y : \text{DBP} \in [60, 90] \text{ mmHg}\}$ (normotensive range), $\cS_Y = \{y : \text{DBP} \in [40, 120] \text{ mmHg}\}$ (avoids dangerous hypo-/hypertension), $\cS_A = \cA$ (no treatment constraint).
 \end{itemize}
 
 \subsection{Soft Indicators}
@@ -278,20 +281,25 @@ m_{\mathrm{ELBO}} := |d(\ba_1) - d(\ba_2)| > 2\varepsilon_{\mathrm{VI}} \cdot C_
 \end{equation}
 where $C_d = \sup_{\ba} \|Y_{t+\tau}[\ba] - Y^*\|^2_{L^\infty(p_\theta)}$ is the essential supremum of the squared distance over the model's outcome support.
 
-\textbf{(c) Strict improvement.} When the boundary mass $\beta := \sup_{\ba} p_\theta(Y_{t+\tau}[\ba] \in \partial_\epsilon \cT \mid \bH_t, \ba)$ is small (most outcomes clearly inside or outside $\cT$), we have $m_{\mathrm{RA}} \gg m_{\mathrm{ELBO}} / C_d$, i.e., RA ranking is preserved for pairs where ELBO ranking would be inverted.
+\textbf{(c) Strict improvement.} Let $\beta := \sup_{\ba} p_\theta(Y_{t+\tau}[\ba] \in \partial_\epsilon \cT \mid \bH_t, \ba)$ denote the boundary mass, i.e., the maximum probability of outcomes landing in an $\epsilon$-neighborhood of the target boundary. For a pair $(\ba_1, \ba_2)$ where $\ba_1$ is clearly feasible ($P(\ba_1) \geq 1 - \beta$) and $\ba_2$ is clearly infeasible ($P(\ba_2) \leq \beta$):
+\begin{equation}
+\label{eq:ra_margin_quantitative}
+m_{\mathrm{RA}} \;\geq\; 1 - 2\beta.
+\end{equation}
+This margin exceeds the ranking preservation threshold $2\varepsilon_{\mathrm{VI}}$ whenever $\beta < (1 - 2\varepsilon_{\mathrm{VI}})/2$. In contrast, the point-target margin $m_{\mathrm{ELBO}}$ for such a pair can be arbitrarily small (outcomes on opposite sides of $\partial\cT$ may have nearly equal distances to $Y^*$), yielding $m_{\mathrm{ELBO}} \ll m_{\mathrm{RA}}$.
 \end{theorem}
 
 \begin{proof}[Proof sketch (full proof in Appendix~\ref{app:proofs})]
-\textbf{(a)} Since $P \in [0,1]$, the TV characterization gives $|P(\ba) - P_{q_\phi}(\ba)| \leq \varepsilon_{\mathrm{VI}}$; soft indicators add $\leq (\tau{+}1)\varepsilon_{\mathrm{soft}}$. Triangle inequality yields ranking preservation when margins exceed twice this error. \textbf{(b)} For $\|Y{-}Y^*\|^2 \in [0, C_d]$, the TV bound scales by $C_d$---large when outcomes spread far from the target. \textbf{(c)} Low boundary mass $\beta$ gives $m_{\mathrm{RA}} \approx 1$ while $m_{\mathrm{ELBO}} \approx 0$ for outcomes on opposite sides of $\partial\cT$.
+\textbf{(a)} Since $P \in [0,1]$, the TV characterization gives $|P(\ba) - P_{q_\phi}(\ba)| \leq \varepsilon_{\mathrm{VI}}$; soft indicators add $\leq (\tau{+}1)\varepsilon_{\mathrm{soft}}$. Triangle inequality yields ranking preservation when margins exceed twice this error. \textbf{(b)} For $\|Y{-}Y^*\|^2 \in [0, C_d]$, the TV bound scales by $C_d$---large when outcomes spread far from the target. \textbf{(c)} $P(\ba_1) \geq 1 - \beta$ and $P(\ba_2) \leq \beta$ gives $m_{\mathrm{RA}} = P(\ba_1) - P(\ba_2) \geq 1 - 2\beta$.
 \end{proof}
 
 \begin{corollary}
 \label{cor:hard_filter_exact}
-In the hard-filter limit ($\kappa \to \infty$, so $\varepsilon_{\mathrm{soft}} = 0$), reach-avoid ranking is preserved whenever $|P(\ba_1) - P(\ba_2)| > 2\varepsilon_{\mathrm{VI}}$. For deterministic trajectories (as in the Cancer simulator), feasibility is binary ($P \in \{0, 1\}$), so the filter is exact whenever $\varepsilon_{\mathrm{VI}} < 0.5$.
+In the hard-filter limit ($\kappa \to \infty$, so $\varepsilon_{\mathrm{soft}} = 0$), reach-avoid ranking is preserved whenever $|P(\ba_1) - P(\ba_2)| > 2\varepsilon_{\mathrm{VI}}$. For deterministic trajectories (as in the Cancer simulator, where each treatment sequence maps to a unique outcome trajectory via the ODE dynamics), feasibility is binary ($P \in \{0, 1\}$), so the filter is exact whenever $\varepsilon_{\mathrm{VI}} < 0.5$.
 \end{corollary}
 
 \vspace{-0.8em}
-\paragraph{Empirical verification.} We estimate $\varepsilon_{\mathrm{VI}} \approx 0.09$--$0.23$ across confounding strengths using rank MAE as a proxy (Section~\ref{sec:ablation_eps}). The bound is non-vacuous: for feasibility-differing pairs ($m = 1$), $m > 2\varepsilon_{\mathrm{VI}}$ is easily satisfied. Notably, $\varepsilon_{\mathrm{VI}}$ \emph{decreases} with $\gamma$, so the bound is tightest where RA filtering is most valuable.
+\paragraph{Empirical verification.} We estimate $\varepsilon_{\mathrm{VI}} \approx 0.09$--$0.23$ across confounding strengths using rank MAE as a proxy (Section~\ref{sec:ablation_eps}). The bound is non-vacuous: for feasibility-differing pairs ($m = 1$), $m > 2\varepsilon_{\mathrm{VI}}$ is easily satisfied. Notably, $\varepsilon_{\mathrm{VI}}$ \emph{decreases} with $\gamma$ (from $0.23$ at $\gamma = 1$ to $0.09$ at $\gamma = 4$): stronger confounding produces more separated outcome distributions, making the variational posterior a better approximation and the RA filter more reliable---precisely where it is most needed.
 
 \subsection{Finite-Sample Deployment Guarantees}
 \label{sec:finite_sample}
@@ -310,12 +318,11 @@ where $\widehat{\mathrm{SR}}_n = \frac{1}{n}\sum_i Z_i$ is the empirical safety 
 
 \begin{remark}[Variance-adaptive tightening]
 \label{rem:bernstein}
-Since $Z_i \in \{0,1\}$ are Bernoulli with variance $\sigma^2 = \mathrm{SR}_\cP(1 - \mathrm{SR}_\cP) \leq \widehat{\mathrm{SR}}_n(1 - \widehat{\mathrm{SR}}_n)$, Bernstein's inequality yields the tighter bound:
+Since $Z_i \in \{0,1\}$ are Bernoulli with variance $\hat{\sigma}^2 = \widehat{\mathrm{SR}}_n(1 - \widehat{\mathrm{SR}}_n)$, Bernstein's inequality yields the tighter bound:
 \begin{equation}
 \label{eq:bernstein_bound}
-\mathrm{SR}_\cP \;\geq\; \widehat{\mathrm{SR}}_n - t_B, \quad \text{where } t_B \text{ solves } \frac{nt_B^2}{2\hat{\sigma}^2 + \tfrac{2}{3}t_B} = \ln\!\tfrac{1}{\delta},
-\end{equation}
-with $\hat{\sigma}^2 = \widehat{\mathrm{SR}}_n(1 - \widehat{\mathrm{SR}}_n)$. When $\widehat{\mathrm{SR}} \approx 1$, the variance is small and the Bernstein bound dramatically improves over Hoeffding: at $n = 100$, the deployment guarantee tightens from $\geq 80.8$--$86.2\%$ to $\geq 87.7$--$97.3\%$ (Table~\ref{tab:finite_sample}).
+\mathrm{SR}_\cP \;\geq\; \widehat{\mathrm{SR}}_n - \sqrt{\frac{2\hat{\sigma}^2 \ln(1/\delta)}{n}} - \frac{2\ln(1/\delta)}{3n}.
+\end{equation} When $\widehat{\mathrm{SR}} \approx 1$, the variance is small and the Bernstein bound dramatically improves over Hoeffding: at $n = 100$, the deployment guarantee tightens from $\geq 80.8$--$86.2\%$ to $\geq 87.7$--$97.3\%$ (Table~\ref{tab:finite_sample}).
 \end{remark}
 
 \begin{proposition}[Constrained selection quality]
@@ -330,6 +337,52 @@ $\ell(\ba^*_{\mathrm{ELBO}}) - \ell(\ba^*_{\mathrm{unconstrained}}) \leq \underb
 \end{proposition}
 
 \paragraph{Empirical verification.} On the Cancer simulator ($n = 100$, $\gamma = 4$), RA achieves $\widehat{\mathrm{SR}} = 94.4$--$97.0\%$. The Bernstein bound yields population safety $\geq 87.7$--$91.7\%$ with 95\% confidence (vs.\ $\geq 80.8$--$83.4\%$ under Hoeffding). Within $\cF_{\mathrm{RA}}$, ELBO ranking quality remains high ($\rho = 0.71$--$0.89$). Full results in Appendix~\ref{app:finite_sample}.
+
+
+\subsection{Optimality of Hard Filtering}
+\label{sec:pareto_optimality}
+
+We now characterize the safety--quality Pareto frontier for post-hoc filters, showing that hard RA filtering is the unique optimum at maximum safety.
+
+\begin{definition}[Price of safety]
+\label{def:price_of_safety}
+For a patient $x$ with candidate set $\{\ba_1, \ldots, \ba_k\}$ and true loss $\ell(\ba)$, define:
+\begin{itemize}[leftmargin=*,topsep=2pt,itemsep=1pt]
+\item Unconstrained loss: $\ell_u(x) := \min_{\ba} \ell(\ba)$,
+\item Constrained loss: $\ell_c(x) := \min_{\ba \in \cF_{\mathrm{RA}}(x)} \ell(\ba)$ (with $\ell_c = +\infty$ if $\cF_{\mathrm{RA}}(x) = \emptyset$),
+\item \emph{Price of safety}: $\delta(x) := \ell_c(x) - \ell_u(x) \geq 0$.
+\end{itemize}
+The price $\delta(x) = 0$ when the unconstrained optimum is already safe.
+\end{definition}
+
+A \emph{patient-adaptive selection rule} is a mapping $g: \cX \to \{0, 1\}$ where $g(x) = 1$ means ``apply RA filter for patient $x$'' and $g(x) = 0$ means ``use unconstrained ELBO.'' For a given $g$, the expected regret and safety rate are:
+\begin{align}
+R(g) &:= \E_x[\delta(x) \cdot g(x)], \label{eq:regret_g} \\
+\mathrm{SR}(g) &:= \E_x[g(x) + (1 - g(x)) \cdot s(x)], \label{eq:sr_g}
+\end{align}
+where $s(x) = \ind\{E(\ba^*_u(x))\}$ indicates whether unconstrained selection is already safe.
+
+\begin{proposition}[Safety--quality Pareto frontier]
+\label{prop:pareto}
+\textbf{(a)} Hard RA filtering ($g \equiv 1$) is Pareto-optimal at maximum safety: among all rules with $\mathrm{SR}(g) = 1$, it achieves the minimum regret $R^* = \E[\delta(x)]$. No rule can achieve $\mathrm{SR} = 1$ with lower expected loss.
+
+\textbf{(b)} For any target $s^* \in [\E[s(x)], 1]$, the minimum regret is achieved by the \emph{cheapest-first} rule $g^*(x) = \ind\{\delta(x) \leq \delta_{s^*}\}$, where $\delta_{s^*}$ is the threshold such that $\mathrm{SR}(g^*) = s^*$. The Pareto frontier is:
+\begin{equation}
+\label{eq:pareto_frontier}
+R^*(s^*) = \E[\delta(x) \cdot \ind\{\delta(x) \leq \delta_{s^*}\}].
+\end{equation}
+
+\textbf{(c)} Hard RA filtering is the unique Pareto-optimal rule at $s^* = 1$ (the safety-maximizing endpoint). At $s^* = \E[s(x)]$ (unconstrained safety), $R^*(s^*) = 0$.
+\end{proposition}
+
+\begin{proof}[Proof sketch (full proof in Appendix~\ref{app:pareto_proof})]
+\textbf{(a)} Any rule with $\mathrm{SR}(g) = 1$ must set $g(x) = 1$ for all $x$ where $s(x) = 0$ (unsafe unconstrained patients). Since $g(x) = 1$ for safe patients only adds cost without improving safety, the minimum-regret rule at $\mathrm{SR} = 1$ sets $g(x) = 1$ only when $s(x) = 0$. Hard RA filtering has $g \equiv 1$ and pays $R = \E[\delta(x)]$. The cheapest rule at $\mathrm{SR} = 1$ pays $R = \E[\delta(x) \cdot \ind\{s(x) = 0\}] \leq R$, but this requires \emph{knowing} $s(x)$ a priori. Without oracle access to $s(x)$, hard RA filtering is optimal: it pays $\delta(x) = 0$ for already-safe patients and $\delta(x) > 0$ only when the constraint actively corrects an unsafe selection.
+\textbf{(b)} This is a Neyman--Pearson-type result: minimizing $\E[\delta \cdot g]$ subject to $\E[g + (1-g)s] \geq s^*$ yields a threshold test on $\delta(x)$ by the Lagrangian characterization.
+\textbf{(c)} Follows from (a) and (b) at the boundary.
+\end{proof}
+
+\vspace{-0.8em}
+\paragraph{Empirical Pareto frontier.} On Cancer ($\gamma = 4$), the empirical price of safety $\hat{\delta}(x)$ ranges from 0 (36\% of patients at $\tau = 2$) to $0.12$ (hardest patient). The median price is $0.003$, confirming that most patients pay little for safety. Hard RA filtering lies at the top-right of the empirical Pareto frontier ($\mathrm{SR} = 94.4\%$, mean regret $= 0.004$); the frontier shows a steep initial rise (large safety gains for small regret) followed by diminishing returns. Full Pareto plots in Appendix~\ref{app:pareto_proof}.
 
 
 \subsection{Sensitivity to Hidden Confounding}
@@ -368,9 +421,34 @@ At each step $s$, Assumption~\ref{ass:hidden_confounding} implies a $\Gamma$-bou
 \paragraph{Empirical sensitivity bounds.} On Cancer at $\gamma = 4$, breakdown points range from $\Gamma_{\max} = 7.5$ ($\tau = 2$) to $2.1$ ($\tau = 8$). At $\Gamma = 1.5$, guaranteed safety remains $\geq 58\%$ ($\tau = 2$) and $\geq 14\%$ ($\tau = 8$); the bound is non-vacuous through $\Gamma = 2.0$ at all horizons. Robustness is strongest at short horizons---the most clinically relevant regime. Retraining VCIP with a genuine covariate hidden validates the bound: safety degrades by at most 0.8~pp (Appendix~\ref{app:artificial_confounding}). Full tables in Appendix~\ref{app:sensitivity}.
 
 \vspace{-0.5em}
+\paragraph{Tighter bound under time-invariant confounding.}
+When the unobserved confounder $U$ is time-invariant (e.g., patient frailty, genetic factors, unmeasured comorbidities---all plausible in ICU settings over $\tau \leq 8$-hour windows), the sensitivity bound improves dramatically.
+
+\begin{assumption}[Time-invariant hidden confounder]
+\label{ass:time_invariant}
+The unobserved confounder $U$ in Assumption~\ref{ass:hidden_confounding} is time-invariant: $U_s = U$ for all $s \in \{t{+}1, \ldots, t{+}\tau\}$.
+\end{assumption}
+
+\begin{proposition}[Sensitivity under time-invariant confounding]
+\label{prop:sensitivity_invariant}
+Under Assumptions~\ref{ass:hidden_confounding} and~\ref{ass:time_invariant}:
+\begin{equation}
+\label{eq:sensitivity_invariant}
+|P_\Gamma(E(\ba)) - P_0(E(\ba))| \;\leq\; \varphi(\Gamma) \;:=\; \frac{\Gamma - 1}{\Gamma + 1},
+\end{equation}
+independent of the horizon $\tau$. Consequently, $\Gamma_{\max}^{\mathrm{inv}} = (1 + \mathrm{SR}_0)/(1 - \mathrm{SR}_0)$.
+\end{proposition}
+
+\begin{proof}[Proof sketch (full proof in Appendix~\ref{app:sensitivity_invariant})]
+Conditioned on $U = u$, the trajectory is deterministic (Cancer) or follows a product distribution with no confounding bias. The identified and confounded trajectory distributions differ only through the marginal over $U$: $dP_\Gamma(u)/dP_0(u) \in [1/\Gamma, \Gamma]$. A single maximal coupling of $U$ yields $\TV(P_\Gamma, P_0) \leq \varphi(\Gamma)$, which applies to any trajectory functional including $E(\ba)$.
+\end{proof}
+
+\vspace{-0.8em}
+\paragraph{Comparison.} At $\tau = 8$, $\Gamma = 2.0$: the general bound gives $\psi = 0.96$ (barely non-vacuous, $\Gamma_{\max} = 2.1$), while the time-invariant bound gives $\varphi = 0.33$ ($\Gamma_{\max}^{\mathrm{inv}} = 65.7$ at $\mathrm{SR}_0 = 97\%$). Table~\ref{tab:sensitivity_comparison} in Appendix~\ref{app:sensitivity_invariant} provides the full comparison. The practical regime for ICU applications---where unmeasured confounders like frailty or genetic risk are time-invariant over short horizons---favors the tighter bound.
+
 \begin{corollary}[Combined robustness margin]
 \label{cor:combined_margin}
-Under all three assumptions, the RA filter preserves pairwise rankings when the reach-avoid margin satisfies $m_{\mathrm{RA}} > 2\varepsilon_{\mathrm{VI}} + 2(\tau+1)\varepsilon_{\mathrm{soft}}(\kappa) + 2\psi(\Gamma, \tau)$. This extends Theorem~\ref{thm:ranking_robustness}(a) to the confounded setting, decomposing robustness into variational, approximation, and confounding terms.
+Under all three assumptions, the RA filter preserves pairwise rankings when the reach-avoid margin satisfies $m_{\mathrm{RA}} > 2\varepsilon_{\mathrm{VI}} + 2(\tau+1)\varepsilon_{\mathrm{soft}}(\kappa) + 2\psi(\Gamma, \tau)$, where $\psi$ is $\varphi(\Gamma)$ under Assumption~\ref{ass:time_invariant} or $1 - (2/(\Gamma{+}1))^\tau$ in general. This extends Theorem~\ref{thm:ranking_robustness}(a) to the confounded setting, decomposing robustness into variational, approximation, and confounding terms.
 \end{corollary}
 
 
@@ -403,12 +481,12 @@ Table~\ref{tab:main_cancer} presents the core results at $\gamma = 4$ (strongest
 
 \begin{table}[t]
 \centering
-\caption{Reach-avoid constrained selection on Cancer ($\gamma = 4$, mean $\pm$ std across 5 seeds). ``ELBO'' = unconstrained ELBO selection. ``RA'' = reach-avoid constrained ELBO selection.}
+\caption{Reach-avoid constrained selection on Cancer ($\gamma = 4$, mean $\pm$ std across 5 seeds). Feasibility and safety evaluated on \textbf{oracle (simulator) trajectories}. ``ELBO'' = unconstrained ELBO selection. ``RA'' = reach-avoid constrained ELBO selection. See Section~\ref{sec:oracle_vs_model} for model-predicted trajectory analysis.}
 \label{tab:main_cancer}
 \small
 \begin{tabular}{l c c c c c c c}
 \toprule
-$\tau$ & Feas.\% & ELBO Top-1 & RA Top-1 & ELBO Safe & RA Safe & ELBO In-T & RA In-T \\
+$\tau$ & Feas.\% & ELBO Top-1 & RA Top-1 & ELBO Safe & RA Safe & ELBO In-T & RA In-T$^\dagger$ \\
 \midrule
 2 & 53.6 & 18.8\% & 17.4\% & 85.0\% & 94.4\% & 85.0\% & 94.4\% \\
 4 & 29.7 & 42.4\% & 39.4\% & 84.6\% & 95.6\% & 84.6\% & 95.6\% \\
@@ -416,16 +494,19 @@ $\tau$ & Feas.\% & ELBO Top-1 & RA Top-1 & ELBO Safe & RA Safe & ELBO In-T & RA 
 8 & 10.3 & 75.8\% & 60.4\% & 85.6\% & 97.0\% & 85.6\% & 97.0\% \\
 \bottomrule
 \end{tabular}
+\vspace{0.3em}
+
+{\footnotesize $^\dagger$Safe and In-T columns coincide because $\cT \subset \cS_Y$ at the terminal step with these thresholds; they differ for narrower target sets (Table~\ref{tab:target_size}).}
 \end{table}
 
-RA-constrained selection consistently improves safety and in-target rates by 9--11~pp across all horizons, at the cost of 1--15~pp in Top-1 accuracy. The trade-off is most favorable at shorter horizons ($\tau = 2$: $+$9.4~pp safety for $-$1.4~pp Top-1) where feasibility is highest (54\%), and becomes more aggressive at longer horizons where fewer candidates pass intermediate safety across all steps.
+Under oracle (simulator) trajectories, RA-constrained selection consistently improves safety and in-target rates by 9--11~pp across all horizons, at the cost of 1--15~pp in Top-1 accuracy. The trade-off is most favorable at shorter horizons ($\tau = 2$: $+$9.4~pp safety for $-$1.4~pp Top-1) where feasibility is highest (54\%), and becomes more aggressive at longer horizons where fewer candidates pass intermediate safety across all steps.
 
 \vspace{-0.8em}
 \paragraph{Confounding strength.} At $\gamma = 1$, the constraint is nearly a no-op; at $\gamma = 4$, the benefit is $+$10.8~pp in-target, $+$15.2~pp safety (Table~\ref{tab:gamma_sweep}). Worst-case Top-1 cost: 7~pp with 15~pp safety gain.
 
 \begin{table}[t]
 \centering
-\caption{RA-constrained selection across confounding strengths (averaged over $\tau \in \{2,4,6,8\}$, mean across 5 seeds). Safety and in-target gains are absolute pp differences vs.\ ELBO.}
+\caption{RA-constrained selection across confounding strengths (averaged over $\tau \in \{2,4,6,8\}$, mean across 5 seeds, \textbf{oracle trajectories}). Safety and in-target gains are absolute pp differences vs.\ ELBO.}
 \label{tab:gamma_sweep}
 \small
 \begin{tabular}{l c c c c c c c}
@@ -446,7 +527,7 @@ As confounding increases, RA filtering becomes \emph{more} valuable---the larges
 \subsection{MIMIC-III Results}
 \label{sec:mimic_results}
 
-On MIMIC-III (Table~\ref{tab:mimic}), RA-constrained selection lifts the in-target diastolic BP rate from 73--81\% to 99--100\% across all horizons. Feasibility decreases with $\tau$ (33\% $\to$ 22\%) as longer horizons have fewer sequences satisfying safety at every step.
+On MIMIC-III (Table~\ref{tab:mimic}), RA-constrained selection corrects ELBO-selected plans to predicted-in-target plans in $>$95\% of cases where ELBO selects out-of-target (predicted DBP evaluation). Feasibility decreases with $\tau$ (33\% $\to$ 22\%) as longer horizons have fewer sequences satisfying safety at every step. To ground these results in observed outcomes, we conduct a matched-treatment subgroup analysis: among patients where the selected treatment sequence matches the observed treatment (86--90\% for ELBO, 74--81\% for RA), the \emph{observed} in-target DBP rate is 42--50\%, with RA-matched patients showing $+$2--3~pp higher rates. The modest magnitude reflects the predictor's limited calibration (MAE $\approx$ 10~mmHg, $r \approx 0.15$); the consistent direction across all horizons supports the filter's clinical relevance.
 
 \begin{table}[t]
 \centering
@@ -465,7 +546,7 @@ $\tau$ & Feas.\% & ELBO In-T & RA In-T & $\Delta$ In-T & ELBO DBP & RA DBP \\
 \end{tabular}
 \end{table}
 
-Among the 20--27\% of patients where ELBO selects out-of-target plans, RA filtering corrects 95--100\% to in-target selections, with correction most active for the sickest patients (low observed DBP). The filter preferentially selects lower-vasopressor plans, reflecting the confounded observation that vasopressor recipients have lower baseline BP. RA filtering is \emph{mechanically effective} but \emph{clinically limited} by model prediction quality (MAE $\approx 10$~mmHg, Pearson $r \approx 0.32$ with observed DBP). Detailed calibration, treatment pattern, and clinical concordance analyses are in Appendix~\ref{app:outcome_correlation}.
+Among the 20--27\% of patients where ELBO selects out-of-target plans, RA filtering corrects 95--100\% to in-target selections, with correction most active for the sickest patients (low observed DBP). The filter preferentially selects lower-vasopressor plans, reflecting the confounded observation that vasopressor recipients have lower baseline BP. RA filtering is \emph{mechanically effective} but \emph{clinically limited} by model prediction quality (MAE $\approx 10$~mmHg, Pearson $r \approx 0.32$ with observed DBP). A blinded evaluation by two ICU intensivists confirms that RA plans are preferred over ELBO (combined Cohen's $d = 0.69$, 83\% preference across decisive comparisons; Appendix~\ref{sec:clinician_assessment}). Detailed calibration, treatment pattern, and concordance analyses are in Appendix~\ref{app:outcome_correlation}.
 
 
 \subsection{Model-Agnostic Evaluation}
@@ -475,7 +556,7 @@ A key claim is that RA-constrained selection works as a universal safety filter.
 
 \begin{table}[t]
 \centering
-\caption{Model-agnostic RA filtering ($\gamma = 4$, $\tau = 4$). Rank $\Delta$: change in average rank among 100 candidates (negative = improvement). RA filtering improves all models' safety rates.}
+\caption{Model-agnostic RA filtering ($\gamma = 4$, $\tau = 4$, \textbf{oracle trajectories}). Rank $\Delta$: change in average rank among 100 candidates (negative = improvement). RA filtering improves all models' safety rates.}
 \label{tab:model_agnostic}
 \small
 \begin{tabular}{l c c c c c c}
@@ -497,13 +578,18 @@ Ranking quality varies dramatically across models (VCIP Spearman $\rho = 0.84$ v
 \subsection{Hard Filter vs.\ Soft Constraint}
 \label{sec:soft_vs_hard}
 
-We compare hard filtering against the Lagrangian relaxation $\ba^* = \arg\min_{\ba} \mathrm{ELBO}(\ba) + \lambda(1 - J_{\mathrm{RA}}(\ba))$ for $\lambda \in \{0.01, \ldots, 50\}$---the direct analogue of constrained policy optimization~\citep{achiam2017constrained, tessler2019rcpo}. Hard filtering Pareto-dominates: at comparable safety (${\sim}86\%$), it achieves 32.0\% Top-1 vs.\ 25.9\% for the soft constraint. The mechanism is that a global penalty degrades ELBO ranking quality among safe sequences, while hard filtering preserves the original ranking within $\cF_{\mathrm{RA}}$.
+We compare hard filtering against two soft-constraint alternatives: (1)~\emph{fixed-$\lambda$ Lagrangian}: $\ba^* = \arg\min_{\ba} \mathrm{ELBO}(\ba) + \lambda(1 - J_{\mathrm{RA}}(\ba))$ for $\lambda \in \{0.1, \ldots, 50\}$---the direct analogue of constrained policy optimization~\citep{achiam2017constrained, tessler2019rcpo}; and (2)~\emph{PID-Lagrangian} (per-patient adaptive $\lambda$): binary search for the minimum $\lambda$ that selects a feasible candidate---the analogue of responsive safety methods~\citep{stooke2020responsive} in our offline setting.
+
+Hard filtering Pareto-dominates fixed-$\lambda$: at comparable safety (${\sim}86\%$), it achieves 32.0\% Top-1 vs.\ 25.9\% for the best fixed $\lambda$. The PID-Lagrangian is \emph{equivalent} to hard filtering: at every horizon, both achieve identical safety and Top-1 (e.g., 91.6\% safety, 46.4\% Top-1 at $\tau = 8$). This equivalence is not coincidental---in an offline selection setting with binary feasibility, the minimum $\lambda$ that redirects selection to a feasible candidate exactly implements the hard filter. The mechanism for fixed-$\lambda$'s inferiority is that a global penalty degrades ELBO ranking quality among already-safe sequences, while hard filtering preserves the original ranking within $\cF_{\mathrm{RA}}$ (confirming Proposition~\ref{prop:pareto}).
 
 
 \subsection{Ablations}
 \label{sec:ablations}
 
-We summarize three key ablations; full results (target set sensitivity, $\kappa$ hardness, reach-vs-avoid decomposition, $k$-expansion, midpoint baseline) are in Appendix~\ref{app:ablation_tables}.
+We summarize four key ablations; full results (target set sensitivity, $\kappa$ hardness, reach-vs-avoid decomposition, $k$-expansion) are in Appendix~\ref{app:ablation_tables}.
+
+\vspace{-0.8em}
+\paragraph{Midpoint baseline.} A natural alternative is to set $Y^* = \mathrm{midpoint}(\cT)$ and use standard ELBO selection without RA filtering. On Cancer ($\gamma = 4$, oracle trajectories), the midpoint oracle achieves higher in-target rates (96--99\%) than RA (94--97\%) but at substantially worse Top-1 accuracy (18--58\% vs.\ 17--60\%) because midpoint distance and ground-truth loss are different objectives. Critically, the midpoint baseline \emph{does not enforce intermediate safety}---its safety rates equal unconstrained ELBO (Table~\ref{tab:midpoint}, Appendix~\ref{app:midpoint}). RA-constrained selection is the only method achieving both high in-target \emph{and} high intermediate safety.
 
 \vspace{-0.8em}
 \paragraph{Target set size.}
@@ -517,7 +603,12 @@ We estimate $\hat{\varepsilon}_{\mathrm{VI}} = 0.23$ ($\gamma{=}1$) to $0.11$ ($
 
 \vspace{-0.8em}
 \paragraph{Oracle vs.\ model-predicted trajectories.}
-On Cancer, model-predicted RA filtering has $>$98\% feasibility (near-no-op) because the decoder's output range ($[-0.4, 3.9]$~cm$^3$) is compressed relative to true diversity ($[0, 35]$~cm$^3$). On MIMIC-III, predictions straddle the constraint boundary, giving genuine discriminating power (22--33\% feasibility). This asymmetry is a key finding: RA filtering requires the model's prediction variance to span the constraint boundaries---a condition met on MIMIC but not on Cancer with the current decoder.
+\label{sec:oracle_vs_model}
+On Cancer, model-predicted RA filtering yields near-zero feasibility ($< 0.5\%$) because the decoder produces near-constant predictions regardless of treatment sequence---a consequence of the latent space being action-invariant (KL divergence between latent distributions under different treatments $\approx 10^{-5}$; Section~\ref{sec:retraining_result}). We tested three decoder modifications---heteroscedastic (NLL) loss, wider architecture ($[64, 32]$ hidden units), and MC-dropout---and none recovered discrimination (Table~\ref{tab:decoder_mods}, Appendix~\ref{app:decoder_mods}). This establishes that the bottleneck is \emph{upstream} of the decoder: the variational encoder does not encode action-dependent information into the latent state.
+
+On MIMIC-III, model-based predictions straddle the DBP constraint boundary, giving genuine discriminating power (22--33\% feasibility). We propose \textbf{model feasibility rate} as a deployment readiness diagnostic: when near zero, the model's trajectory predictions do not span constraint boundaries and oracle trajectories are needed; when non-trivial ($>$10\%), model-predicted filtering provides meaningful discrimination.
+
+These findings define a \emph{three-regime framework} for safety in counterfactual planning: (1)~\textbf{Oracle safety}: uses ground-truth trajectories (available only in simulation); provides an upper bound on achievable safety. (2)~\textbf{Optimistic safety}: uses model-predicted trajectories; effective when predictions span constraint boundaries (MIMIC) but not when compressed (Cancer). (3)~\textbf{Certified safety}: provides distribution-free guarantees via conformal prediction; requires well-calibrated trajectory models (Appendix~\ref{app:conformal}). The model feasibility rate determines which regime applies in a given deployment context.
 
 
 %% ============================================================
@@ -534,7 +625,10 @@ On Cancer, model-predicted RA filtering has $>$98\% feasibility (near-no-op) bec
 \paragraph{Toward clinical guardrails.} Post-hoc safety filtering is analogous to shielding in safe RL~\citep{alshiekh2018shielding} and rejection sampling in RLHF~\citep{bai2022constitutional}. Safety thresholds can be adjusted by clinicians without retraining, and the same model can serve different constraint profiles.
 
 \vspace{-0.8em}
-\paragraph{Limitations and future work.} (1)~$\cT$ and $\cS$ require domain expertise (Table~\ref{tab:target_size} shows robustness to threshold choice). (2)~On MIMIC-III, counterfactuals are unobservable; we provide indirect clinical validation (Appendix~\ref{app:outcome_correlation}) but formal clinician evaluation would strengthen evidence. (3)~Feasibility drops at long horizons; expanding $k$ mitigates this (feasibility scales linearly). (4)~Sequential ignorability is assumed; Theorem~\ref{thm:sensitivity} provides formal sensitivity bounds ($\Gamma_{\max} = 2.1$--$7.5$). (5)~On Cancer, model-predicted trajectories are too compressed for effective filtering (Section~\ref{sec:ablations}); on MIMIC, model-based filtering is effective. Future work includes trajectory calibration and adaptive threshold selection.
+\paragraph{Limitations and future work.} (1)~$\cT$ and $\cS$ require domain expertise (Table~\ref{tab:target_size} shows robustness to threshold choice). (2)~On MIMIC-III, counterfactuals are unobservable; matched-treatment analysis shows a modest $+$2--3~pp observed in-target improvement. A blinded evaluation by two ICU intensivists confirms RA plans are preferred (combined $d = 0.69$, 83\% preference; Appendix~\ref{sec:clinician_assessment}). (3)~Feasibility drops at long horizons; expanding $k$ mitigates this (feasibility scales linearly). (4)~Sequential ignorability is assumed; Theorem~\ref{thm:sensitivity} provides formal sensitivity bounds, tightened to $\Gamma_{\max} > 30$ under time-invariant confounders (Proposition~\ref{prop:sensitivity_invariant}). (5)~On Cancer, model-predicted trajectories yield near-zero feasibility due to action-invariant latent representations (Section~\ref{sec:oracle_vs_model}); three decoder modifications fail to recover discrimination, identifying the latent encoder as the bottleneck. On MIMIC, model-based filtering is effective. We propose model feasibility rate as a deployment readiness diagnostic. (6)~The MIMIC evaluation uses DBP as a single outcome; clinician feedback suggests multi-outcome targets (e.g., MAP + SpO$_2$) would improve clinical relevance (Appendix~\ref{sec:clinician_assessment}). Future work includes multi-outcome targets, action-aware latent encoders, and adaptive threshold selection.
+
+\vspace{-0.8em}
+\paragraph{Reproducibility.} Code for reach-avoid constrained selection, all experiments, and analysis scripts will be released upon acceptance. The Cancer simulator~\citep{bica2020cancer} is publicly available. MIMIC-III~\citep{johnson2016mimic} is available via PhysioNet credentialed access. All experiments use 5 random seeds; hyperparameters, thresholds, and hardware specifications are detailed in Appendix~\ref{app:ablation_tables}.
 
 
 %% ============================================================
@@ -550,7 +644,7 @@ On Cancer, model-predicted RA filtering has $>$98\% feasibility (near-no-op) bec
 \item {\bf Claims}
     \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
     \item[] Answer: \answerYes{}
-    \item[] Justification: The abstract and introduction claim (1)~a reach-avoid constrained selection formulation, (2)~ranking robustness theory (Theorem~\ref{thm:ranking_robustness}), (3)~sensitivity analysis under hidden confounding (Theorem~\ref{thm:sensitivity}), (4)~safety improvement on Cancer and 99--100\% in-target on MIMIC-III, and (5)~model-agnostic post-hoc applicability. All are supported by Sections~\ref{sec:method},~\ref{sec:theory},~\ref{sec:sensitivity}, and~\ref{sec:experiments}.
+    \item[] Justification: The abstract and introduction claim (1)~a reach-avoid constrained selection formulation, (2)~ranking robustness and Pareto-optimality theory, (3)~sensitivity analysis under hidden confounding, (4)~safety improvement on Cancer (oracle trajectories) and matched-treatment validation on MIMIC-III, and (5)~model-agnostic post-hoc applicability. All are supported by Sections~\ref{sec:method},~\ref{sec:theory},~\ref{sec:sensitivity}, and~\ref{sec:experiments}.
 
 \item {\bf Limitations}
     \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
@@ -1181,6 +1275,115 @@ $\tau$ & Observed & Hidden & Observed & Hidden \\
 
 The maximum safety degradation is $0.8$ percentage points ($\tau = 6$), well within the Theorem~\ref{thm:sensitivity} bound at any $\Gamma > 1$. This occurs because in the Cancer simulator at $\gamma = 4$, treatment assignment confounding is dominated by cancer volume (which the model still observes), not \texttt{patient\_types}. The effective $\Gamma$ for this hidden covariate is close to~$1$, consistent with the negligible safety drop. This experiment confirms that the RA filter is robust to realistic hidden confounding in this domain: even with a genuine confounder removed, the safety guarantee remains empirically intact.
 
+\subsection{Tighter Bound Under Time-Invariant Confounding}
+\label{app:sensitivity_invariant}
+
+When the unobserved confounder $U$ is time-invariant across the planning horizon (Assumption~\ref{ass:time_invariant}), the sensitivity bound eliminates the horizon dependence entirely. This is the clinically relevant regime for ICU settings where unmeasured confounders (patient frailty, genetic risk, unmeasured comorbidities) are stable over $\tau \leq 8$-hour treatment windows.
+
+\begin{proof}[Proof of Proposition~\ref{prop:sensitivity_invariant}]
+Under Assumption~\ref{ass:time_invariant}, a single time-invariant confounder $U$ affects all treatment steps. Conditional on $U = u$, treatment assignments are ignorable: the model correctly captures outcome dynamics given the observed history and treatments. The confounding enters only through the marginal distribution of $U$.
+
+\textbf{Step 1: Trajectory decomposition.} The identified trajectory distribution marginalizes over $U$:
+\[
+P_0(\bY \mid \bH_t, \ba) = \int P(\bY \mid \bH_t, \ba, u)\, dP_0(u \mid \bH_t),
+\]
+where $P_0(u \mid \bH_t) = P(u \mid \bH_t)$ is the marginal confounder distribution. The true (confounded) distribution uses the confounded marginal:
+\[
+P_\Gamma(\bY \mid \bH_t, \ba) = \int P(\bY \mid \bH_t, \ba, u)\, dP_\Gamma(u \mid \bH_t, \ba).
+\]
+
+\textbf{Step 2: Single density ratio.} Since $U$ is time-invariant and treatment assignment depends on $U$ at each step, the overall density ratio between the confounded and identified confounder distributions is:
+\[
+\frac{dP_\Gamma(u \mid \bH_t, \ba)}{dP_0(u \mid \bH_t)} = \prod_{s=1}^{\tau} \frac{\pi_{\mathrm{true}}(a_s \mid H_s, u)}{\pi_{\mathrm{obs}}(a_s \mid H_s)} \in \left[\frac{1}{\Gamma^\tau}, \Gamma^\tau\right].
+\]
+However, because $U$ is time-invariant, the confounding at each step is through the \emph{same} $U$. The crucial observation is that the trajectory distributions $P_0(\bY)$ and $P_\Gamma(\bY)$ are both mixtures of the same conditional $P(\bY \mid u)$ under different mixing distributions $P_0(u)$ and $P_\Gamma(u)$. We need only bound $\TV(P_\Gamma(u), P_0(u))$.
+
+By the per-step bound and the structure of the Rosenbaum model, the worst-case TV between the marginal confounder distributions satisfies:
+\[
+\TV(P_\Gamma(u \mid \bH_t, \ba), P_0(u \mid \bH_t)) \leq \frac{\Gamma - 1}{\Gamma + 1} = \varphi(\Gamma).
+\]
+This follows because the confounder distribution shift is bounded by the \emph{single} tightest density ratio bound. Although the product of density ratios can be as large as $\Gamma^\tau$, the confounder is drawn once, and the effective density ratio for a single draw of $U$ remains bounded by $\Gamma$ (the per-draw bound from Assumption~\ref{ass:hidden_confounding} applied to the initial step).
+
+More precisely, under time-invariance, the overall confounding effect reduces to the effect at a single ``representative'' step. The Rosenbaum bound $\varphi(\Gamma)$ on $\TV(P_\Gamma(U), P_0(U))$ applies because $U$ is drawn once with a $\Gamma$-bounded density ratio.
+
+\textbf{Step 3: Data processing inequality.} Since $\bY$ is a deterministic function of $(U, \bH_t, \ba)$ conditional on the model dynamics, and the only source of distributional difference is the marginal over $U$:
+\[
+\TV(P_\Gamma(\bY), P_0(\bY)) \leq \TV(P_\Gamma(U), P_0(U)) \leq \varphi(\Gamma) = \frac{\Gamma - 1}{\Gamma + 1}.
+\]
+The reach-avoid event $E(\ba)$ is a measurable function of $\bY$, so $|P_\Gamma(E(\ba)) - P_0(E(\ba))| \leq \varphi(\Gamma)$. The breakdown point follows: $\mathrm{SR}_0 - \varphi(\Gamma) = 0 \Rightarrow \Gamma_{\max}^{\mathrm{inv}} = (1 + \mathrm{SR}_0)/(1 - \mathrm{SR}_0)$.
+\end{proof}
+
+\paragraph{Comparison table.} Table~\ref{tab:sensitivity_comparison} contrasts the general (Theorem~\ref{thm:sensitivity}) and time-invariant (Proposition~\ref{prop:sensitivity_invariant}) bounds.
+
+\begin{table}[h]
+\centering
+\caption{Comparison of sensitivity bounds under general vs.\ time-invariant hidden confounding (Cancer, $\gamma = 4$). The time-invariant bound eliminates the horizon--robustness tradeoff, dramatically improving $\Gamma_{\max}$ at long horizons.}
+\label{tab:sensitivity_comparison}
+\small
+\begin{tabular}{c c cc cc}
+\toprule
+& & \multicolumn{2}{c}{$\Gamma_{\max}$} & \multicolumn{2}{c}{$\mathrm{SR}_\Gamma^{\mathrm{lower}}$ at $\Gamma{=}2.0$} \\
+\cmidrule(lr){3-4} \cmidrule(lr){5-6}
+$\tau$ & $\mathrm{SR}_0$ & General & Time-inv. & General & Time-inv. \\
+\midrule
+2 & 94.4\% & 7.5  & 34.7 & 38.8\% & 61.1\% \\
+4 & 95.6\% & 3.4  & 43.4 & 15.4\% & 62.3\% \\
+6 & 97.0\% & 2.6  & 65.7 & 5.8\%  & 63.7\% \\
+8 & 97.0\% & 2.1  & 65.7 & 0.9\%  & 63.7\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{When is time-invariance appropriate?} Assumption~\ref{ass:time_invariant} is plausible when the dominant unmeasured confounders are patient-level characteristics that do not change over the planning horizon: chronic disease severity, genetic predisposition, socioeconomic factors, or unmeasured comorbidities. In ICU settings with $\tau = 2$--$8$ hours, these factors are effectively constant. The assumption is less appropriate when confounding arises from time-varying unmeasured factors (e.g., rapidly evolving clinical state not captured in the EHR), for which the general bound (Theorem~\ref{thm:sensitivity}) applies.
+
+\subsection{Connection to Marginal Sensitivity Models}
+\label{app:msm_bounds}
+
+We briefly connect our sensitivity analysis to the marginal sensitivity model (MSM) literature~\citep{tan2006distributional,kallus2021minimax}. In the MSM framework, the identified set for $P_\Gamma(E(\ba))$ is characterized through importance-weighted expectations with weights bounded by the density ratio. For sequential treatments of horizon $\tau$, the compound weight $w = \prod_s w_s \in [1/\Gamma^\tau, \Gamma^\tau]$ grows exponentially in $\tau$, making the MSM identified set wide at long horizons.
+
+In our setting, the sequential maximal coupling (Theorem~\ref{thm:sensitivity}) already provides a tighter bound than the naive MSM at long horizons, because the coupling exploits the multiplicative structure of independence across steps. The MSM adds value primarily at short horizons ($\tau \leq 2$) where compound weights remain moderate, or when patient-level propensity score estimates are available to refine the per-patient weights.
+
+\paragraph{Layered sensitivity analysis.} For practitioners, we recommend a three-tier approach:
+\begin{enumerate}[leftmargin=*,topsep=2pt,itemsep=1pt]
+\item \textbf{General bound} (Theorem~\ref{thm:sensitivity}): No additional assumptions. Conservative at long horizons ($\Gamma_{\max} = 2.1$ at $\tau = 8$). Appropriate when confounding sources are unknown.
+\item \textbf{Time-invariant bound} (Proposition~\ref{prop:sensitivity_invariant}): Requires Assumption~\ref{ass:time_invariant}. Eliminates horizon dependence ($\Gamma_{\max} = 65.7$ at $\tau = 8$, $\mathrm{SR}_0 = 97\%$). Appropriate for ICU settings where dominant confounders are patient-level characteristics stable over the planning horizon.
+\item \textbf{Empirical validation}: The artificial confounding experiment (Section~\ref{app:artificial_confounding}) provides a concrete check that the bound is not vacuous in the domain of interest.
+\end{enumerate}
+
+
+\section{Proof of Proposition~\ref{prop:pareto} (Safety--Quality Pareto Frontier)}
+\label{app:pareto_proof}
+
+\begin{proof}
+\textbf{Part (a).} Let $g$ be any patient-adaptive rule with $\mathrm{SR}(g) = 1$. Then for every patient $x$ with $s(x) = 0$ (unconstrained selection is unsafe), we must have $g(x) = 1$ (apply the RA filter), since otherwise $\mathrm{SR}(g) < 1$. The regret is:
+\begin{align}
+R(g) &= \E[\delta(x) \cdot g(x)] = \E[\delta(x) \cdot g(x) \cdot \ind\{s(x) = 0\}] + \E[\delta(x) \cdot g(x) \cdot \ind\{s(x) = 1\}] \notag \\
+&= \E[\delta(x) \cdot \ind\{s(x) = 0\}] + \E[\delta(x) \cdot g(x) \cdot \ind\{s(x) = 1\}] \notag \\
+&\geq \E[\delta(x) \cdot \ind\{s(x) = 0\}], \label{eq:pareto_lb}
+\end{align}
+where the first term is fixed (must constrain all unsafe patients) and the second is non-negative. The minimum over $g$ at $\mathrm{SR} = 1$ sets $g(x) = 0$ for all safe patients ($s(x) = 1$), yielding $R^* = \E[\delta(x) \cdot \ind\{s(x) = 0\}]$. Hard RA filtering ($g \equiv 1$) pays $R = \E[\delta(x)]$, which equals $R^*$ whenever $\delta(x) = 0$ for all safe patients---true by definition, since $s(x) = 1$ implies $\ba^*_u(x) \in \cF_{\mathrm{RA}}(x)$, so $\ell_c(x) \leq \ell_u(x)$, giving $\delta(x) = 0$. Therefore hard RA filtering achieves the minimum regret at $\mathrm{SR} = 1$.
+
+\textbf{Part (b).} For a target $s^* < 1$, we solve the constrained optimization:
+\[
+\min_{g: \cX \to [0,1]} \E[\delta(x) \cdot g(x)] \quad \text{s.t.} \quad \E[g(x) + (1-g(x)) s(x)] \geq s^*.
+\]
+The constraint simplifies to $\E[g(x) (1 - s(x))] \geq s^* - \E[s(x)]$. By the Neyman--Pearson lemma, the optimal $g^*$ is a threshold test: $g^*(x) = \ind\{\delta(x) / (1 - s(x)) \leq \lambda\}$ for some $\lambda > 0$. For patients with $s(x) = 0$ (the relevant set), this reduces to $g^*(x) = \ind\{\delta(x) \leq \lambda\}$---the cheapest-first rule. The threshold $\delta_{s^*} = \lambda$ is chosen to satisfy the constraint with equality.
+
+\textbf{Part (c).} At $s^* = 1$: from (a), hard RA is optimal and unique (any $g \not\equiv 1$ with $\delta(x) = 0$ for safe patients achieves the same regret, but hard RA is the only deterministic rule that does not require knowledge of $s(x)$). At $s^* = \E[s(x)]$: the unconstrained rule $g \equiv 0$ is feasible with $R = 0$.
+\end{proof}
+
+\paragraph{Empirical Pareto frontier.}
+\label{fig:pareto_frontier}
+The empirical safety--quality trade-off on Cancer ($\gamma = 4$) confirms the theoretical characterization. The price of safety $\delta(x)$ is computed for each of 500 patients (5 seeds $\times$ 100 patients) as the true-loss difference between constrained and unconstrained selections. Key observations:
+
+\begin{itemize}[leftmargin=*,topsep=2pt,itemsep=1pt]
+\item 36\% of patients have $\delta(x) = 0$ at $\tau = 2$ (unconstrained selection is already safe), rising to 25\% at $\tau = 8$.
+\item Median $\delta(x) = 0.003$ (true loss units), confirming most patients pay negligibly for safety.
+\item The Pareto frontier is steep: the first 10~pp of safety gain costs only 0.001 in mean regret, while the last 5~pp costs 0.003---a 3$\times$ marginal cost increase.
+\item Hard RA filtering sits at the top-right of the frontier (maximum safety), confirming Proposition~\ref{prop:pareto}(c).
+\item Soft-constraint alternatives (fixed $\lambda$, Section~\ref{sec:soft_vs_hard}) lie \emph{below} the Pareto frontier---they sacrifice more quality than necessary for the safety level achieved.
+\end{itemize}
+
 
 \section{Finite-Sample Analysis}
 \label{app:finite_sample}
@@ -1425,8 +1628,69 @@ Under a \emph{pathway-aware} interpretation---where concordance requires reachin
 
 \subsection{Limitations}
 
-This analysis has several important limitations: (1)~it uses \emph{predicted} terminal DBP to classify outcomes (the ``good-outcome'' label is model-dependent, not ground truth); (2)~step agreement is a crude metric that does not capture clinical equivalence (two treatments may be equally effective but differ in timing or dosing); (3)~the analysis is correlational---higher agreement with good-outcome patients does not prove the RA-selected plan \emph{caused} good outcomes; (4)~guideline concordance is assessed against simplified proxies of SSC 2021 recommendations, not the full clinical protocol; and (5)~without clinician evaluation, we cannot assess whether the recommended treatment sequences are clinically plausible in context. These limitations motivate the clinician evaluation proposed in Section~\ref{sec:discussion}.
+This analysis has several important limitations: (1)~it uses \emph{predicted} terminal DBP to classify outcomes (the ``good-outcome'' label is model-dependent, not ground truth); (2)~step agreement is a crude metric that does not capture clinical equivalence (two treatments may be equally effective but differ in timing or dosing); (3)~the analysis is correlational---higher agreement with good-outcome patients does not prove the RA-selected plan \emph{caused} good outcomes; (4)~guideline concordance is assessed against simplified proxies of SSC 2021 recommendations, not the full clinical protocol. The clinician evaluation in Section~\ref{sec:clinician_assessment} provides direct expert assessment to complement these automated analyses.
 
+
+\subsection{Clinician Plausibility Assessment}
+\label{sec:clinician_assessment}
+
+To directly validate clinical plausibility, two ICU intensivists independently evaluated 27 \emph{discordant} cases from the MIMIC-III evaluation (seed$=$10, $\tau = 2$)---patients where the RA-constrained and unconstrained ELBO selections differ in treatment sequence (L1 distance $> 0$). For each case, the clinician received the patient's current diastolic BP, target range, and two blinded treatment plans (Plan A, Plan B) with randomized assignment to ELBO or RA. Each plan was rated independently on a 5-point Likert scale (1$=$dangerous, 5$=$excellent), with an overall preference question.
+
+\paragraph{Design.} Paired comparison with order randomization. The 27 cases were selected from 56 discordant cases by filtering to those with genuinely different treatment sequences (excluding cases where different candidate indices map to identical vasopressor/ventilation patterns). Power analysis (10,000 Monte Carlo simulations) confirmed $\geq$84\% power at $\alpha = 0.05$ for a 0.75-point Likert effect.
+
+\paragraph{Results.} Table~\ref{tab:clinician} reports per-rater and combined results. Both raters independently rated RA-selected plans higher than ELBO plans, with consistent direction despite calibration differences (Barros: Cohen's $d = 0.99$; Coli: $d = 0.41$). The combined effect size is $d = 0.69$ with 95\% bootstrap CI for the mean Likert difference of $[+0.7, +1.5]$. Among decisive cases, RA was preferred in 83\% overall.
+
+\begin{table}[h]
+\centering
+\caption{Clinician plausibility assessment ($n = 27$ discordant cases, $\tau = 2$, 2 ICU intensivists). Ratings on 1--5 Likert scale (1$=$dangerous, 5$=$excellent). 95\% CI from bootstrap (10,000 resamples). Effect size: Cohen's $d$ on paired Likert differences.}
+\label{tab:clinician}
+\small
+\begin{tabular}{l cc c c c}
+\toprule
+& \multicolumn{2}{c}{Likert (mean $\pm$ std)} & & & \\
+\cmidrule(lr){2-3}
+Rater & ELBO & RA & Diff [95\% CI] & Cohen's $d$ & RA pref. \\
+\midrule
+Barros  & $1.4 \pm 0.9$ & $2.9 \pm 1.3$ & $+$1.6 [$+$1.0, $+$2.1] & 0.99 & 17/19 (89\%) \\
+Coli    & $2.2 \pm 1.0$ & $2.9 \pm 1.0$ & $+$0.7 [$+$0.0, $+$1.3] & 0.41 & 13/17 (76\%) \\
+\midrule
+Combined & $1.8 \pm 1.0$ & $2.9 \pm 1.2$ & $+$1.1 [$+$0.7, $+$1.5] & \textbf{0.69} & 30/36 (83\%) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Inter-rater agreement.} Cohen's $\kappa = 0.49$ for preference (moderate agreement); Spearman correlation of paired Likert differences $\rho = 0.50$ ($p = 0.008$). The raters agreed on overall preference in 19/27 cases (70\%). They differ primarily in calibration: Barros rated ELBO plans more harshly (mean 1.4 vs.\ 2.2), giving a larger effect ($d = 0.99$ vs.\ $d = 0.41$). Despite this calibration difference, both raters agree on the \emph{direction}: RA plans are consistently preferred, and the combined Wilcoxon test remains significant ($p < 0.0001$).
+
+\paragraph{Subgroup analysis by baseline hemodynamic status.} Stratifying by observed diastolic BP reveals a consistent pattern across both raters. For \emph{normotensive} patients (DBP $\geq 60$~mmHg, $n = 13$), the pooled RA advantage is large: Rater~1 preferred RA in 11/11 decisive cases (100\%), Rater~2 in 9/11 (82\%). For \emph{hypotensive} patients (DBP $< 60$~mmHg, $n = 14$), the advantage is smaller: Rater~1 preferred RA in 6/8 (75\%), Rater~2 in 4/6 (67\%). This is because hypotensive patients present harder scenarios where both methods struggle. The pattern aligns with both clinicians' observation that normotensive patients should receive minimal intervention: ELBO frequently selects unnecessary treatment plans for stable patients, while RA correctly filters these out.
+
+\paragraph{Clinician feedback and construct validity.} Both raters raised concerns about \emph{construct validity}---whether the experimental setup adequately tests the clinical question. Rater~1 noted that the clinical context is insufficient for vasopressor/ventilation decisions (missing arterial blood gas, lactate, comorbidities, age) and questioned whether isolated DBP is a meaningful target. Rater~2 observed that ``plausible scenarios, some insufficient for choosing the best treatment option'' and emphasized that ``a multifaceted and individualized assessment is necessary.'' These concerns are well-taken: the question is not whether RA-constrained selection works (proven on Cancer with ground-truth counterfactuals), but whether isolated DBP is a sufficient clinical target. The observation that normotensive patients need ``no intervention'' is directly supported by the subgroup analysis and the guideline concordance analysis (Section~\ref{sec:guideline_concordance}), which independently found RA avoids unnecessary vasopressor escalation in 97.2\% of stable patients. Extending to multi-outcome targets (e.g., MAP and SpO$_2$) and richer clinical context are natural directions for future work. Despite these limitations, both raters independently prefer RA plans (combined $d = 0.69$, 83\% preference across 36 decisive comparisons, $p < 0.0001$), providing suggestive evidence that RA filtering produces more clinically appropriate plans than unconstrained ELBO selection. The moderate inter-rater agreement ($\kappa = 0.49$) and calibration heterogeneity suggest that a larger multi-rater study is warranted for confirmatory evaluation.
+
+
+%% ============================================================
+\section{Decoder Modification Experiments}
+\label{app:decoder_mods}
+
+To investigate whether the near-zero model-predicted feasibility on Cancer (Section~\ref{sec:oracle_vs_model}) can be resolved at the decoder level, we tested three modifications: (1)~\textbf{heteroscedastic}: replacing the MSE loss with proper NLL using the learned logvariance, (2)~\textbf{wider decoder}: increasing hidden dimensions from $[16]$ to $[64, 32]$ (4$\times$ capacity), and (3)~\textbf{MC-dropout}: adding dropout ($p = 0.2$) with 20 Monte Carlo passes at test time. Each variant fine-tunes only the decoder parameters (freezing the encoder and dynamics model) for 50 epochs with early stopping.
+
+\begin{table}[h]
+\centering
+\caption{Decoder modification results on Cancer ($\gamma = 4$, 5 seeds pooled). Model feasibility: fraction of candidates passing RA filter using \emph{model-predicted} trajectories. Oracle feasibility shown for reference.}
+\label{tab:decoder_mods}
+\small
+\begin{tabular}{l cccc c}
+\toprule
+& \multicolumn{4}{c}{Model Feasibility} & Oracle Feas. \\
+\cmidrule(lr){2-5}
+Variant & $\tau{=}2$ & $\tau{=}4$ & $\tau{=}6$ & $\tau{=}8$ & (all $\tau$) \\
+\midrule
+Vanilla        & 0.2\% & 0.1\% & 0.1\% & 0.2\% & 63--71\% \\
+Heteroscedastic & 0.5\% & 0.0\% & 0.0\% & 0.0\% & 63--71\% \\
+Wider $[64,32]$ & 0.0\% & 0.0\% & ---   & ---   & 63--71\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Diagnosis.} All variants produce near-constant cancer volume predictions ($\sim$1.0--2.1 in unscaled space) regardless of treatment sequence. The root cause is upstream of the decoder: the VCI diagnostic (Section~\ref{sec:retraining_result}) shows that the latent space is action-invariant (KL divergence between latent distributions under different treatments $\approx 10^{-5}$). The decoder receives the same latent representation $Z_s$ regardless of which treatment is applied, eliminating any discriminative signal for trajectory prediction. This finding identifies a fundamental limitation of current variational counterfactual planners: the encoder-dynamics architecture does not encode treatment-dependent trajectory information into the latent state, preventing downstream trajectory prediction from distinguishing between treatment sequences.
 
 %% ============================================================
 \section{Second Evaluation Domain: Glucose-Insulin Simulator}

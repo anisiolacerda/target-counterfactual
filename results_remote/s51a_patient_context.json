@@ -1,0 +1,2189 @@
+{
+  "20": {
+    "subject_id": 8770,
+    "total_timesteps": 194,
+    "demographics": {
+      "age": 300.0,
+      "gender": "F",
+      "ethnicity": "WHITE",
+      "diagnosis": "CHEST PAIN",
+      "icu_type": "MICU",
+      "los_icu_days": 8.1
+    },
+    "vitals_history": {
+      "heart rate": [
+        null,
+        null,
+        46.0,
+        42.0,
+        0.0,
+        null
+      ],
+      "mean blood pressure": [
+        null,
+        null,
+        28.7,
+        null,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        null,
+        null,
+        8.0,
+        null,
+        0.0,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        null,
+        null,
+        17.0,
+        null,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 2.0,
+      "bicarbonate": 30.0,
+      "anion gap": 14.0,
+      "hemoglobin": 10.1,
+      "glucose": 162.0,
+      "platelets": 245.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 17.0
+  },
+  "80": {
+    "subject_id": 30282,
+    "total_timesteps": 94,
+    "demographics": {
+      "age": 88.9,
+      "gender": "M",
+      "ethnicity": "WHITE",
+      "diagnosis": "LOWER GI BLEED",
+      "icu_type": "SICU",
+      "los_icu_days": 3.9
+    },
+    "vitals_history": {
+      "heart rate": [
+        102.0,
+        103.5,
+        43.5,
+        null,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        59.5,
+        55.2,
+        null,
+        null,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        16.0,
+        17.0,
+        null,
+        null,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        43.5,
+        41.2,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.8,
+      "bicarbonate": 18.0,
+      "anion gap": 9.0,
+      "hemoglobin": 8.4,
+      "glucose": 161.0,
+      "platelets": 149.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 41.2
+  },
+  "90": {
+    "subject_id": 42482,
+    "total_timesteps": 114,
+    "demographics": {
+      "age": 24.4,
+      "gender": "M",
+      "ethnicity": "UNABLE TO OBTAIN",
+      "diagnosis": "BLUNT TRAUMA",
+      "icu_type": "TSICU",
+      "los_icu_days": 4.7
+    },
+    "vitals_history": {
+      "heart rate": [
+        104.0,
+        96.0,
+        85.0,
+        93.0,
+        93.0,
+        null
+      ],
+      "mean blood pressure": [
+        77.0,
+        85.0,
+        77.0,
+        83.0,
+        78.0,
+        null
+      ],
+      "respiratory rate": [
+        30.0,
+        34.0,
+        23.0,
+        30.0,
+        26.0,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        70.0,
+        73.0,
+        66.0,
+        70.0,
+        63.0,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.5,
+      "bicarbonate": 25.0,
+      "anion gap": 15.0,
+      "hemoglobin": 9.0,
+      "glucose": 107.0,
+      "platelets": 247.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 63.0
+  },
+  "30": {
+    "subject_id": 11473,
+    "total_timesteps": 100,
+    "demographics": {
+      "age": 77.5,
+      "gender": "M",
+      "ethnicity": "WHITE",
+      "diagnosis": "V-FIB ARREST",
+      "icu_type": "CCU",
+      "los_icu_days": 4.1
+    },
+    "vitals_history": {
+      "heart rate": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 2.3,
+      "bicarbonate": 25.0,
+      "anion gap": 15.0,
+      "hemoglobin": 11.1,
+      "glucose": 271.0,
+      "platelets": 267.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 45.0
+  },
+  "69": {
+    "subject_id": 23885,
+    "total_timesteps": 113,
+    "demographics": {
+      "age": 50.2,
+      "gender": "M",
+      "ethnicity": "WHITE",
+      "diagnosis": "ENCEPHELOPATHY AND R/O MI",
+      "icu_type": "CSRU",
+      "los_icu_days": 4.7
+    },
+    "vitals_history": {
+      "heart rate": [
+        90.0,
+        null,
+        87.0,
+        null,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        98.0,
+        null,
+        93.7,
+        null,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        26.0,
+        null,
+        24.0,
+        null,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        15.0,
+        null,
+        15.0,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        82.0,
+        null,
+        76.0,
+        null,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.7,
+      "bicarbonate": 30.0,
+      "anion gap": 12.0,
+      "hemoglobin": 9.0,
+      "glucose": 95.0,
+      "platelets": 168.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 76.0
+  },
+  "51": {
+    "subject_id": 19444,
+    "total_timesteps": 163,
+    "demographics": {
+      "age": 81.2,
+      "gender": "F",
+      "ethnicity": "WHITE",
+      "diagnosis": "SEPSIS",
+      "icu_type": "CCU",
+      "los_icu_days": 6.8
+    },
+    "vitals_history": {
+      "heart rate": [
+        119.0,
+        113.0,
+        112.0,
+        114.0,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        73.0,
+        85.0,
+        95.0,
+        89.0,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        23.0,
+        19.0,
+        19.0,
+        19.0,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        12.0,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        66.0,
+        67.0,
+        76.0,
+        69.0,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.2,
+      "bicarbonate": 21.0,
+      "anion gap": 16.0,
+      "hemoglobin": 10.3,
+      "glucose": 98.0,
+      "platelets": 168.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 69.0
+  },
+  "56": {
+    "subject_id": 20279,
+    "total_timesteps": 142,
+    "demographics": {
+      "age": 48.3,
+      "gender": "M",
+      "ethnicity": "BLACK/AFRICAN AMERICAN",
+      "diagnosis": "RECTAL BLEED",
+      "icu_type": "MICU",
+      "los_icu_days": 5.9
+    },
+    "vitals_history": {
+      "heart rate": [
+        90.0,
+        91.0,
+        93.5,
+        null,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        86.0,
+        71.3,
+        74.7,
+        null,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        20.0,
+        19.0,
+        16.0,
+        null,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        15.0,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        71.0,
+        55.0,
+        58.0,
+        null,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 3.8,
+      "bicarbonate": 27.0,
+      "anion gap": 13.0,
+      "hemoglobin": 9.6,
+      "glucose": 83.0,
+      "platelets": 149.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 58.0
+  },
+  "98": {
+    "subject_id": 47547,
+    "total_timesteps": 69,
+    "demographics": {
+      "age": 71.7,
+      "gender": "M",
+      "ethnicity": "WHITE",
+      "diagnosis": "CHEST PAIN\\LEFT HEART CATHETERIZATION",
+      "icu_type": "CCU",
+      "los_icu_days": 2.8
+    },
+    "vitals_history": {
+      "heart rate": [
+        96.0,
+        82.0,
+        81.0,
+        84.0,
+        89.0,
+        null
+      ],
+      "mean blood pressure": [
+        84.0,
+        66.0,
+        74.0,
+        79.0,
+        64.0,
+        null
+      ],
+      "respiratory rate": [
+        20.0,
+        23.0,
+        17.0,
+        15.0,
+        22.0,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        62.0,
+        55.0,
+        62.0,
+        65.0,
+        42.0,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 1.3,
+      "bicarbonate": 25.0,
+      "anion gap": 10.0,
+      "hemoglobin": 9.9,
+      "glucose": 205.0,
+      "platelets": 54.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 42.0
+  },
+  "19": {
+    "subject_id": 8676,
+    "total_timesteps": 72,
+    "demographics": {
+      "age": 52.0,
+      "gender": "F",
+      "ethnicity": "WHITE",
+      "diagnosis": "SHORTNESS OF BREATH;RULE-OUT MYOCARDIAL INFARCTION;TELEMETRY;HYPERGLYCEMIA",
+      "icu_type": "MICU",
+      "los_icu_days": 3.0
+    },
+    "vitals_history": {
+      "heart rate": [
+        96.0,
+        96.0,
+        null,
+        null,
+        null,
+        108.0
+      ],
+      "mean blood pressure": [
+        91.7,
+        80.0,
+        null,
+        null,
+        null,
+        86.7
+      ],
+      "respiratory rate": [
+        17.0,
+        21.0,
+        null,
+        null,
+        null,
+        24.0
+      ],
+      "glascow coma scale total": [
+        null,
+        15.0,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        78.0,
+        63.0,
+        null,
+        null,
+        null,
+        66.0
+      ]
+    },
+    "labs": {
+      "creatinine": 0.5,
+      "bicarbonate": 20.0,
+      "anion gap": 11.0,
+      "hemoglobin": 10.1,
+      "glucose": 114.0,
+      "platelets": 168.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 66.0
+  },
+  "81": {
+    "subject_id": 30409,
+    "total_timesteps": 79,
+    "demographics": {
+      "age": 81.5,
+      "gender": "M",
+      "ethnicity": "WHITE - BRAZILIAN",
+      "diagnosis": "MITRAL REGURGITATION",
+      "icu_type": "CSRU",
+      "los_icu_days": 3.3
+    },
+    "vitals_history": {
+      "heart rate": [
+        93.0,
+        99.0,
+        106.0,
+        null,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        80.0,
+        49.0,
+        68.0,
+        null,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        26.0,
+        25.0,
+        25.0,
+        null,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        15.0,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        67.0,
+        36.0,
+        57.0,
+        null,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 2.1,
+      "bicarbonate": 39.0,
+      "anion gap": 12.0,
+      "hemoglobin": 10.4,
+      "glucose": 139.0,
+      "platelets": 188.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 57.0
+  },
+  "39": {
+    "subject_id": 17025,
+    "total_timesteps": 92,
+    "demographics": {
+      "age": 53.2,
+      "gender": "M",
+      "ethnicity": "WHITE",
+      "diagnosis": "SQUAMOUS CELL CA FLOOR OF MOUTH/SDA",
+      "icu_type": "SICU",
+      "los_icu_days": 3.8
+    },
+    "vitals_history": {
+      "heart rate": [
+        91.0,
+        91.0,
+        136.0,
+        111.5,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        75.0,
+        76.0,
+        91.8,
+        82.4,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        22.0,
+        19.0,
+        16.0,
+        24.5,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        15.0,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        55.0,
+        55.0,
+        32.5,
+        62.7,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.4,
+      "bicarbonate": 24.0,
+      "anion gap": 15.0,
+      "hemoglobin": 8.0,
+      "glucose": 152.0,
+      "platelets": 350.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 62.7
+  },
+  "5": {
+    "subject_id": 1991,
+    "total_timesteps": 66,
+    "demographics": {
+      "age": 39.3,
+      "gender": "F",
+      "ethnicity": "WHITE",
+      "diagnosis": "RULE-OUT MYOCARDIAL INFARCTION;TELEMETRY",
+      "icu_type": "CCU",
+      "los_icu_days": 2.7
+    },
+    "vitals_history": {
+      "heart rate": [
+        82.0,
+        null,
+        88.0,
+        null,
+        84.0,
+        null
+      ],
+      "mean blood pressure": [
+        102.0,
+        null,
+        99.7,
+        null,
+        99.0,
+        null
+      ],
+      "respiratory rate": [
+        17.0,
+        null,
+        18.0,
+        null,
+        20.0,
+        null
+      ],
+      "glascow coma scale total": [
+        15.0,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        83.0,
+        null,
+        81.0,
+        null,
+        76.0,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.6,
+      "bicarbonate": 28.0,
+      "anion gap": 15.0,
+      "hemoglobin": 11.4,
+      "glucose": 143.0,
+      "platelets": 206.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 76.0
+  },
+  "28": {
+    "subject_id": 11177,
+    "total_timesteps": 144,
+    "demographics": {
+      "age": 59.5,
+      "gender": "M",
+      "ethnicity": "UNKNOWN/NOT SPECIFIED",
+      "diagnosis": "HEMOPTYSIS",
+      "icu_type": "MICU",
+      "los_icu_days": 6.0
+    },
+    "vitals_history": {
+      "heart rate": [
+        115.0,
+        109.0,
+        119.0,
+        116.0,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        112.3,
+        95.3,
+        94.0,
+        null,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        19.0,
+        25.0,
+        20.0,
+        20.0,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        14.0,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        89.0,
+        76.0,
+        74.0,
+        null,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.8,
+      "bicarbonate": 29.0,
+      "anion gap": 13.0,
+      "hemoglobin": 10.1,
+      "glucose": 134.0,
+      "platelets": 321.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 74.0
+  },
+  "17": {
+    "subject_id": 7795,
+    "total_timesteps": 123,
+    "demographics": {
+      "age": 86.3,
+      "gender": "F",
+      "ethnicity": "WHITE",
+      "diagnosis": "DISSECTION FOR BENTALL PROCEDURE",
+      "icu_type": "CSRU",
+      "los_icu_days": 5.1
+    },
+    "vitals_history": {
+      "heart rate": [
+        53.0,
+        53.0,
+        56.0,
+        null,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        62.3,
+        63.3,
+        79.7,
+        null,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        15.0,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        45.0,
+        42.0,
+        54.0,
+        null,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 1.0,
+      "bicarbonate": 24.0,
+      "anion gap": 12.0,
+      "hemoglobin": 10.4,
+      "glucose": 127.0,
+      "platelets": 162.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 54.0
+  },
+  "92": {
+    "subject_id": 43209,
+    "total_timesteps": 61,
+    "demographics": {
+      "age": 71.9,
+      "gender": "M",
+      "ethnicity": "OTHER",
+      "diagnosis": "PELVIC FRACTURE",
+      "icu_type": "TSICU",
+      "los_icu_days": 2.5
+    },
+    "vitals_history": {
+      "heart rate": [
+        88.0,
+        92.0,
+        90.0,
+        93.0,
+        96.0,
+        null
+      ],
+      "mean blood pressure": [
+        77.0,
+        74.0,
+        65.0,
+        66.0,
+        73.0,
+        null
+      ],
+      "respiratory rate": [
+        27.0,
+        21.0,
+        24.0,
+        21.0,
+        21.0,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        65.0,
+        58.0,
+        57.0,
+        55.0,
+        65.0,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.5,
+      "bicarbonate": 21.0,
+      "anion gap": 12.0,
+      "hemoglobin": 9.4,
+      "glucose": 101.0,
+      "platelets": 131.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 65.0
+  },
+  "58": {
+    "subject_id": 20612,
+    "total_timesteps": 74,
+    "demographics": {
+      "age": 71.6,
+      "gender": "M",
+      "ethnicity": "BLACK/AFRICAN AMERICAN",
+      "diagnosis": "DEHYDRATION",
+      "icu_type": "MICU",
+      "los_icu_days": 3.1
+    },
+    "vitals_history": {
+      "heart rate": [
+        76.0,
+        null,
+        74.0,
+        76.0,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        87.0,
+        null,
+        89.3,
+        83.7,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        15.0,
+        null,
+        17.0,
+        22.0,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        15.0,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        61.0,
+        null,
+        61.0,
+        54.0,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 2.3,
+      "bicarbonate": 20.0,
+      "anion gap": 12.0,
+      "hemoglobin": 7.6,
+      "glucose": 185.0,
+      "platelets": 306.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 54.0
+  },
+  "78": {
+    "subject_id": 28913,
+    "total_timesteps": 111,
+    "demographics": {
+      "age": 28.6,
+      "gender": "F",
+      "ethnicity": "WHITE",
+      "diagnosis": "S/P MOTOR VEHICLE ACCIDENT;SPLENIC LAC;SKULL FRACTURE",
+      "icu_type": "TSICU",
+      "los_icu_days": 4.6
+    },
+    "vitals_history": {
+      "heart rate": [
+        99.0,
+        91.0,
+        102.0,
+        102.0,
+        96.0,
+        null
+      ],
+      "mean blood pressure": [
+        85.0,
+        87.0,
+        87.0,
+        86.0,
+        86.0,
+        null
+      ],
+      "respiratory rate": [
+        21.0,
+        23.0,
+        22.0,
+        20.0,
+        23.0,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        null,
+        null,
+        15.0,
+        null
+      ],
+      "diastolic blood pressure": [
+        74.0,
+        79.0,
+        78.0,
+        73.0,
+        73.0,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.5,
+      "bicarbonate": 29.0,
+      "anion gap": 10.0,
+      "hemoglobin": 9.7,
+      "glucose": 113.0,
+      "platelets": 395.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 73.0
+  },
+  "62": {
+    "subject_id": 21573,
+    "total_timesteps": 60,
+    "demographics": {
+      "age": 42.7,
+      "gender": "M",
+      "ethnicity": "UNKNOWN/NOT SPECIFIED",
+      "diagnosis": "ACUTE MYOCARDIAL INFARCTION\\CARDIAC CATH",
+      "icu_type": "CCU",
+      "los_icu_days": 2.5
+    },
+    "vitals_history": {
+      "heart rate": [
+        null,
+        77.0,
+        69.5,
+        80.0,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        null,
+        84.7,
+        90.7,
+        80.7,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        null,
+        23.0,
+        15.5,
+        null,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        15.0,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        null,
+        60.0,
+        70.0,
+        62.0,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 1.2,
+      "bicarbonate": 29.0,
+      "anion gap": 9.0,
+      "hemoglobin": 13.9,
+      "glucose": 119.0,
+      "platelets": 193.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 62.0
+  },
+  "65": {
+    "subject_id": 23312,
+    "total_timesteps": 132,
+    "demographics": {
+      "age": 80.3,
+      "gender": "F",
+      "ethnicity": "WHITE",
+      "diagnosis": "CHEST PAIN",
+      "icu_type": "CCU",
+      "los_icu_days": 5.5
+    },
+    "vitals_history": {
+      "heart rate": [
+        75.0,
+        73.0,
+        75.0,
+        73.5,
+        56.0,
+        null
+      ],
+      "mean blood pressure": [
+        84.0,
+        60.0,
+        63.0,
+        56.0,
+        56.0,
+        null
+      ],
+      "respiratory rate": [
+        30.0,
+        21.5,
+        26.0,
+        21.0,
+        16.0,
+        null
+      ],
+      "glascow coma scale total": [
+        15.0,
+        null,
+        null,
+        null,
+        15.0,
+        null
+      ],
+      "diastolic blood pressure": [
+        47.0,
+        34.7,
+        32.0,
+        30.0,
+        34.0,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.9,
+      "bicarbonate": 22.0,
+      "anion gap": 9.0,
+      "hemoglobin": 9.3,
+      "glucose": 138.0,
+      "platelets": 99.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 34.0
+  },
+  "50": {
+    "subject_id": 19147,
+    "total_timesteps": 157,
+    "demographics": {
+      "age": 63.8,
+      "gender": "F",
+      "ethnicity": "WHITE",
+      "diagnosis": "BILATERAL PE",
+      "icu_type": "MICU",
+      "los_icu_days": 6.5
+    },
+    "vitals_history": {
+      "heart rate": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.2,
+      "bicarbonate": 31.0,
+      "anion gap": 13.0,
+      "hemoglobin": 9.3,
+      "glucose": 119.0,
+      "platelets": 102.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 25.0
+  },
+  "72": {
+    "subject_id": 25035,
+    "total_timesteps": 61,
+    "demographics": {
+      "age": 77.9,
+      "gender": "F",
+      "ethnicity": "WHITE",
+      "diagnosis": "UNRESPONSIVE",
+      "icu_type": "MICU",
+      "los_icu_days": 2.5
+    },
+    "vitals_history": {
+      "heart rate": [
+        91.0,
+        84.0,
+        88.0,
+        93.0,
+        88.0,
+        null
+      ],
+      "mean blood pressure": [
+        77.0,
+        90.0,
+        83.3,
+        91.3,
+        74.3,
+        null
+      ],
+      "respiratory rate": [
+        23.0,
+        25.0,
+        22.0,
+        22.0,
+        23.0,
+        null
+      ],
+      "glascow coma scale total": [
+        14.0,
+        null,
+        null,
+        null,
+        14.0,
+        null
+      ],
+      "diastolic blood pressure": [
+        52.0,
+        75.0,
+        59.0,
+        70.0,
+        51.0,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.4,
+      "bicarbonate": 26.0,
+      "anion gap": 13.0,
+      "hemoglobin": 12.7,
+      "glucose": 143.0,
+      "platelets": 152.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 51.0
+  },
+  "26": {
+    "subject_id": 9445,
+    "total_timesteps": 95,
+    "demographics": {
+      "age": 300.0,
+      "gender": "F",
+      "ethnicity": "OTHER",
+      "diagnosis": "SMALL BOWEL OBSTRUCTION",
+      "icu_type": "TSICU",
+      "los_icu_days": 4.0
+    },
+    "vitals_history": {
+      "heart rate": [
+        95.0,
+        109.0,
+        99.0,
+        97.0,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        60.0,
+        64.0,
+        62.0,
+        58.0,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        23.0,
+        22.0,
+        12.0,
+        24.0,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        15.0,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        32.0,
+        37.0,
+        39.0,
+        28.0,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.7,
+      "bicarbonate": 25.0,
+      "anion gap": 21.0,
+      "hemoglobin": 9.1,
+      "glucose": 89.0,
+      "platelets": 430.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 28.0
+  },
+  "15": {
+    "subject_id": 7651,
+    "total_timesteps": 75,
+    "demographics": {
+      "age": 64.6,
+      "gender": "F",
+      "ethnicity": "WHITE",
+      "diagnosis": "SEVERE ISCHEMIA/SDA",
+      "icu_type": "CCU",
+      "los_icu_days": 3.1
+    },
+    "vitals_history": {
+      "heart rate": [
+        104.0,
+        null,
+        80.0,
+        null,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        69.0,
+        null,
+        76.0,
+        null,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        21.0,
+        null,
+        16.0,
+        null,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        49.0,
+        null,
+        49.0,
+        null,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.5,
+      "bicarbonate": 25.0,
+      "anion gap": 12.0,
+      "hemoglobin": 10.6,
+      "glucose": 93.0,
+      "platelets": 384.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 49.0
+  },
+  "55": {
+    "subject_id": 20232,
+    "total_timesteps": 60,
+    "demographics": {
+      "age": 65.5,
+      "gender": "F",
+      "ethnicity": "UNKNOWN/NOT SPECIFIED",
+      "diagnosis": "ACUTE MYOCARDIAL INFARCTION",
+      "icu_type": "CCU",
+      "los_icu_days": 2.5
+    },
+    "vitals_history": {
+      "heart rate": [
+        61.0,
+        61.0,
+        60.0,
+        68.0,
+        89.0,
+        null
+      ],
+      "mean blood pressure": [
+        null,
+        null,
+        87.7,
+        null,
+        74.7,
+        null
+      ],
+      "respiratory rate": [
+        15.0,
+        15.0,
+        16.0,
+        21.0,
+        22.0,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        null,
+        null,
+        15.0,
+        null
+      ],
+      "diastolic blood pressure": [
+        null,
+        null,
+        69.0,
+        null,
+        52.0,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.7,
+      "bicarbonate": 29.0,
+      "anion gap": 12.0,
+      "hemoglobin": 11.9,
+      "glucose": 102.0,
+      "platelets": 214.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 52.0
+  },
+  "0": {
+    "subject_id": 354,
+    "total_timesteps": 156,
+    "demographics": {
+      "age": 59.5,
+      "gender": "M",
+      "ethnicity": "WHITE",
+      "diagnosis": "CONGESTIVE HEART FAILURE",
+      "icu_type": "CCU",
+      "los_icu_days": 6.5
+    },
+    "vitals_history": {
+      "heart rate": [
+        89.0,
+        84.0,
+        84.0,
+        88.0,
+        86.0,
+        null
+      ],
+      "mean blood pressure": [
+        84.0,
+        63.0,
+        66.0,
+        73.0,
+        70.0,
+        null
+      ],
+      "respiratory rate": [
+        14.0,
+        7.0,
+        13.0,
+        9.0,
+        12.0,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        15.0,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        65.0,
+        50.0,
+        53.0,
+        58.0,
+        54.0,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.5,
+      "bicarbonate": 31.0,
+      "anion gap": 11.0,
+      "hemoglobin": 10.1,
+      "glucose": 124.0,
+      "platelets": 373.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 54.0
+  },
+  "4": {
+    "subject_id": 1989,
+    "total_timesteps": 201,
+    "demographics": {
+      "age": 74.5,
+      "gender": "F",
+      "ethnicity": "WHITE",
+      "diagnosis": "SEIZURE;TELEMETRY",
+      "icu_type": "CCU",
+      "los_icu_days": 8.4
+    },
+    "vitals_history": {
+      "heart rate": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.8,
+      "bicarbonate": 24.0,
+      "anion gap": 18.0,
+      "hemoglobin": 10.3,
+      "glucose": 180.0,
+      "platelets": 160.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 38.0
+  },
+  "37": {
+    "subject_id": 16081,
+    "total_timesteps": 75,
+    "demographics": {
+      "age": 84.4,
+      "gender": "M",
+      "ethnicity": "OTHER",
+      "diagnosis": "INFECTED LEFT TOE ULCER",
+      "icu_type": "SICU",
+      "los_icu_days": 3.1
+    },
+    "vitals_history": {
+      "heart rate": [
+        82.0,
+        70.0,
+        71.0,
+        83.0,
+        null,
+        null
+      ],
+      "mean blood pressure": [
+        95.0,
+        74.7,
+        73.7,
+        78.0,
+        null,
+        null
+      ],
+      "respiratory rate": [
+        30.0,
+        27.0,
+        31.0,
+        30.0,
+        null,
+        null
+      ],
+      "glascow coma scale total": [
+        null,
+        14.0,
+        null,
+        14.0,
+        null,
+        null
+      ],
+      "diastolic blood pressure": [
+        61.0,
+        47.0,
+        41.0,
+        48.0,
+        null,
+        null
+      ]
+    },
+    "labs": {
+      "creatinine": 0.6,
+      "bicarbonate": 24.0,
+      "anion gap": 13.0,
+      "hemoglobin": 11.1,
+      "glucose": 153.0,
+      "platelets": 418.0
+    },
+    "treatment_history": {
+      "vaso": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vent": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "last_dbp": 48.0
+  }
+}
